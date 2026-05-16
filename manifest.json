@@ -1,0 +1,26 @@
+{
+  "name": "OneClick CRM",
+  "short_name": "OC CRM",
+  "description": "OneClick Soluções — Gestão de Clientes TI Enterprise",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#010712",
+  "theme_color": "#00e5ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://fbgcafwoovwrtzdewclx.supabase.co/storage/v1/object/public/assets/LOGO.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://fbgcafwoovwrtzdewclx.supabase.co/storage/v1/object/public/assets/LOGO.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "pt-BR"
+}
