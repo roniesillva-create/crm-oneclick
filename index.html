@@ -13,12 +13,32 @@
 }
 body{font-family:'Segoe UI',Arial,sans-serif;color:var(--text);background:linear-gradient(135deg,var(--bg1),var(--bg2) 60%,#020611);min-height:100vh;position:relative;overflow-x:hidden}
 body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(#00e5ff0d 1px,transparent 1px),linear-gradient(90deg,#00e5ff0d 1px,transparent 1px);background-size:36px 36px;pointer-events:none;z-index:0}
-.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
 
-/* HEADER */
+/* LOGIN */
+.login-screen{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bg1),var(--bg2) 60%,#020611)}
+.login-screen::before{content:"";position:fixed;inset:0;background-image:linear-gradient(#00e5ff0d 1px,transparent 1px),linear-gradient(90deg,#00e5ff0d 1px,transparent 1px);background-size:36px 36px;pointer-events:none}
+.login-box{position:relative;z-index:1;background:#071b2eee;border:1px solid #00e5ff55;border-radius:24px;padding:40px 36px;width:420px;max-width:95vw;box-shadow:0 0 60px #00e5ff22,inset 0 0 40px #00e5ff08;text-align:center}
+.login-logo{margin-bottom:24px}
+.login-logo img{height:72px;filter:drop-shadow(0 0 12px #00e5ff) drop-shadow(0 0 28px #00e5ff88)}
+.login-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:4px}
+.login-title span{color:var(--cyan)}
+.login-sub{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:32px}
+.login-group{text-align:left;margin-bottom:16px}
+.login-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px;display:block}
+.login-input{width:100%;background:#04111f;border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+.login-input:focus{border-color:var(--cyan);box-shadow:0 0 12px #00e5ff22}
+.login-input::placeholder{color:#4a7a99}
+.login-btn{width:100%;margin-top:8px;padding:12px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:14px;border:none;cursor:pointer;box-shadow:0 0 18px #00e5ff44;transition:transform .15s,box-shadow .15s;font-family:inherit;letter-spacing:.5px}
+.login-btn:hover{transform:scale(1.03);box-shadow:0 0 28px #00e5ff66}
+.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.login-error{background:#ff3b5f15;border:1px solid #ff3b5f44;border-radius:8px;padding:10px 14px;color:var(--red);font-size:12px;margin-top:12px;display:none}
+.login-footer{margin-top:24px;font-size:10px;color:var(--muted);letter-spacing:1px}
+
+/* APP */
+.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh;display:none}
 .header{display:flex;align-items:center;justify-content:space-between;padding:10px 28px;background:#071b2ecc;border-bottom:1px solid var(--border);backdrop-filter:blur(8px);position:sticky;top:0;z-index:100}
 .brand{display:flex;align-items:center;gap:0}
-.brand img{height:64px;width:auto;filter:drop-shadow(0 0 10px #00e5ff) drop-shadow(0 0 24px #00e5ff88);object-fit:contain}
+.brand img{height:60px;width:auto;filter:drop-shadow(0 0 10px #00e5ff) drop-shadow(0 0 24px #00e5ff88);object-fit:contain}
 .brand-info{margin-left:14px}
 .brand-name{font-size:17px;font-weight:700;letter-spacing:1px;color:#fff}
 .brand-name span{color:var(--cyan)}
@@ -30,38 +50,28 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .badge-connecting{border:1px solid #ffd34d55;background:#ffd34d10;color:var(--yellow)}
 .dot{width:7px;height:7px;border-radius:50%;animation:pulse 2s infinite}
 .dot-green{background:var(--green);box-shadow:0 0 6px var(--green)}
-.dot-yellow{background:var(--yellow);box-shadow:0 0 6px var(--yellow)}
+.dot-yellow{background:var(--yellow)}
 .dot-red{background:var(--red)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.btn-novo{padding:8px 18px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:12px;border:none;cursor:pointer;letter-spacing:.5px;box-shadow:0 0 14px #00e5ff44;transition:transform .15s,box-shadow .15s}
-.btn-novo:hover{transform:scale(1.05);box-shadow:0 0 22px #00e5ff77}
-
-/* METRICS */
+.btn-novo{padding:8px 18px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:12px;border:none;cursor:pointer;letter-spacing:.5px;box-shadow:0 0 14px #00e5ff44;transition:transform .15s}
+.btn-novo:hover{transform:scale(1.05)}
+.btn-logout{padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 28px 0}
-.metric{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;box-shadow:0 0 18px #00e5ff0d;transition:box-shadow .2s,transform .2s;cursor:default}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;box-shadow:0 0 18px #00e5ff0d;transition:box-shadow .2s,transform .2s}
 .metric:hover{box-shadow:0 0 28px #00e5ff22;transform:translateY(-2px)}
 .metric-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;margin-bottom:8px}
 .metric-val{font-size:36px;font-weight:900;color:var(--cyan);text-shadow:0 0 12px #00e5ff66;line-height:1}
 .metric-val.green{color:var(--green);text-shadow:0 0 12px #00ff9955}
 .metric-val.yellow{color:var(--yellow);text-shadow:0 0 12px #ffd34d55}
-.metric-val.red{color:var(--red);text-shadow:0 0 12px #ff3b5f55}
 .metric-sub{font-size:11px;color:var(--muted);margin-top:6px}
-
-/* LAYOUT */
 .main{display:flex;gap:0;flex:1;margin-top:18px}
-
-/* SIDEBAR */
 .sidebar{width:215px;min-width:215px;padding:0 0 24px 28px;display:flex;flex-direction:column;gap:4px}
 .sidebar-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);padding:0 12px 8px;font-weight:700;margin-top:6px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .15s;border:1px solid transparent}
 .nav-item:hover,.nav-item.active{background:#00e5ff11;border-color:var(--border);color:var(--cyan)}
-.nav-icon{font-size:15px;width:20px;text-align:center}
 .nav-badge{margin-left:auto;background:#00e5ff22;color:var(--cyan);font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px}
-
-/* CONTENT */
 .content{flex:1;padding:0 28px 28px}
-
-/* TOOLBAR */
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 .search-box{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 14px;transition:border-color .2s}
 .search-box:focus-within{border-color:var(--cyan)}
@@ -70,9 +80,7 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .filter-select{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--muted);font-size:12px;font-family:inherit;cursor:pointer;outline:none;transition:border-color .2s}
 .filter-select:focus{border-color:var(--cyan);color:var(--text)}
 .btn-icon{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 12px;color:var(--cyan);font-size:14px;cursor:pointer;transition:all .15s}
-.btn-icon:hover{background:#00e5ff11;box-shadow:0 0 10px #00e5ff22}
-
-/* TABLE */
+.btn-icon:hover{background:#00e5ff11}
 .table-card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 0 24px #00e5ff0d}
 .table-header{display:grid;grid-template-columns:2.2fr 1.1fr 1fr 0.9fr 1.3fr 0.7fr;padding:13px 20px;background:#04111fcc;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;gap:8px}
 .table-row{display:grid;grid-template-columns:2.2fr 1.1fr 1fr 0.9fr 1.3fr 0.7fr;padding:13px 20px;border-bottom:1px solid #00e5ff0d;align-items:center;gap:8px;transition:background .15s;cursor:pointer}
@@ -99,17 +107,16 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .action-btn:hover{background:#00e5ff22;box-shadow:0 0 8px #00e5ff33}
 .loading-row{padding:48px;text-align:center;color:var(--muted);font-size:13px}
 .spinner{display:inline-block;width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:14px}
+.spinner-sm{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:#000000aa;z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
-.modal{background:linear-gradient(135deg,#071b2e,#041426);border:1px solid #00e5ff66;border-radius:22px;padding:30px;width:600px;max-width:96vw;box-shadow:0 0 60px #00e5ff22,inset 0 0 40px #00e5ff08;max-height:92vh;overflow-y:auto}
-.modal-title{font-size:18px;font-weight:800;color:var(--cyan);margin-bottom:22px;text-shadow:0 0 14px #00e5ff55;display:flex;align-items:center;gap:10px}
+.modal{background:linear-gradient(135deg,#071b2e,#041426);border:1px solid #00e5ff66;border-radius:22px;padding:30px;width:600px;max-width:96vw;box-shadow:0 0 60px #00e5ff22;max-height:92vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:800;color:var(--cyan);margin-bottom:22px;text-shadow:0 0 14px #00e5ff55}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .form-full{grid-column:1/-1}
 .form-group{display:flex;flex-direction:column;gap:6px}
 .form-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}
-.form-input,.form-select,.form-textarea{background:#04111f;border:1px solid var(--border);border-radius:9px;padding:9px 13px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+.form-input,.form-select,.form-textarea{background:#04111f;border:1px solid var(--border);border-radius:9px;padding:9px 13px;color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--cyan);box-shadow:0 0 10px #00e5ff22}
 .form-input::placeholder,.form-textarea::placeholder{color:#4a7a99}
 .form-textarea{resize:vertical;min-height:70px}
@@ -121,15 +128,11 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .btn-save{padding:10px 26px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:12px;border:none;cursor:pointer;box-shadow:0 0 14px #00e5ff44;font-family:inherit;transition:transform .15s;display:flex;align-items:center;gap:8px}
 .btn-save:hover{transform:scale(1.04)}
 .btn-save:disabled{opacity:.6;cursor:not-allowed;transform:none}
-
-/* TOAST */
-.toast{position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:13px;font-size:13px;font-weight:700;z-index:300;animation:toastIn .3s;pointer-events:none;max-width:340px}
-.toast-ok{background:#00ff9920;border:1px solid var(--green);color:var(--green);box-shadow:0 0 20px #00ff9922}
+.toast{position:fixed;bottom:28px;right:28px;padding:14px 22px;border-radius:13px;font-size:13px;font-weight:700;z-index:999;animation:toastIn .3s;pointer-events:none}
+.toast-ok{background:#00ff9920;border:1px solid var(--green);color:var(--green)}
 .toast-err{background:#ff3b5f20;border:1px solid var(--red);color:var(--red)}
 .toast-info{background:#00e5ff20;border:1px solid var(--cyan);color:var(--cyan)}
 @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-/* DETAIL MODAL */
 .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 .detail-item{background:#04111f;border:1px solid var(--border);border-radius:10px;padding:12px}
 .detail-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:4px}
@@ -137,27 +140,46 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .detail-full{grid-column:1/-1}
 .ia-box{background:#00e5ff08;border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px}
 .ia-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--cyan);font-weight:700;margin-bottom:8px}
-.ia-loading{color:var(--muted);font-size:12px;display:flex;align-items:center;gap:8px}
-
 .hidden{display:none!important}
 .footer{text-align:center;padding:13px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);background:#071b2eaa;letter-spacing:1px;margin-top:auto}
-
 @media(max-width:900px){
   .metrics{grid-template-columns:repeat(2,1fr)}
   .main{flex-direction:column}
   .sidebar{width:100%;min-width:unset;padding:0 16px;flex-direction:row;flex-wrap:wrap;gap:6px}
   .content{padding:0 16px 16px}
   .table-header,.table-row{grid-template-columns:2fr 1fr 1.2fr 0.8fr}
-  .col-tel,.col-city{display:none}
   .header{padding:10px 16px}
-  .brand img{height:48px}
+  .brand img{height:44px}
 }
 </style>
 </head>
 <body>
-<div class="app">
 
-<!-- HEADER -->
+<!-- TELA DE LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="https://fbgcafwoovwrtzdewclx.supabase.co/storage/v1/object/public/assets/LOGO.png" alt="OneClick">
+    </div>
+    <div class="login-title">ONE<span>CLICK</span> CRM</div>
+    <div class="login-sub">TI Enterprise • Acesso Restrito</div>
+    <div class="login-group">
+      <label class="login-label">Usuário</label>
+      <input class="login-input" type="text" id="l-user" placeholder="Digite seu usuário" autocomplete="username">
+    </div>
+    <div class="login-group">
+      <label class="login-label">Senha</label>
+      <input class="login-input" type="password" id="l-pass" placeholder="Digite sua senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')fazerLogin()">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="fazerLogin()">Entrar no CRM</button>
+    <div class="login-error" id="login-error">⚠️ Usuário ou senha incorretos.</div>
+    <div class="login-footer">ONECLICK SOLUÇÕES • TI ENTERPRISE<br>Acesso autorizado apenas para colaboradores</div>
+  </div>
+</div>
+
+<!-- APP PRINCIPAL -->
+<div class="app" id="app">
+
 <header class="header">
   <div class="brand">
     <img src="https://fbgcafwoovwrtzdewclx.supabase.co/storage/v1/object/public/assets/LOGO.png" alt="OneClick Soluções">
@@ -172,62 +194,43 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
       <span id="status-txt">CONECTANDO...</span>
     </div>
     <button class="btn-novo" onclick="abrirModal()">+ Novo Cliente</button>
+    <button class="btn-logout" onclick="fazerLogout()">⏻ Sair</button>
   </div>
 </header>
 
-<!-- MÉTRICAS -->
 <div class="metrics">
-  <div class="metric">
-    <div class="metric-label">Total de Clientes</div>
-    <div class="metric-val" id="m-total">—</div>
-    <div class="metric-sub">Cadastrados no CRM</div>
-  </div>
-  <div class="metric">
-    <div class="metric-label">Ativos</div>
-    <div class="metric-val green" id="m-ativos">—</div>
-    <div class="metric-sub">Clientes ativos</div>
-  </div>
-  <div class="metric">
-    <div class="metric-label">Em Negociação</div>
-    <div class="metric-val yellow" id="m-negoc">—</div>
-    <div class="metric-sub">Pipeline em andamento</div>
-  </div>
-  <div class="metric">
-    <div class="metric-label">Fechados</div>
-    <div class="metric-val" id="m-fechados">—</div>
-    <div class="metric-sub">Contratos fechados</div>
-  </div>
+  <div class="metric"><div class="metric-label">Total de Clientes</div><div class="metric-val" id="m-total">—</div><div class="metric-sub">Cadastrados no CRM</div></div>
+  <div class="metric"><div class="metric-label">Ativos</div><div class="metric-val green" id="m-ativos">—</div><div class="metric-sub">Clientes ativos</div></div>
+  <div class="metric"><div class="metric-label">Em Negociação</div><div class="metric-val yellow" id="m-negoc">—</div><div class="metric-sub">Pipeline em andamento</div></div>
+  <div class="metric"><div class="metric-label">Fechados</div><div class="metric-val" id="m-fechados">—</div><div class="metric-sub">Contratos fechados</div></div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
-  <!-- SIDEBAR -->
   <nav class="sidebar">
     <div class="sidebar-title">Menu</div>
-    <div class="nav-item active" onclick="filtrarSeg('')"><span class="nav-icon">👥</span> Todos <span class="nav-badge" id="nav-count">0</span></div>
-    <div class="nav-item" onclick="filtrarSeg('')"><span class="nav-icon">📊</span> Pipeline</div>
-    <div class="nav-item" onclick="filtrarSeg('')"><span class="nav-icon">📋</span> Apresentações</div>
-    <div class="nav-item" onclick="filtrarSeg('')"><span class="nav-icon">🔔</span> Interações</div>
-    <div class="nav-item" onclick="filtrarSeg('')"><span class="nav-icon">📈</span> Relatórios</div>
+    <div class="nav-item active" onclick="filtrarSeg('')">👥 Todos <span class="nav-badge" id="nav-count">0</span></div>
+    <div class="nav-item" onclick="filtrarSeg('')">📊 Pipeline</div>
+    <div class="nav-item" onclick="filtrarSeg('')">📋 Apresentações</div>
+    <div class="nav-item" onclick="filtrarSeg('')">🔔 Interações</div>
+    <div class="nav-item" onclick="filtrarSeg('')">📈 Relatórios</div>
     <div class="sidebar-title">Segmentos</div>
-    <div class="nav-item" onclick="filtrarSeg('')"><span class="nav-icon">🌐</span> Todos</div>
-    <div class="nav-item" onclick="filtrarSeg('Farmacia')"><span class="nav-icon">💊</span> Farmácia</div>
-    <div class="nav-item" onclick="filtrarSeg('Mercado')"><span class="nav-icon">🛒</span> Mercado</div>
-    <div class="nav-item" onclick="filtrarSeg('Hospital')"><span class="nav-icon">🏥</span> Hospital</div>
-    <div class="nav-item" onclick="filtrarSeg('Medico / Clinica')"><span class="nav-icon">👨‍⚕️</span> Clínica</div>
-    <div class="nav-item" onclick="filtrarSeg('Posto de Gasolina')"><span class="nav-icon">⛽</span> Posto</div>
-    <div class="nav-item" onclick="filtrarSeg('Tecnologia / TI')"><span class="nav-icon">💻</span> TI</div>
-    <div class="nav-item" onclick="filtrarSeg('Contabilidade')"><span class="nav-icon">📊</span> Contabilidade</div>
-    <div class="nav-item" onclick="filtrarSeg('Restaurante')"><span class="nav-icon">🍽️</span> Restaurante</div>
-    <div class="nav-item" onclick="filtrarSeg('Outros')"><span class="nav-icon">📋</span> Outros</div>
+    <div class="nav-item" onclick="filtrarSeg('')">🌐 Todos</div>
+    <div class="nav-item" onclick="filtrarSeg('Farmacia')">💊 Farmácia</div>
+    <div class="nav-item" onclick="filtrarSeg('Mercado')">🛒 Mercado</div>
+    <div class="nav-item" onclick="filtrarSeg('Hospital')">🏥 Hospital</div>
+    <div class="nav-item" onclick="filtrarSeg('Medico / Clinica')">👨‍⚕️ Clínica</div>
+    <div class="nav-item" onclick="filtrarSeg('Posto de Gasolina')">⛽ Posto</div>
+    <div class="nav-item" onclick="filtrarSeg('Tecnologia / TI')">💻 TI</div>
+    <div class="nav-item" onclick="filtrarSeg('Contabilidade')">📊 Contabilidade</div>
+    <div class="nav-item" onclick="filtrarSeg('Restaurante')">🍽️ Restaurante</div>
+    <div class="nav-item" onclick="filtrarSeg('Outros')">📋 Outros</div>
   </nav>
 
-  <!-- CONTENT -->
   <div class="content">
     <div class="toolbar">
       <div class="search-box">
         <span style="color:var(--muted);font-size:15px">🔍</span>
-        <input type="text" placeholder="Buscar cliente, cidade, CNPJ, e-mail..." id="search" oninput="filtrar()">
+        <input type="text" placeholder="Buscar cliente, cidade, CNPJ..." id="search" oninput="filtrar()">
       </div>
       <select class="filter-select" id="f-pipeline" onchange="filtrar()">
         <option value="">Todos os Pipelines</option>
@@ -241,26 +244,23 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
       </select>
       <select class="filter-select" id="f-status" onchange="filtrar()">
         <option value="">Todos os Status</option>
-        <option>Prospect</option>
-        <option>Ativo</option>
-        <option>Inativo</option>
-        <option>Perdido</option>
-        <option>Suspenso</option>
+        <option>Prospect</option><option>Ativo</option>
+        <option>Inativo</option><option>Perdido</option><option>Suspenso</option>
       </select>
-      <button class="btn-icon" onclick="carregarClientes()" title="Atualizar lista">🔄</button>
+      <button class="btn-icon" onclick="carregarClientes()" title="Atualizar">🔄</button>
     </div>
 
     <div class="table-card">
       <div class="table-header">
         <div>Cliente / Segmento</div>
-        <div class="col-city">Cidade / UF</div>
-        <div class="col-tel">Telefone</div>
+        <div>Cidade / UF</div>
+        <div>Telefone</div>
         <div>Status</div>
         <div>Pipeline</div>
         <div>Ação</div>
       </div>
       <div id="table-body">
-        <div class="loading-row"><div class="spinner"></div><br>Conectando ao banco de dados...</div>
+        <div class="loading-row"><div class="spinner"></div><br>Carregando...</div>
       </div>
     </div>
   </div>
@@ -272,94 +272,45 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
     <div class="modal-title">⊕ Novo Cliente</div>
     <div class="form-grid">
       <div class="section-label">Dados da Empresa</div>
-      <div class="form-group form-full">
-        <div class="form-label">Razão Social *</div>
-        <input class="form-input" id="f-razao" placeholder="Nome oficial da empresa">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Nome Fantasia</div>
-        <input class="form-input" id="f-fantasia" placeholder="Como é conhecido">
-      </div>
-      <div class="form-group">
-        <div class="form-label">CNPJ</div>
-        <input class="form-input" id="f-cnpj" placeholder="00.000.000/0000-00">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Segmento *</div>
+      <div class="form-group form-full"><div class="form-label">Razão Social *</div><input class="form-input" id="f-razao" placeholder="Nome oficial da empresa"></div>
+      <div class="form-group"><div class="form-label">Nome Fantasia</div><input class="form-input" id="f-fantasia" placeholder="Como é conhecido"></div>
+      <div class="form-group"><div class="form-label">CNPJ</div><input class="form-input" id="f-cnpj" placeholder="00.000.000/0000-00"></div>
+      <div class="form-group"><div class="form-label">Segmento *</div>
         <select class="form-select" id="f-seg">
-          <option value="">Selecione o segmento...</option>
-          <option>Farmacia</option><option>Mercado</option>
-          <option>Posto de Gasolina</option><option>Medico / Clinica</option>
-          <option>Hospital</option><option>Odontologia</option>
-          <option>Laboratorio</option><option>Restaurante</option>
-          <option>Hotel / Pousada</option><option>Escola / Faculdade</option>
-          <option>Academia</option><option>Salao de Beleza</option>
-          <option>Advocacia</option><option>Contabilidade</option>
-          <option>Imobiliaria</option><option>Comercio / Varejo</option>
-          <option>Industria</option><option>Tecnologia / TI</option>
+          <option value="">Selecione...</option>
+          <option>Farmacia</option><option>Mercado</option><option>Posto de Gasolina</option>
+          <option>Medico / Clinica</option><option>Hospital</option><option>Odontologia</option>
+          <option>Laboratorio</option><option>Restaurante</option><option>Hotel / Pousada</option>
+          <option>Escola / Faculdade</option><option>Academia</option><option>Salao de Beleza</option>
+          <option>Advocacia</option><option>Contabilidade</option><option>Imobiliaria</option>
+          <option>Comercio / Varejo</option><option>Industria</option><option>Tecnologia / TI</option>
           <option>Transporte / Logistica</option><option>Outros</option>
         </select>
       </div>
-      <div class="form-group">
-        <div class="form-label">Porte</div>
+      <div class="form-group"><div class="form-label">Porte</div>
         <select class="form-select" id="f-porte">
           <option value="">Selecione...</option>
-          <option>MEI</option><option>Micro</option>
-          <option>Pequeno</option><option>Medio</option><option>Grande</option>
+          <option>MEI</option><option>Micro</option><option>Pequeno</option><option>Medio</option><option>Grande</option>
         </select>
       </div>
-      <div class="form-group">
-        <div class="form-label">Nº de Funcionários</div>
-        <input class="form-input" id="f-func" placeholder="Ex: 10-50">
-      </div>
+      <div class="form-group"><div class="form-label">Nº Funcionários</div><input class="form-input" id="f-func" placeholder="Ex: 10-50"></div>
       <hr class="section-divider">
       <div class="section-label">Contato</div>
-      <div class="form-group">
-        <div class="form-label">Telefone</div>
-        <input class="form-input" id="f-tel" placeholder="(11) 3333-4444">
-      </div>
-      <div class="form-group">
-        <div class="form-label">WhatsApp</div>
-        <input class="form-input" id="f-wpp" placeholder="(11) 99999-9999">
-      </div>
-      <div class="form-group form-full">
-        <div class="form-label">E-mail</div>
-        <input class="form-input" id="f-email" placeholder="contato@empresa.com.br">
-      </div>
-      <div class="form-group form-full">
-        <div class="form-label">Site</div>
-        <input class="form-input" id="f-site" placeholder="https://www.empresa.com.br">
-      </div>
+      <div class="form-group"><div class="form-label">Telefone</div><input class="form-input" id="f-tel" placeholder="(11) 3333-4444"></div>
+      <div class="form-group"><div class="form-label">WhatsApp</div><input class="form-input" id="f-wpp" placeholder="(11) 99999-9999"></div>
+      <div class="form-group form-full"><div class="form-label">E-mail</div><input class="form-input" id="f-email" placeholder="contato@empresa.com.br"></div>
+      <div class="form-group form-full"><div class="form-label">Site</div><input class="form-input" id="f-site" placeholder="https://www.empresa.com.br"></div>
       <hr class="section-divider">
       <div class="section-label">Endereço</div>
-      <div class="form-group">
-        <div class="form-label">CEP</div>
-        <input class="form-input" id="f-cep" placeholder="00000-000">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Logradouro</div>
-        <input class="form-input" id="f-end" placeholder="Rua, Av...">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Número</div>
-        <input class="form-input" id="f-num" placeholder="123">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Bairro</div>
-        <input class="form-input" id="f-bairro" placeholder="Bairro">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Cidade</div>
-        <input class="form-input" id="f-cidade" placeholder="São Paulo">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Estado (UF)</div>
-        <input class="form-input" id="f-estado" placeholder="SP" maxlength="2">
-      </div>
+      <div class="form-group"><div class="form-label">CEP</div><input class="form-input" id="f-cep" placeholder="00000-000"></div>
+      <div class="form-group"><div class="form-label">Logradouro</div><input class="form-input" id="f-end" placeholder="Rua, Av..."></div>
+      <div class="form-group"><div class="form-label">Número</div><input class="form-input" id="f-num" placeholder="123"></div>
+      <div class="form-group"><div class="form-label">Bairro</div><input class="form-input" id="f-bairro" placeholder="Bairro"></div>
+      <div class="form-group"><div class="form-label">Cidade</div><input class="form-input" id="f-cidade" placeholder="São Paulo"></div>
+      <div class="form-group"><div class="form-label">Estado (UF)</div><input class="form-input" id="f-estado" placeholder="SP" maxlength="2"></div>
       <hr class="section-divider">
       <div class="section-label">CRM</div>
-      <div class="form-group">
-        <div class="form-label">Pipeline</div>
+      <div class="form-group"><div class="form-label">Pipeline</div>
         <select class="form-select" id="f-pipe">
           <option value="Em Prospeccao">Em Prospecção</option>
           <option value="Contato Feito">Contato Feito</option>
@@ -370,8 +321,7 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
           <option value="Perdido">Perdido</option>
         </select>
       </div>
-      <div class="form-group">
-        <div class="form-label">Fonte do Lead</div>
+      <div class="form-group"><div class="form-label">Fonte do Lead</div>
         <select class="form-select" id="f-fonte">
           <option value="Manual">Manual</option>
           <option value="Planilha Importada">Planilha Importada</option>
@@ -381,18 +331,9 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
           <option value="Outro">Outro</option>
         </select>
       </div>
-      <div class="form-group">
-        <div class="form-label">Responsável</div>
-        <input class="form-input" id="f-resp" placeholder="Nome do responsável" value="Ronie Silva">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Próximo Contato</div>
-        <input class="form-input" type="date" id="f-prox">
-      </div>
-      <div class="form-group form-full">
-        <div class="form-label">Observações</div>
-        <textarea class="form-textarea" id="f-obs" placeholder="Anotações, histórico, informações relevantes..."></textarea>
-      </div>
+      <div class="form-group"><div class="form-label">Responsável</div><input class="form-input" id="f-resp" placeholder="Nome do responsável" value="Ronie Silva"></div>
+      <div class="form-group"><div class="form-label">Próximo Contato</div><input class="form-input" type="date" id="f-prox"></div>
+      <div class="form-group form-full"><div class="form-label">Observações</div><textarea class="form-textarea" id="f-obs" placeholder="Anotações sobre o cliente..."></textarea></div>
     </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="fecharModal('modal-novo')">Cancelar</button>
@@ -404,11 +345,11 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 <!-- MODAL DETALHE -->
 <div class="modal-overlay hidden" id="modal-detalhe">
   <div class="modal">
-    <div class="modal-title" id="d-titulo">📋 Detalhe do Cliente</div>
+    <div class="modal-title" id="d-titulo">📋 Cliente</div>
     <div class="detail-grid" id="d-grid"></div>
     <div class="ia-box">
       <div class="ia-label">🤖 Sugestão de Vendas — IA OneClick</div>
-      <div id="ia-content" class="ia-loading"><div class="spinner" style="width:16px;height:16px;margin:0"></div> Analisando cliente...</div>
+      <div id="ia-content" style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px"><div class="spinner-sm"></div> Analisando...</div>
     </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="fecharModal('modal-detalhe')">Fechar</button>
@@ -416,9 +357,7 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
   </div>
 </div>
 
-<footer class="footer">
-  ONECLICK SOLUÇÕES • TI ENTERPRISE • CRM v1.0 • oneclicksolucoes.com.br
-</footer>
+<footer class="footer">ONECLICK SOLUÇÕES • TI ENTERPRISE • CRM v1.0 • oneclicksolucoes.com.br</footer>
 </div>
 
 <script>
@@ -426,13 +365,51 @@ const SUPA_URL='https://fbgcafwoovwrtzdewclx.supabase.co';
 const SUPA_KEY='sb_publishable_ctaS6OQJleKbEPsvERbvnA_j9DIAbsv';
 const H={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=representation'};
 
-let clientes=[], filtroSeg='';
+// CREDENCIAIS — altere aqui se quiser mudar depois
+const USUARIOS=[{user:'ronie',pass:'Natura123!@#',nome:'Ronie Silva'}];
+
+let clientes=[],filtroSeg='';
+
+function fazerLogin(){
+  const u=document.getElementById('l-user').value.trim().toLowerCase();
+  const p=document.getElementById('l-pass').value;
+  const found=USUARIOS.find(x=>x.user===u&&x.pass===p);
+  const err=document.getElementById('login-error');
+  if(found){
+    err.style.display='none';
+    sessionStorage.setItem('crm_auth',JSON.stringify({user:found.user,nome:found.nome}));
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    carregarClientes();
+  }else{
+    err.style.display='block';
+    document.getElementById('l-pass').value='';
+    document.getElementById('l-pass').focus();
+  }
+}
+
+function fazerLogout(){
+  sessionStorage.removeItem('crm_auth');
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('l-user').value='';
+  document.getElementById('l-pass').value='';
+}
+
+function verificarSessao(){
+  const s=sessionStorage.getItem('crm_auth');
+  if(s){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    carregarClientes();
+  }
+}
 
 async function api(path,method='GET',body=null){
   const opts={method,headers:H};
   if(body) opts.body=JSON.stringify(body);
   const r=await fetch(SUPA_URL+path,opts);
-  if(!r.ok) throw new Error((await r.text()));
+  if(!r.ok) throw new Error(await r.text());
   return r.status===204?null:r.json();
 }
 
@@ -441,37 +418,23 @@ async function carregarClientes(){
     document.getElementById('table-body').innerHTML='<div class="loading-row"><div class="spinner"></div><br>Carregando clientes...</div>';
     const data=await api('/rest/v1/clientes?select=*,segmentos(nome)&order=criado_em.desc');
     clientes=(data||[]).map(c=>({...c,segmento:c.segmentos?.nome||''}));
-    setStatus(true);
-    atualizarMetricas(clientes);
-    filtrar();
+    setStatus(true);atualizarMetricas(clientes);filtrar();
   }catch(e){
-    setStatus(false,'ERRO');
+    setStatus(false);
     document.getElementById('table-body').innerHTML=`<div class="loading-row" style="color:var(--red)">⚠️ Erro ao conectar.<br><small style="color:var(--muted)">${e.message}</small><br><br><button class="action-btn" onclick="carregarClientes()">Tentar novamente</button></div>`;
   }
 }
 
-function setStatus(ok,txt=''){
+function setStatus(ok){
   const badge=document.getElementById('badge-status');
   const dot=document.getElementById('status-dot');
   const t=document.getElementById('status-txt');
   if(ok){badge.className='badge-status badge-online';dot.className='dot dot-green';t.textContent='SUPABASE ONLINE';}
-  else{badge.className='badge-status badge-offline';dot.className='dot dot-red';t.textContent=txt||'ERRO DE CONEXÃO';}
+  else{badge.className='badge-status badge-offline';dot.className='dot dot-red';t.textContent='ERRO DE CONEXÃO';}
 }
 
-function pipeClass(p){
-  return{
-    'Em Prospeccao':'p-prospect','Contato Feito':'p-contato',
-    'Apresentacao Enviada':'p-enviada','Em Negociacao':'p-negoc',
-    'Proposta Enviada':'p-proposta','Fechado':'p-fechado','Perdido':'p-perdido'
-  }[p]||'p-prospect';
-}
-function pipeLabel(p){
-  return{
-    'Em Prospeccao':'Prospecção','Contato Feito':'Contato Feito',
-    'Apresentacao Enviada':'Apresentação','Em Negociacao':'Negociação',
-    'Proposta Enviada':'Proposta','Fechado':'✓ Fechado','Perdido':'Perdido'
-  }[p]||p;
-}
+function pipeClass(p){return{'Em Prospeccao':'p-prospect','Contato Feito':'p-contato','Apresentacao Enviada':'p-enviada','Em Negociacao':'p-negoc','Proposta Enviada':'p-proposta','Fechado':'p-fechado','Perdido':'p-perdido'}[p]||'p-prospect';}
+function pipeLabel(p){return{'Em Prospeccao':'Prospecção','Contato Feito':'Contato Feito','Apresentacao Enviada':'Apresentação','Em Negociacao':'Negociação','Proposta Enviada':'Proposta','Fechado':'✓ Fechado','Perdido':'Perdido'}[p]||p;}
 function stClass(s){return{Ativo:'s-ativo',Prospect:'s-prospect',Inativo:'s-inativo',Perdido:'s-perdido'}[s]||'s-prospect';}
 
 function atualizarMetricas(l){
@@ -497,15 +460,12 @@ function filtrarSeg(seg){filtroSeg=seg;filtrar();}
 
 function renderTabela(lista){
   const tbody=document.getElementById('table-body');
-  if(!lista.length){
-    tbody.innerHTML=`<div class="loading-row">📋 Nenhum cliente encontrado.<br><span style="color:var(--cyan);cursor:pointer;font-weight:700;margin-top:8px;display:inline-block" onclick="abrirModal()">+ Cadastrar primeiro cliente</span></div>`;
-    return;
-  }
+  if(!lista.length){tbody.innerHTML=`<div class="loading-row">📋 Nenhum cliente encontrado.<br><span style="color:var(--cyan);cursor:pointer;font-weight:700;display:inline-block;margin-top:8px" onclick="abrirModal()">+ Cadastrar primeiro cliente</span></div>`;return;}
   tbody.innerHTML=lista.map(c=>`
     <div class="table-row" onclick="verCliente(${c.id})">
       <div><div class="client-name">${c.razao_social||''}</div><div class="client-seg">${c.segmento||'—'}</div></div>
-      <div class="city col-city">${c.cidade||'—'}${c.estado?' / '+c.estado:''}</div>
-      <div class="phone col-tel">${c.telefone||'—'}</div>
+      <div class="city">${c.cidade||'—'}${c.estado?' / '+c.estado:''}</div>
+      <div class="phone">${c.telefone||'—'}</div>
       <div><span class="status-dot ${stClass(c.status||'Prospect')}"></span><span style="font-size:12px">${c.status||'Prospect'}</span></div>
       <div><span class="pipeline-badge ${pipeClass(c.pipeline||'Em Prospeccao')}">${pipeLabel(c.pipeline||'Em Prospeccao')}</span></div>
       <div><button class="action-btn" onclick="event.stopPropagation();verCliente(${c.id})">Ver</button></div>
@@ -520,14 +480,11 @@ async function salvarCliente(){
   if(!razao){toast('Informe a Razão Social!','err');return;}
   const segNome=document.getElementById('f-seg').value;
   const btn=document.getElementById('btn-salvar');
-  btn.textContent='Salvando...';btn.disabled=true;
+  btn.innerHTML='<div class="spinner-sm"></div> Salvando...';btn.disabled=true;
   try{
     let segId=null;
-    if(segNome){
-      const segs=await api(`/rest/v1/segmentos?nome=eq.${encodeURIComponent(segNome)}&select=id`);
-      if(segs&&segs.length) segId=segs[0].id;
-    }
-    const novo={
+    if(segNome){const segs=await api(`/rest/v1/segmentos?nome=eq.${encodeURIComponent(segNome)}&select=id`);if(segs&&segs.length)segId=segs[0].id;}
+    await api('/rest/v1/clientes','POST',{
       razao_social:razao,
       nome_fantasia:document.getElementById('f-fantasia').value||null,
       cnpj:document.getElementById('f-cnpj').value||null,
@@ -550,38 +507,27 @@ async function salvarCliente(){
       data_proximo_contato:document.getElementById('f-prox').value||null,
       status:'Prospect',
       observacoes:document.getElementById('f-obs').value||null
-    };
-    await api('/rest/v1/clientes','POST',novo);
+    });
     toast('✅ Cliente salvo com sucesso!','ok');
-    fecharModal('modal-novo');
-    limparForm();
-    await carregarClientes();
-  }catch(e){
-    toast('Erro ao salvar: '+e.message,'err');
-  }finally{
-    btn.innerHTML='💾 Salvar Cliente';btn.disabled=false;
-  }
+    fecharModal('modal-novo');limparForm();await carregarClientes();
+  }catch(e){toast('Erro: '+e.message,'err');}
+  finally{btn.innerHTML='💾 Salvar Cliente';btn.disabled=false;}
 }
 
 function limparForm(){
-  ['f-razao','f-fantasia','f-cnpj','f-tel','f-wpp','f-email','f-site','f-cep','f-end','f-num','f-bairro','f-cidade','f-estado','f-obs','f-func','f-resp'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['f-razao','f-fantasia','f-cnpj','f-tel','f-wpp','f-email','f-site','f-cep','f-end','f-num','f-bairro','f-cidade','f-estado','f-obs','f-func'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('f-resp').value='Ronie Silva';
-  document.getElementById('f-seg').value='';
-  document.getElementById('f-porte').value='';
-  document.getElementById('f-pipe').value='Em Prospeccao';
-  document.getElementById('f-fonte').value='Manual';
+  document.getElementById('f-seg').value='';document.getElementById('f-porte').value='';
+  document.getElementById('f-pipe').value='Em Prospeccao';document.getElementById('f-fonte').value='Manual';
   document.getElementById('f-prox').value='';
 }
 
 async function verCliente(id){
-  const c=clientes.find(x=>x.id===id);
-  if(!c) return;
+  const c=clientes.find(x=>x.id===id);if(!c)return;
   document.getElementById('d-titulo').textContent='📋 '+c.razao_social;
   document.getElementById('modal-detalhe').classList.remove('hidden');
-  document.getElementById('ia-content').innerHTML='<div class="ia-loading"><div class="spinner" style="width:16px;height:16px;margin:0"></div> Analisando cliente com IA...</div>';
-
-  const grid=document.getElementById('d-grid');
-  grid.innerHTML=`
+  document.getElementById('ia-content').innerHTML='<div style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px"><div class="spinner-sm"></div> Analisando com IA...</div>';
+  document.getElementById('d-grid').innerHTML=`
     <div class="detail-item"><div class="detail-label">Segmento</div><div class="detail-val">${c.segmento||'—'}</div></div>
     <div class="detail-item"><div class="detail-label">Status</div><div class="detail-val"><span class="status-dot ${stClass(c.status||'Prospect')}"></span>${c.status||'Prospect'}</div></div>
     <div class="detail-item"><div class="detail-label">CNPJ</div><div class="detail-val">${c.cnpj||'—'}</div></div>
@@ -593,55 +539,25 @@ async function verCliente(id){
     <div class="detail-item"><div class="detail-label">Pipeline</div><div class="detail-val"><span class="pipeline-badge ${pipeClass(c.pipeline||'Em Prospeccao')}">${pipeLabel(c.pipeline||'Em Prospeccao')}</span></div></div>
     <div class="detail-item"><div class="detail-label">Responsável</div><div class="detail-val">${c.responsavel||'—'}</div></div>
     <div class="detail-item"><div class="detail-label">Próximo Contato</div><div class="detail-val">${c.data_proximo_contato||'—'}</div></div>
-    ${c.observacoes?`<div class="detail-item detail-full"><div class="detail-label">Observações</div><div class="detail-val">${c.observacoes}</div></div>`:''}
-  `;
-
-  // Chamada real à API Claude
+    ${c.observacoes?`<div class="detail-item detail-full"><div class="detail-label">Observações</div><div class="detail-val">${c.observacoes}</div></div>`:''}`;
   try{
-    const prompt=`Você é um consultor de vendas especialista da OneClick Soluções, empresa de TI Enterprise em São Paulo que oferece: Monitoramento de TI, Infraestrutura, Segurança da Informação, Cloud & Backup, Banco de Dados (SQL & Oracle) e BI & Relatórios.
-
-Analise este cliente do CRM e forneça sugestões práticas e objetivas de estratégia de vendas:
-
-Empresa: ${c.razao_social}
-Segmento: ${c.segmento||'N/A'}
-Porte: ${c.porte||'N/A'}
-Cidade: ${c.cidade||'N/A'} / ${c.estado||'N/A'}
-Pipeline atual: ${c.pipeline||'N/A'}
-Status: ${c.status||'N/A'}
-Observações: ${c.observacoes||'Nenhuma'}
-
-Responda em português, de forma direta e prática. Liste:
-1. Qual produto/serviço da OneClick tem mais fit com esse cliente
-2. Argumento principal de venda para esse segmento
-3. Próxima ação recomendada
-Seja conciso, máximo 5 linhas.`;
-
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Você é consultor de vendas da OneClick Soluções (TI Enterprise, São Paulo). Serviços: Monitoramento de TI, Infraestrutura, Segurança, Cloud & Backup, Banco de Dados, BI & Relatórios.\n\nCliente: ${c.razao_social}\nSegmento: ${c.segmento||'N/A'}\nPorte: ${c.porte||'N/A'}\nCidade: ${c.cidade||'N/A'}/${c.estado||'N/A'}\nPipeline: ${c.pipeline||'N/A'}\nObservações: ${c.observacoes||'Nenhuma'}\n\nResponda em português, direto e prático, máximo 5 linhas:\n1. Melhor produto/serviço para esse cliente\n2. Principal argumento de venda para esse segmento\n3. Próxima ação recomendada`}]})});
     const data=await resp.json();
-    const txt=data.content?.[0]?.text||'Não foi possível gerar sugestão.';
+    const txt=data.content?.[0]?.text||'Não disponível.';
     document.getElementById('ia-content').innerHTML=`<div style="font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap">${txt}</div>`;
   }catch(e){
-    document.getElementById('ia-content').innerHTML=`<div style="font-size:12px;color:var(--muted)">Sugestão de IA indisponível no momento. Acesse pelo Claude para análise completa.</div>`;
+    document.getElementById('ia-content').innerHTML=`<div style="font-size:12px;color:var(--muted)">Sugestão IA indisponível no momento.</div>`;
   }
 }
 
 function toast(msg,tipo){
   const t=document.createElement('div');
   t.className='toast toast-'+(tipo==='ok'?'ok':tipo==='info'?'info':'err');
-  t.textContent=msg;
-  document.body.appendChild(t);
+  t.textContent=msg;document.body.appendChild(t);
   setTimeout(()=>t.remove(),3500);
 }
 
-carregarClientes();
+verificarSessao();
 </script>
 </body>
 </html>
