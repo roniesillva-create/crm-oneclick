@@ -243,22 +243,25 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
     <div class="chips-label">Segmento <span style="color:var(--cyan);font-size:9px;cursor:pointer" onclick="togglePainel()">📊 ver totais</span></div>
     <div class="chips-row" id="chips-seg">
       <div class="chip active" onclick="setChip(this,'seg','')">🌐 Todos</div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Farmacia')" data-seg="Farmacia">💊 Farmácia <span class="chip-count" id="cnt-1">—</span></div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Medico / Clinica')" data-seg="Medico / Clinica">👨‍⚕️ Médico/Clínica <span class="chip-count" id="cnt-4">—</span></div>
+      <div class="chip chip-yellow" onclick="setChip(this,'seg','Farmácia')" data-seg="Farmácia">💊 Farmácia <span class="chip-count" id="cnt-1">—</span></div>
+      <div class="chip chip-yellow" onclick="setChip(this,'seg','Médico / Clínica')" data-seg="Médico / Clínica">👨‍⚕️ Médico/Clínica <span class="chip-count" id="cnt-4">—</span></div>
       <div class="chip chip-yellow" onclick="setChip(this,'seg','Hospital')" data-seg="Hospital">🏥 Hospital <span class="chip-count" id="cnt-5">—</span></div>
       <div class="chip chip-yellow" onclick="setChip(this,'seg','Odontologia')" data-seg="Odontologia">🦷 Odontologia <span class="chip-count" id="cnt-6">—</span></div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Laboratorio')" data-seg="Laboratorio">🔬 Laboratório <span class="chip-count" id="cnt-7">—</span></div>
-      <div class="chip chip-green" onclick="setChip(this,'seg','Mercado')" data-seg="Mercado">🛒 Mercado <span class="chip-count" id="cnt-2">—</span></div>
-      <div class="chip chip-green" onclick="setChip(this,'seg','Restaurante')" data-seg="Restaurante">🍽️ Restaurante <span class="chip-count" id="cnt-8">—</span></div>
-      <div class="chip chip-green" onclick="setChip(this,'seg','Comercio / Varejo')" data-seg="Comercio / Varejo">🏪 Com. Varejo <span class="chip-count" id="cnt-16">—</span></div>
+      <div class="chip chip-yellow" onclick="setChip(this,'seg','Laboratório')" data-seg="Laboratório">🔬 Laboratório <span class="chip-count" id="cnt-7">—</span></div>
+      <div class="chip chip-green" onclick="setChip(this,'seg','Mercado / Supermercado')" data-seg="Mercado / Supermercado">🛒 Mercado <span class="chip-count" id="cnt-2">—</span></div>
+      <div class="chip chip-green" onclick="setChip(this,'seg','Restaurante / Lanchonete')" data-seg="Restaurante / Lanchonete">🍽️ Restaurante <span class="chip-count" id="cnt-8">—</span></div>
+      <div class="chip chip-green" onclick="setChip(this,'seg','Comércio / Varejo')" data-seg="Comércio / Varejo">🏪 Com. Varejo <span class="chip-count" id="cnt-16">—</span></div>
       <div class="chip chip-purple" onclick="setChip(this,'seg','Tecnologia / TI')" data-seg="Tecnologia / TI">💻 TI <span class="chip-count" id="cnt-18">—</span></div>
       <div class="chip chip-purple" onclick="setChip(this,'seg','Contabilidade')" data-seg="Contabilidade">📊 Contab. <span class="chip-count" id="cnt-14">—</span></div>
-      <div class="chip chip-purple" onclick="setChip(this,'seg','Advocacia')" data-seg="Advocacia">⚖️ Advocacia <span class="chip-count" id="cnt-13">—</span></div>
+      <div class="chip chip-purple" onclick="setChip(this,'seg','Advocacia / Escritório Jurídico')" data-seg="Advocacia / Escritório Jurídico">⚖️ Advocacia <span class="chip-count" id="cnt-13">—</span></div>
       <div class="chip" onclick="setChip(this,'seg','Posto de Gasolina')" data-seg="Posto de Gasolina">⛽ Posto <span class="chip-count" id="cnt-3">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Academia')" data-seg="Academia">💪 Academia <span class="chip-count" id="cnt-11">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Industria')" data-seg="Industria">🏭 Indústria <span class="chip-count" id="cnt-17">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Transporte / Logistica')" data-seg="Transporte / Logistica">🚚 Transporte <span class="chip-count" id="cnt-19">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Salao de Beleza')" data-seg="Salao de Beleza">💇 Salão <span class="chip-count" id="cnt-12">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Academia / Fitness')" data-seg="Academia / Fitness">💪 Academia <span class="chip-count" id="cnt-11">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Indústria')" data-seg="Indústria">🏭 Indústria <span class="chip-count" id="cnt-17">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Transporte / Logística')" data-seg="Transporte / Logística">🚚 Transporte <span class="chip-count" id="cnt-19">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Salão de Beleza')" data-seg="Salão de Beleza">💇 Salão <span class="chip-count" id="cnt-12">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Hotel / Pousada')" data-seg="Hotel / Pousada">🏨 Hotel <span class="chip-count" id="cnt-9">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Escola / Faculdade')" data-seg="Escola / Faculdade">🎓 Escola <span class="chip-count" id="cnt-10">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Imobiliária')" data-seg="Imobiliária">🏠 Imobiliária <span class="chip-count" id="cnt-15">—</span></div>
       <div class="chip" onclick="setChip(this,'seg','Outros')" data-seg="Outros">📋 Outros <span class="chip-count" id="cnt-20">—</span></div>
     </div>
   </div>
@@ -329,13 +332,13 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
     <div class="form-group"><label class="form-label">Segmento</label>
       <select class="form-select" id="f-seg">
         <option value="">Selecione...</option>
-        <option>Farmacia</option><option>Medico / Clinica</option><option>Hospital</option>
-        <option>Odontologia</option><option>Laboratorio</option><option>Mercado</option>
-        <option>Posto de Gasolina</option><option>Restaurante</option><option>Hotel / Pousada</option>
-        <option>Escola / Faculdade</option><option>Academia</option><option>Salao de Beleza</option>
-        <option>Advocacia</option><option>Contabilidade</option><option>Imobiliaria</option>
-        <option>Comercio / Varejo</option><option>Industria</option><option>Tecnologia / TI</option>
-        <option>Transporte / Logistica</option><option>Outros</option>
+        <option>Farmácia</option><option>Médico / Clínica</option><option>Hospital</option>
+        <option>Odontologia</option><option>Laboratório</option><option>Mercado / Supermercado</option>
+        <option>Posto de Gasolina</option><option>Restaurante / Lanchonete</option><option>Hotel / Pousada</option>
+        <option>Escola / Faculdade</option><option>Academia / Fitness</option><option>Salão de Beleza</option>
+        <option>Advocacia / Escritório Jurídico</option><option>Contabilidade</option><option>Imobiliária</option>
+        <option>Comércio / Varejo</option><option>Indústria</option><option>Tecnologia / TI</option>
+        <option>Transporte / Logística</option><option>Outros</option>
       </select>
     </div>
     <div class="section-label">Contato</div>
@@ -480,7 +483,7 @@ async function carregarTotaisSegmentos(){
     });
 
     // Montar painel de segmentos
-    const segEmojis={'Farmacia':'💊','Medico / Clinica':'👨‍⚕️','Hospital':'🏥','Odontologia':'🦷','Laboratorio':'🔬','Mercado':'🛒','Restaurante':'🍽️','Comercio / Varejo':'🏪','Tecnologia / TI':'💻','Contabilidade':'📊','Advocacia':'⚖️','Posto de Gasolina':'⛽','Academia':'💪','Industria':'🏭','Transporte / Logistica':'🚚','Salao de Beleza':'💇','Hotel / Pousada':'🏨','Escola / Faculdade':'🎓','Imobiliaria':'🏠','Outros':'📋'};
+    const segEmojis={'Farmácia':'💊','Médico / Clínica':'👨‍⚕️','Hospital':'🏥','Odontologia':'🦷','Laboratório':'🔬','Mercado / Supermercado':'🛒','Restaurante / Lanchonete':'🍽️','Comércio / Varejo':'🏪','Tecnologia / TI':'💻','Contabilidade':'📊','Advocacia / Escritório Jurídico':'⚖️','Posto de Gasolina':'⛽','Academia / Fitness':'💪','Indústria':'🏭','Transporte / Logística':'🚚','Salão de Beleza':'💇','Hotel / Pousada':'🏨','Escola / Faculdade':'🎓','Imobiliária':'🏠','Outros':'📋'};
     
     const grid = document.getElementById('seg-grid');
     grid.innerHTML = segmentosCache
@@ -636,7 +639,7 @@ function limparFiltros(){
 function pipeClass(p){return{'Em Prospeccao':'p-prospect','Contato Feito':'p-contato','Apresentacao Enviada':'p-enviada','Em Negociacao':'p-negoc','Proposta Enviada':'p-proposta','Fechado':'p-fechado','Perdido':'p-perdido'}[p]||'p-prospect';}
 function pipeLabel(p){return{'Em Prospeccao':'Prospecção','Contato Feito':'Contato','Apresentacao Enviada':'Apresentação','Em Negociacao':'Negociação','Proposta Enviada':'Proposta','Fechado':'✓ Fechado','Perdido':'Perdido'}[p]||p;}
 function stClass(s){return{Ativo:'s-ativo',Prospect:'s-prospect',Inativo:'s-inativo',Perdido:'s-perdido'}[s]||'s-prospect';}
-function segEmoji(s){return{'Farmacia':'💊','Mercado':'🛒','Posto de Gasolina':'⛽','Medico / Clinica':'👨‍⚕️','Hospital':'🏥','Odontologia':'🦷','Laboratorio':'🔬','Restaurante':'🍽️','Hotel / Pousada':'🏨','Escola / Faculdade':'🎓','Academia':'💪','Salao de Beleza':'💇','Advocacia':'⚖️','Contabilidade':'📊','Imobiliaria':'🏠','Comercio / Varejo':'🏪','Industria':'🏭','Tecnologia / TI':'💻','Transporte / Logistica':'🚚'}[s]||'📋';}
+function segEmoji(s){return{'Farmácia':'💊','Mercado / Supermercado':'🛒','Posto de Gasolina':'⛽','Médico / Clínica':'👨‍⚕️','Hospital':'🏥','Odontologia':'🦷','Laboratório':'🔬','Restaurante / Lanchonete':'🍽️','Hotel / Pousada':'🏨','Escola / Faculdade':'🎓','Academia / Fitness':'💪','Salão de Beleza':'💇','Advocacia / Escritório Jurídico':'⚖️','Contabilidade':'📊','Imobiliária':'🏠','Comércio / Varejo':'🏪','Indústria':'🏭','Tecnologia / TI':'💻','Transporte / Logística':'🚚','Outros':'📋'}[s]||'📋';}
 
 function renderLista(lista){
   const el=document.getElementById('client-list');
