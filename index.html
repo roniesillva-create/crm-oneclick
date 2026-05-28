@@ -460,13 +460,18 @@ async function carregarMetricas(){
 
 async function carregarTotaisSegmentos(){
   try{
-    // Buscar contagem por segmento
-    const data = await api('/rest/v1/clientes?select=segmento_id,segmentos(id,nome)&segmento_id=not.is.null');
+    // Buscar segmentos primeiro
+    const segsData = await api('/rest/v1/segmentos?select=id,nome&order=nome');
+    segmentosCache = segsData||[];
+
+    // Contar cada segmento em paralelo de forma eficiente
     const contagem = {};
-    (data||[]).forEach(c=>{
-      const id = c.segmento_id;
-      contagem[id] = (contagem[id]||0)+1;
-    });
+    await Promise.all(segmentosCache.map(async s=>{
+      try{
+        const total = await apiCount(`/rest/v1/clientes?select=id&segmento_id=eq.${s.id}`);
+        if(total>0) contagem[s.id]=total;
+      }catch(e){}
+    }));
 
     // Atualizar chips com totais
     Object.entries(contagem).forEach(([id,total])=>{
@@ -475,8 +480,6 @@ async function carregarTotaisSegmentos(){
     });
 
     // Montar painel de segmentos
-    const segs = await api('/rest/v1/segmentos?select=id,nome,icone&order=nome');
-    segmentosCache = segs||[];
     const segEmojis={'Farmacia':'💊','Medico / Clinica':'👨‍⚕️','Hospital':'🏥','Odontologia':'🦷','Laboratorio':'🔬','Mercado':'🛒','Restaurante':'🍽️','Comercio / Varejo':'🏪','Tecnologia / TI':'💻','Contabilidade':'📊','Advocacia':'⚖️','Posto de Gasolina':'⛽','Academia':'💪','Industria':'🏭','Transporte / Logistica':'🚚','Salao de Beleza':'💇','Hotel / Pousada':'🏨','Escola / Faculdade':'🎓','Imobiliaria':'🏠','Outros':'📋'};
     
     const grid = document.getElementById('seg-grid');
