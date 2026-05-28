@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OneClick CRM">
 <link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="https://fbgcafwoovwrtzdewclx.supabase.co/storage/v1/object/public/assets/LOGO.png">
 <title>OneClick CRM</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -48,40 +47,35 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .metric-mini-val{font-size:20px;font-weight:900;color:var(--cyan);line-height:1}
 .metric-mini-val.green{color:var(--green)}
 .metric-mini-val.yellow{color:var(--yellow)}
-
-/* FILTROS */
 .filtros-section{padding:10px 16px;background:#041426cc;border-bottom:1px solid var(--border)}
-.filtros-row1{display:flex;gap:8px;margin-bottom:8px}
+.filtros-row1{display:flex;gap:8px}
 .search-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px}
 .search-wrap:focus-within{border-color:var(--cyan)}
 .search-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:15px;flex:1;font-family:inherit;width:100%}
 .search-wrap input::placeholder{color:var(--muted)}
 .btn-buscar{padding:9px 16px;border-radius:10px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:12px;border:none;cursor:pointer;white-space:nowrap}
-
-/* CHIPS */
 .chips-section{padding:8px 16px;background:#041426cc;border-bottom:1px solid var(--border)}
 .chips-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;margin-bottom:6px}
 .chips-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .chips-row::-webkit-scrollbar{display:none}
-.chip{padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.chip{padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;display:flex;align-items:center;gap:4px}
 .chip.active{border-color:var(--cyan);background:#00e5ff15;color:var(--cyan)}
 .chip.chip-green.active{border-color:var(--green);background:#00ff9915;color:var(--green)}
 .chip.chip-purple.active{border-color:#b060ff;background:#b060ff15;color:#c088ff}
 .chip.chip-yellow.active{border-color:var(--yellow);background:#ffd34d15;color:var(--yellow)}
-
-/* FILTROS EXTRAS */
+.chip-count{background:#00e5ff22;color:var(--cyan);font-size:9px;font-weight:800;padding:1px 5px;border-radius:999px;min-width:18px;text-align:center}
+.chip.active .chip-count{background:#00e5ff33}
+.chip.chip-yellow.active .chip-count{background:#ffd34d33;color:var(--yellow)}
+.chip.chip-green.active .chip-count{background:#00ff9933;color:var(--green)}
+.chip.chip-purple.active .chip-count{background:#b060ff33;color:#c088ff}
 .filtros-extras{display:flex;gap:8px;padding:8px 16px;background:#041426cc;border-bottom:1px solid var(--border)}
 .select-filtro{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 10px;color:var(--muted);font-size:12px;font-family:inherit;cursor:pointer;outline:none;flex:1}
 .select-filtro:focus{border-color:var(--cyan)}
-
-/* EXPORT BAR */
 .export-bar{display:flex;gap:6px;padding:8px 16px;background:#041426aa;border-bottom:1px solid var(--border)}
 .btn-export{flex:1;padding:8px 6px;border-radius:10px;font-size:10px;font-weight:700;border:none;cursor:pointer;font-family:inherit}
 .btn-export-email{background:#b060ff22;border:1px solid #b060ff44;color:#c088ff}
 .btn-export-wpp{background:#00ff9915;border:1px solid #00ff9944;color:var(--green)}
 .btn-export-csv{background:#00e5ff11;border:1px solid var(--border);color:var(--cyan)}
-
-/* CONTENT */
 .content{flex:1;padding:0 16px 100px}
 .results-info{font-size:11px;color:var(--muted);padding:8px 0 4px;display:flex;justify-content:space-between;align-items:center}
 .results-info strong{color:var(--cyan)}
@@ -91,7 +85,7 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .card-nome{font-size:14px;font-weight:700;color:var(--text);flex:1;margin-right:8px;line-height:1.3}
 .card-fantasia{font-size:11px;color:var(--muted);margin-top:2px}
 .card-mid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.card-tag{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:3px}
+.card-tag{font-size:11px;color:var(--muted)}
 .card-tag.tel{color:var(--cyan)}
 .card-tag.email{color:#c088ff}
 .card-tag.wpp{color:var(--green)}
@@ -114,7 +108,7 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .pag-info{font-size:12px;color:var(--muted);text-align:center;flex:1}
 .pag-info strong{color:var(--cyan)}
 .pag-nums{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:6px}
-.pag-num{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pag-num{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .pag-num.active{border-color:var(--cyan);background:#00e5ff15;color:var(--cyan)}
 .fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--cyan));border:none;cursor:pointer;box-shadow:0 0 24px #00e5ff55;display:flex;align-items:center;justify-content:center;font-size:26px;z-index:100}
 .fab:active{transform:scale(.93)}
@@ -132,6 +126,7 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .modal-btns{display:flex;gap:10px;margin-top:20px}
 .btn-cancel{flex:1;padding:13px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;font-family:inherit}
 .btn-save{flex:2;padding:13px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:14px;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-save:disabled{opacity:.6}
 .detail-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
 .detail-avatar{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#003a5c,#005f8a);border:1.5px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .detail-name{font-size:15px;font-weight:800;color:var(--text);line-height:1.2}
@@ -140,8 +135,14 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 .detail-item{background:#04111f;border:1px solid var(--border);border-radius:12px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center}
 .detail-item-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}
 .detail-item-val{font-size:13px;color:var(--text);font-weight:500;text-align:right;max-width:65%}
-.ia-box{background:#00e5ff08;border:1px solid var(--border);border-radius:14px;padding:14px}
+.ia-box{background:#00e5ff08;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px}
 .ia-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--cyan);font-weight:700;margin-bottom:10px}
+/* EDITAR SEGMENTO */
+.edit-seg-box{background:#04111f;border:1px solid #ffd34d44;border-radius:14px;padding:14px;margin-bottom:14px}
+.edit-seg-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--yellow);font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.edit-seg-row{display:flex;gap:8px}
+.edit-seg-select{flex:1;background:#071b2e;border:1px solid #ffd34d44;border-radius:10px;padding:10px 12px;color:var(--text);font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none}
+.btn-seg-save{padding:10px 16px;border-radius:10px;background:linear-gradient(90deg,var(--yellow),#ff9d00);color:#001018;font-weight:800;font-size:12px;border:none;cursor:pointer;white-space:nowrap}
 .loading-state{padding:48px 20px;text-align:center;color:var(--muted);font-size:13px}
 .spinner{display:inline-block;width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
 .spinner-sm{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
@@ -152,11 +153,21 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .empty-state{padding:60px 20px;text-align:center;color:var(--muted)}
 .hidden{display:none!important}
+
+/* PAINEL DE SEGMENTOS */
+.seg-painel{display:none;padding:10px 16px 0}
+.seg-painel-title{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;margin-bottom:8px}
+.seg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.seg-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s}
+.seg-card:active{background:#00e5ff08}
+.seg-card-icon{font-size:20px}
+.seg-card-info{flex:1}
+.seg-card-nome{font-size:11px;font-weight:700;color:var(--text)}
+.seg-card-total{font-size:18px;font-weight:900;color:var(--cyan)}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-logo"><img src="https://fbgcafwoovwrtzdewclx.supabase.co/storage/v1/object/public/assets/LOGO.png"></div>
@@ -175,9 +186,7 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
   </div>
 </div>
 
-<!-- APP -->
 <div class="app" id="app">
-
   <header class="header">
     <div class="brand">
       <img src="https://fbgcafwoovwrtzdewclx.supabase.co/storage/v1/object/public/assets/LOGO.png">
@@ -200,18 +209,22 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
     <div class="metric-mini"><div class="metric-mini-label">Fechados</div><div class="metric-mini-val yellow" id="m-fechados">—</div></div>
   </div>
 
-  <!-- BUSCA -->
+  <!-- PAINEL DE SEGMENTOS COM TOTAIS -->
+  <div class="seg-painel" id="seg-painel">
+    <div class="seg-painel-title">📊 Leads por Segmento</div>
+    <div class="seg-grid" id="seg-grid"></div>
+  </div>
+
   <div class="filtros-section">
     <div class="filtros-row1">
       <div class="search-wrap">
         <span style="color:var(--muted)">🔍</span>
-        <input type="search" id="search" placeholder="Buscar nome, cidade, CNPJ, email..." onkeydown="if(event.key==='Enter')buscar()">
+        <input type="search" id="search" placeholder="Buscar nome, cidade, CNPJ..." onkeydown="if(event.key==='Enter')buscar()">
       </div>
       <button class="btn-buscar" onclick="buscar()">Buscar</button>
     </div>
   </div>
 
-  <!-- CHIPS PIPELINE -->
   <div class="chips-section">
     <div class="chips-label">Pipeline</div>
     <div class="chips-row" id="chips-pipeline">
@@ -226,35 +239,30 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
     </div>
   </div>
 
-  <!-- CHIPS SEGMENTO -->
   <div class="chips-section">
-    <div class="chips-label">Segmento</div>
+    <div class="chips-label">Segmento <span style="color:var(--cyan);font-size:9px;cursor:pointer" onclick="togglePainel()">📊 ver totais</span></div>
     <div class="chips-row" id="chips-seg">
       <div class="chip active" onclick="setChip(this,'seg','')">🌐 Todos</div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Farmacia')">💊 Farmácia</div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Medico / Clinica')">👨‍⚕️ Médico/Clínica</div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Hospital')">🏥 Hospital</div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Odontologia')">🦷 Odontologia</div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Laboratorio')">🔬 Laboratório</div>
-      <div class="chip chip-green" onclick="setChip(this,'seg','Mercado')">🛒 Mercado</div>
-      <div class="chip chip-green" onclick="setChip(this,'seg','Restaurante')">🍽️ Restaurante</div>
-      <div class="chip chip-green" onclick="setChip(this,'seg','Comercio / Varejo')">🏪 Com. Varejo</div>
-      <div class="chip chip-purple" onclick="setChip(this,'seg','Tecnologia / TI')">💻 TI</div>
-      <div class="chip chip-purple" onclick="setChip(this,'seg','Contabilidade')">📊 Contab.</div>
-      <div class="chip chip-purple" onclick="setChip(this,'seg','Advocacia')">⚖️ Advocacia</div>
-      <div class="chip chip-purple" onclick="setChip(this,'seg','Imobiliaria')">🏠 Imobiliária</div>
-      <div class="chip" onclick="setChip(this,'seg','Posto de Gasolina')">⛽ Posto</div>
-      <div class="chip" onclick="setChip(this,'seg','Academia')">💪 Academia</div>
-      <div class="chip" onclick="setChip(this,'seg','Hotel / Pousada')">🏨 Hotel</div>
-      <div class="chip" onclick="setChip(this,'seg','Escola / Faculdade')">🎓 Escola</div>
-      <div class="chip" onclick="setChip(this,'seg','Industria')">🏭 Indústria</div>
-      <div class="chip" onclick="setChip(this,'seg','Transporte / Logistica')">🚚 Transporte</div>
-      <div class="chip" onclick="setChip(this,'seg','Salao de Beleza')">💇 Salão</div>
-      <div class="chip" onclick="setChip(this,'seg','Outros')">📋 Outros</div>
+      <div class="chip chip-yellow" onclick="setChip(this,'seg','Farmacia')" data-seg="Farmacia">💊 Farmácia <span class="chip-count" id="cnt-1">—</span></div>
+      <div class="chip chip-yellow" onclick="setChip(this,'seg','Medico / Clinica')" data-seg="Medico / Clinica">👨‍⚕️ Médico/Clínica <span class="chip-count" id="cnt-4">—</span></div>
+      <div class="chip chip-yellow" onclick="setChip(this,'seg','Hospital')" data-seg="Hospital">🏥 Hospital <span class="chip-count" id="cnt-5">—</span></div>
+      <div class="chip chip-yellow" onclick="setChip(this,'seg','Odontologia')" data-seg="Odontologia">🦷 Odontologia <span class="chip-count" id="cnt-6">—</span></div>
+      <div class="chip chip-yellow" onclick="setChip(this,'seg','Laboratorio')" data-seg="Laboratorio">🔬 Laboratório <span class="chip-count" id="cnt-7">—</span></div>
+      <div class="chip chip-green" onclick="setChip(this,'seg','Mercado')" data-seg="Mercado">🛒 Mercado <span class="chip-count" id="cnt-2">—</span></div>
+      <div class="chip chip-green" onclick="setChip(this,'seg','Restaurante')" data-seg="Restaurante">🍽️ Restaurante <span class="chip-count" id="cnt-8">—</span></div>
+      <div class="chip chip-green" onclick="setChip(this,'seg','Comercio / Varejo')" data-seg="Comercio / Varejo">🏪 Com. Varejo <span class="chip-count" id="cnt-16">—</span></div>
+      <div class="chip chip-purple" onclick="setChip(this,'seg','Tecnologia / TI')" data-seg="Tecnologia / TI">💻 TI <span class="chip-count" id="cnt-18">—</span></div>
+      <div class="chip chip-purple" onclick="setChip(this,'seg','Contabilidade')" data-seg="Contabilidade">📊 Contab. <span class="chip-count" id="cnt-14">—</span></div>
+      <div class="chip chip-purple" onclick="setChip(this,'seg','Advocacia')" data-seg="Advocacia">⚖️ Advocacia <span class="chip-count" id="cnt-13">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Posto de Gasolina')" data-seg="Posto de Gasolina">⛽ Posto <span class="chip-count" id="cnt-3">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Academia')" data-seg="Academia">💪 Academia <span class="chip-count" id="cnt-11">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Industria')" data-seg="Industria">🏭 Indústria <span class="chip-count" id="cnt-17">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Transporte / Logistica')" data-seg="Transporte / Logistica">🚚 Transporte <span class="chip-count" id="cnt-19">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Salao de Beleza')" data-seg="Salao de Beleza">💇 Salão <span class="chip-count" id="cnt-12">—</span></div>
+      <div class="chip" onclick="setChip(this,'seg','Outros')" data-seg="Outros">📋 Outros <span class="chip-count" id="cnt-20">—</span></div>
     </div>
   </div>
 
-  <!-- CHIPS ESPECIAIS + ESTADO -->
   <div class="chips-section" style="border-bottom:none">
     <div class="chips-label">Filtros Especiais</div>
     <div class="chips-row">
@@ -266,14 +274,13 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
     </div>
   </div>
 
-  <!-- FILTROS EXTRAS -->
   <div class="filtros-extras">
     <select class="select-filtro" id="f-estado" onchange="buscar()">
       <option value="">Todos os Estados</option>
       <option>SP</option><option>MG</option><option>RJ</option><option>GO</option>
       <option>PR</option><option>SC</option><option>RS</option><option>BA</option>
       <option>PB</option><option>PE</option><option>CE</option><option>MT</option>
-      <option>MS</option><option>PA</option><option>AM</option><option>DF</option>
+      <option>MS</option><option>PA</option><option>AM</option><option>DF</option><option>ES</option>
     </select>
     <select class="select-filtro" id="f-status" onchange="buscar()">
       <option value="">Todos os Status</option>
@@ -283,14 +290,12 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
     <button class="btn-buscar" onclick="limparFiltros()" style="background:#00e5ff11;border:1px solid var(--border);color:var(--muted);box-shadow:none;padding:8px 12px;font-size:11px">🗑️ Limpar</button>
   </div>
 
-  <!-- EXPORT -->
   <div class="export-bar">
     <button class="btn-export btn-export-email" onclick="exportarEmails()">📧 Emails</button>
     <button class="btn-export btn-export-wpp" onclick="exportarWhatsApp()">💬 WhatsApp</button>
     <button class="btn-export btn-export-csv" onclick="exportarCSV()">📊 CSV</button>
   </div>
 
-  <!-- LISTA -->
   <div class="content">
     <div class="results-info" id="results-info"></div>
     <div id="client-list"><div class="loading-state"><div class="spinner"></div><br>Carregando...</div></div>
@@ -383,10 +388,11 @@ const H={'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer 
 const USUARIOS=[{user:'ronie',pass:'Natura123!@#',nome:'Ronie Silva'}];
 const POR_PAGINA=50;
 
-let paginaAtual=1,totalPaginas=1,totalRegistros=0;
+let paginaAtual=1,totalPaginas=1;
 let filtroPipe='',filtroSeg='',filtroSegId=null;
 let filtroEmail=false,filtroWpp=false,filtroEstado='';
-let clientesCache=[];
+let clientesCache=[],segmentosCache=[];
+let painelAberto=false;
 
 // AUTH
 function fazerLogin(){
@@ -418,7 +424,6 @@ function verificarSessao(){
   }
 }
 
-// API
 async function api(path,method='GET',body=null){
   const opts={method,headers:H};
   if(body)opts.body=JSON.stringify(body);
@@ -434,7 +439,7 @@ async function apiCount(path){
 }
 
 async function inicializar(){
-  await Promise.all([carregarMetricas(),buscar()]);
+  await Promise.all([carregarMetricas(),carregarTotaisSegmentos(),buscar()]);
 }
 
 async function carregarMetricas(){
@@ -453,8 +458,61 @@ async function carregarMetricas(){
   }catch(e){document.getElementById('status-dot').className='dot-status offline';}
 }
 
+async function carregarTotaisSegmentos(){
+  try{
+    // Buscar contagem por segmento
+    const data = await api('/rest/v1/clientes?select=segmento_id,segmentos(id,nome)&segmento_id=not.is.null');
+    const contagem = {};
+    (data||[]).forEach(c=>{
+      const id = c.segmento_id;
+      contagem[id] = (contagem[id]||0)+1;
+    });
+
+    // Atualizar chips com totais
+    Object.entries(contagem).forEach(([id,total])=>{
+      const el=document.getElementById('cnt-'+id);
+      if(el) el.textContent=total>999?(Math.round(total/1000)+'k'):total;
+    });
+
+    // Montar painel de segmentos
+    const segs = await api('/rest/v1/segmentos?select=id,nome,icone&order=nome');
+    segmentosCache = segs||[];
+    const segEmojis={'Farmacia':'💊','Medico / Clinica':'👨‍⚕️','Hospital':'🏥','Odontologia':'🦷','Laboratorio':'🔬','Mercado':'🛒','Restaurante':'🍽️','Comercio / Varejo':'🏪','Tecnologia / TI':'💻','Contabilidade':'📊','Advocacia':'⚖️','Posto de Gasolina':'⛽','Academia':'💪','Industria':'🏭','Transporte / Logistica':'🚚','Salao de Beleza':'💇','Hotel / Pousada':'🏨','Escola / Faculdade':'🎓','Imobiliaria':'🏠','Outros':'📋'};
+    
+    const grid = document.getElementById('seg-grid');
+    grid.innerHTML = segmentosCache
+      .filter(s=>contagem[s.id]>0)
+      .sort((a,b)=>(contagem[b.id]||0)-(contagem[a.id]||0))
+      .map(s=>`
+        <div class="seg-card" onclick="filtrarPorSegmento('${s.nome}')">
+          <div class="seg-card-icon">${segEmojis[s.nome]||'📋'}</div>
+          <div class="seg-card-info">
+            <div class="seg-card-nome">${s.nome}</div>
+            <div class="seg-card-total">${(contagem[s.id]||0).toLocaleString('pt-BR')}</div>
+          </div>
+        </div>`).join('');
+  }catch(e){console.error('Erro segmentos:',e);}
+}
+
+function togglePainel(){
+  painelAberto=!painelAberto;
+  document.getElementById('seg-painel').style.display=painelAberto?'block':'none';
+}
+
+function filtrarPorSegmento(nome){
+  filtroSeg=nome;
+  // Ativar chip correspondente
+  document.querySelectorAll('#chips-seg .chip').forEach(c=>{
+    c.classList.toggle('active',c.dataset.seg===nome);
+  });
+  if(painelAberto)togglePainel();
+  buscar();
+}
+
 async function resolverSegId(nome){
   if(!nome){filtroSegId=null;return;}
+  const found=segmentosCache.find(s=>s.nome===nome);
+  if(found){filtroSegId=found.id;return;}
   try{
     const d=await api(`/rest/v1/segmentos?nome=eq.${encodeURIComponent(nome)}&select=id`);
     filtroSegId=d&&d.length?d[0].id:null;
@@ -478,7 +536,7 @@ function montarQuery(soCount=false){
 
 async function buscar(resetPagina=true){
   if(resetPagina)paginaAtual=1;
-  if(filtroSeg) await resolverSegId(filtroSeg);
+  if(filtroSeg)await resolverSegId(filtroSeg);
   else filtroSegId=null;
   await Promise.all([contarResultados(),carregarPagina()]);
 }
@@ -486,7 +544,6 @@ async function buscar(resetPagina=true){
 async function contarResultados(){
   try{
     const total=await apiCount(montarQuery(true));
-    totalRegistros=total;
     totalPaginas=Math.ceil(total/POR_PAGINA)||1;
     document.getElementById('results-info').innerHTML=
       `<span>Encontrados: <strong>${total.toLocaleString('pt-BR')}</strong></span>
@@ -509,8 +566,7 @@ async function carregarPagina(){
 
 function irPagina(p){
   if(p<1||p>totalPaginas)return;
-  paginaAtual=p;
-  carregarPagina();contarResultados();
+  paginaAtual=p;carregarPagina();contarResultados();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -533,13 +589,12 @@ function renderPaginacao(){
   }
 }
 
-// CHIPS
 function setChip(el,tipo,val){
   const grupoId=tipo==='pipeline'?'chips-pipeline':'chips-seg';
   document.querySelectorAll(`#${grupoId} .chip`).forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   if(tipo==='pipeline')filtroPipe=val;
-  else filtroSeg=val;
+  else{filtroSeg=val;}
   buscar();
 }
 
@@ -550,15 +605,15 @@ function toggleEspecial(tipo){
 }
 
 function toggleEstado(est){
-  const chipId={'SP':'chip-sp','MG':'chip-mg','RJ':'chip-rj'}[est];
+  const ids={'SP':'chip-sp','MG':'chip-mg','RJ':'chip-rj'};
   if(filtroEstado===est){
     filtroEstado='';
-    document.getElementById(chipId).classList.remove('active');
+    document.getElementById(ids[est]).classList.remove('active');
     document.getElementById('f-estado').value='';
   }else{
     filtroEstado=est;
-    ['chip-sp','chip-mg','chip-rj'].forEach(id=>document.getElementById(id).classList.remove('active'));
-    document.getElementById(chipId).classList.add('active');
+    Object.values(ids).forEach(id=>document.getElementById(id).classList.remove('active'));
+    document.getElementById(ids[est]).classList.add('active');
     document.getElementById('f-estado').value=est;
   }
   buscar();
@@ -572,11 +627,9 @@ function limparFiltros(){
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   document.querySelector('#chips-pipeline .chip').classList.add('active');
   document.querySelector('#chips-seg .chip').classList.add('active');
-  ['chip-email','chip-wpp','chip-sp','chip-mg','chip-rj'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
   buscar();
 }
 
-// RENDER
 function pipeClass(p){return{'Em Prospeccao':'p-prospect','Contato Feito':'p-contato','Apresentacao Enviada':'p-enviada','Em Negociacao':'p-negoc','Proposta Enviada':'p-proposta','Fechado':'p-fechado','Perdido':'p-perdido'}[p]||'p-prospect';}
 function pipeLabel(p){return{'Em Prospeccao':'Prospecção','Contato Feito':'Contato','Apresentacao Enviada':'Apresentação','Em Negociacao':'Negociação','Proposta Enviada':'Proposta','Fechado':'✓ Fechado','Perdido':'Perdido'}[p]||p;}
 function stClass(s){return{Ativo:'s-ativo',Prospect:'s-prospect',Inativo:'s-inativo',Perdido:'s-perdido'}[s]||'s-prospect';}
@@ -598,16 +651,14 @@ function renderLista(lista){
         ${c.cidade?`<span class="card-tag">📍 ${c.cidade}${c.estado?' / '+c.estado:''}</span>`:''}
         ${c.telefone?`<span class="card-tag tel">📞 ${c.telefone}</span>`:''}
         ${c.email?`<span class="card-tag email">📧 ${c.email}</span>`:''}
-        ${c.whatsapp&&c.whatsapp!==c.telefone?`<span class="card-tag wpp">💬 ${c.whatsapp}</span>`:''}
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><span class="status-dot ${stClass(c.status||'Prospect')}"></span><span style="font-size:11px;color:var(--muted)">${c.status||'Prospect'}</span> ${c.segmento?`<span style="font-size:10px;color:var(--muted)">• ${c.segmento}</span>`:''}</div>
+        <div><span class="status-dot ${stClass(c.status||'Prospect')}"></span><span style="font-size:11px;color:var(--muted)">${c.status||'Prospect'}</span>${c.segmento?` <span style="font-size:10px;color:var(--muted)">• ${c.segmento}</span>`:''}</div>
         ${c.data_proximo_contato?`<span style="font-size:10px;color:var(--yellow)">📅 ${c.data_proximo_contato}</span>`:''}
       </div>
     </div>`).join('');
 }
 
-// NOVO CLIENTE
 function abrirNovo(){document.getElementById('modal-novo').classList.remove('hidden');}
 function fecharModal(id){document.getElementById(id).classList.add('hidden');}
 function fecharSeOverlay(e,id){if(e.target===e.currentTarget)fecharModal(id);}
@@ -620,7 +671,11 @@ async function salvarCliente(){
   btn.innerHTML='<div class="spinner-sm"></div>';btn.disabled=true;
   try{
     let segId=null;
-    if(segNome){const s=await api(`/rest/v1/segmentos?nome=eq.${encodeURIComponent(segNome)}&select=id`);if(s&&s.length)segId=s[0].id;}
+    if(segNome){
+      const found=segmentosCache.find(s=>s.nome===segNome);
+      if(found)segId=found.id;
+      else{const s=await api(`/rest/v1/segmentos?nome=eq.${encodeURIComponent(segNome)}&select=id`);if(s&&s.length)segId=s[0].id;}
+    }
     await api('/rest/v1/clientes','POST',{
       razao_social:razao,nome_fantasia:document.getElementById('f-fantasia').value||null,
       cnpj:document.getElementById('f-cnpj').value||null,segmento_id:segId,
@@ -644,10 +699,12 @@ async function salvarCliente(){
   finally{btn.innerHTML='💾 Salvar';btn.disabled=false;}
 }
 
-// DETALHE
 async function verCliente(id){
   const c=clientesCache.find(x=>x.id===id);if(!c)return;
   document.getElementById('modal-detalhe').classList.remove('hidden');
+
+  const opcoesSegs = segmentosCache.map(s=>`<option value="${s.id}" ${c.segmento_id===s.id?'selected':''}>${segEmoji(s.nome)} ${s.nome}</option>`).join('');
+
   document.getElementById('d-content').innerHTML=`
     <div class="detail-header">
       <div class="detail-avatar">${segEmoji(c.segmento)}</div>
@@ -660,14 +717,25 @@ async function verCliente(id){
       <div class="detail-item"><div class="detail-item-label">WhatsApp</div><div class="detail-item-val"><a href="https://wa.me/55${(c.whatsapp||'').replace(/\D/g,'')}" style="color:var(--green)" target="_blank">${c.whatsapp||'—'}</a></div></div>
       <div class="detail-item"><div class="detail-item-label">E-mail</div><div class="detail-item-val" style="word-break:break-all">${c.email||'—'}</div></div>
       <div class="detail-item"><div class="detail-item-label">Cidade / UF</div><div class="detail-item-val">${c.cidade||'—'}${c.estado?' / '+c.estado:''}</div></div>
-      <div class="detail-item"><div class="detail-item-label">Segmento</div><div class="detail-item-val">${segEmoji(c.segmento)} ${c.segmento||'—'}</div></div>
       ${c.data_proximo_contato?`<div class="detail-item"><div class="detail-item-label">Próx. Contato</div><div class="detail-item-val" style="color:var(--yellow)">${c.data_proximo_contato}</div></div>`:''}
       ${c.observacoes?`<div class="detail-item" style="flex-direction:column;align-items:flex-start;gap:6px"><div class="detail-item-label">Observações</div><div style="font-size:12px;color:var(--text)">${c.observacoes}</div></div>`:''}
+    </div>
+    <!-- EDITAR SEGMENTO -->
+    <div class="edit-seg-box">
+      <div class="edit-seg-label">✏️ Corrigir Segmento</div>
+      <div class="edit-seg-row">
+        <select class="edit-seg-select" id="edit-seg-${id}">
+          <option value="">Selecione...</option>
+          ${opcoesSegs}
+        </select>
+        <button class="btn-seg-save" onclick="salvarSegmento(${id})">Salvar</button>
+      </div>
     </div>
     <div class="ia-box">
       <div class="ia-label">🤖 Sugestão de Vendas IA</div>
       <div id="ia-txt" style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px"><div class="spinner-sm"></div> Analisando...</div>
     </div>`;
+
   try{
     const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Consultor de vendas OneClick Soluções TI Enterprise SP. Serviços: Monitoramento TI, Infraestrutura, Segurança, Cloud & Backup, Banco de Dados, BI.\nCliente: ${c.razao_social} | Segmento: ${c.segmento||'N/A'} | ${c.cidade||'N/A'}/${c.estado||'N/A'} | Pipeline: ${c.pipeline||'N/A'}\nObs: ${c.observacoes||'Nenhuma'}\nPT-BR, direto, máx 4 linhas: 1.Melhor serviço 2.Argumento principal 3.Próxima ação`}]})});
     const d=await resp.json();
@@ -675,7 +743,22 @@ async function verCliente(id){
   }catch(e){document.getElementById('ia-txt').innerHTML='Sugestão IA indisponível.';}
 }
 
-// EXPORTAR
+async function salvarSegmento(clienteId){
+  const sel=document.getElementById('edit-seg-'+clienteId);
+  const novoSegId=sel?.value;
+  if(!novoSegId){toast('Selecione um segmento!','err');return;}
+  try{
+    await fetch(SUPA+'/rest/v1/clientes?id=eq.'+clienteId,{
+      method:'PATCH',
+      headers:H,
+      body:JSON.stringify({segmento_id:parseInt(novoSegId)})
+    });
+    toast('✅ Segmento atualizado!','ok');
+    fecharModal('modal-detalhe');
+    await Promise.all([carregarTotaisSegmentos(),carregarPagina()]);
+  }catch(e){toast('Erro ao salvar','err');}
+}
+
 async function exportarEmails(){
   toast('Buscando emails...','ok');
   try{
@@ -686,8 +769,8 @@ async function exportarEmails(){
       if(d.length<1000)break;offset+=1000;
     }
     copiarOuDownload(todos.map(c=>c.email).filter(Boolean).join('\n'),'emails_clientes.txt');
-    toast(`✅ ${todos.length} emails exportados!`,'ok');
-  }catch(e){toast('Erro ao exportar','err');}
+    toast(`✅ ${todos.length} emails!`,'ok');
+  }catch(e){toast('Erro','err');}
 }
 
 async function exportarWhatsApp(){
@@ -700,8 +783,8 @@ async function exportarWhatsApp(){
       if(d.length<1000)break;offset+=1000;
     }
     copiarOuDownload(todos.map(c=>`${c.razao_social}\t${c.whatsapp}`).join('\n'),'whatsapp_clientes.txt');
-    toast(`✅ ${todos.length} WhatsApp exportados!`,'ok');
-  }catch(e){toast('Erro ao exportar','err');}
+    toast(`✅ ${todos.length} WhatsApp!`,'ok');
+  }catch(e){toast('Erro','err');}
 }
 
 async function exportarCSV(){
@@ -716,8 +799,8 @@ async function exportarCSV(){
     const header='Razão Social;Nome Fantasia;CNPJ;CPF;Telefone;WhatsApp;Email;Cidade;Estado;Pipeline;Status';
     const rows=todos.map(c=>[c.razao_social,c.nome_fantasia,c.cnpj,c.cpf,c.telefone,c.whatsapp,c.email,c.cidade,c.estado,c.pipeline,c.status].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(';'));
     copiarOuDownload(header+'\n'+rows.join('\n'),'clientes_oneclick.csv');
-    toast(`✅ ${todos.length} registros exportados!`,'ok');
-  }catch(e){toast('Erro ao exportar','err');}
+    toast(`✅ ${todos.length} registros!`,'ok');
+  }catch(e){toast('Erro','err');}
 }
 
 function copiarOuDownload(txt,nome){
