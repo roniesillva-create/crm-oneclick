@@ -1,4 +1,4 @@
-const CACHE = 'oneclick-crm-v1';
+const CACHE = 'oneclick-crm-v3';
 const ASSETS = ['/', '/index.html'];
 
 self.addEventListener('install', e => {
