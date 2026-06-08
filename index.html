@@ -277,7 +277,37 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
     </div>
   </div>
 
+  <!-- FILTROS BANDEIRA -->
+  <div class="chips-section" style="border-bottom:none">
+    <div class="chips-label">Bandeira <span style="font-size:9px;color:var(--muted)">(Postos)</span></div>
+    <div class="chips-row" id="chips-bandeira">
+      <div class="chip" onclick="setChipExtra(this,'bandeira','')">⛽ Todas</div>
+      <div class="chip" onclick="setChipExtra(this,'bandeira','Ipiranga')">🟡 Ipiranga</div>
+      <div class="chip" onclick="setChipExtra(this,'bandeira','Shell')">🔴 Shell</div>
+      <div class="chip" onclick="setChipExtra(this,'bandeira','BR Petrobras')">🟢 BR</div>
+      <div class="chip" onclick="setChipExtra(this,'bandeira','ALE')">🔵 ALE</div>
+      <div class="chip" onclick="setChipExtra(this,'bandeira','Bandeira Branca')">⚪ Branca</div>
+      <div class="chip" onclick="setChipExtra(this,'bandeira','ESSO')">🟠 ESSO</div>
+    </div>
+  </div>
+
   <div class="filtros-extras">
+    <select class="select-filtro" id="f-rede" onchange="buscar()">
+      <option value="">Todas as Redes</option>
+      <option>Ipiranga</option>
+      <option>REDE ESA</option>
+      <option>Rede Duque</option>
+      <option>Raia Drogasil</option>
+      <option>MC Projetos</option>
+      <option>REDE VIDA</option>
+      <option>Sandra (Sincopetro)</option>
+      <option>REDE CAMPEÃO</option>
+      <option>Gusmão</option>
+      <option>Volney</option>
+      <option>Éllu</option>
+      <option>JBS</option>
+      <option>Primers</option>
+    </select>
     <select class="select-filtro" id="f-estado" onchange="buscar()">
       <option value="">Todos os Estados</option>
       <option>SP</option><option>MG</option><option>RJ</option><option>GO</option>
@@ -394,6 +424,7 @@ const POR_PAGINA=50;
 let paginaAtual=1,totalPaginas=1;
 let filtroPipe='',filtroSeg='',filtroSegId=null;
 let filtroEmail=false,filtroWpp=false,filtroEstado='';
+let filtroBandeira='',filtroRede='';
 let clientesCache=[],segmentosCache=[];
 let painelAberto=false;
 
@@ -530,13 +561,16 @@ function montarQuery(soCount=false){
   const busca=document.getElementById('search').value.trim();
   const estado=document.getElementById('f-estado').value||filtroEstado;
   const status=document.getElementById('f-status').value;
-  if(busca) q+=`&or=(razao_social.ilike.*${encodeURIComponent(busca)}*,nome_fantasia.ilike.*${encodeURIComponent(busca)}*,cidade.ilike.*${encodeURIComponent(busca)}*,cnpj.ilike.*${encodeURIComponent(busca)}*,email.ilike.*${encodeURIComponent(busca)}*)`;
+  const rede=document.getElementById('f-rede').value||filtroRede;
+  if(busca) q+=`&or=(razao_social.ilike.*${encodeURIComponent(busca)}*,nome_fantasia.ilike.*${encodeURIComponent(busca)}*,cidade.ilike.*${encodeURIComponent(busca)}*,cnpj.ilike.*${encodeURIComponent(busca)}*,email.ilike.*${encodeURIComponent(busca)}*,rede.ilike.*${encodeURIComponent(busca)}*)`;
   if(filtroPipe) q+=`&pipeline=eq.${encodeURIComponent(filtroPipe)}`;
   if(filtroSegId) q+=`&segmento_id=eq.${filtroSegId}`;
   if(estado) q+=`&estado=eq.${estado}`;
   if(status) q+=`&status=eq.${encodeURIComponent(status)}`;
   if(filtroEmail) q+=`&email=not.is.null&email=neq.`;
   if(filtroWpp) q+=`&whatsapp=not.is.null&whatsapp=neq.`;
+  if(filtroBandeira) q+=`&bandeira=eq.${encodeURIComponent(filtroBandeira)}`;
+  if(rede) q+=`&rede=eq.${encodeURIComponent(rede)}`;
   return q;
 }
 
@@ -625,14 +659,26 @@ function toggleEstado(est){
   buscar();
 }
 
+function setChipExtra(el,tipo,val){
+  const grupoId=tipo==='bandeira'?'chips-bandeira':'chips-rede';
+  document.querySelectorAll(`#${grupoId} .chip`).forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  if(tipo==='bandeira') filtroBandeira=val;
+  else filtroRede=val;
+  buscar();
+}
+
 function limparFiltros(){
   filtroPipe='';filtroSeg='';filtroSegId=null;filtroEmail=false;filtroWpp=false;filtroEstado='';
+  filtroBandeira='';filtroRede='';
   document.getElementById('search').value='';
   document.getElementById('f-estado').value='';
   document.getElementById('f-status').value='';
+  document.getElementById('f-rede').value='';
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   document.querySelector('#chips-pipeline .chip').classList.add('active');
   document.querySelector('#chips-seg .chip').classList.add('active');
+  document.querySelector('#chips-bandeira .chip').classList.add('active');
   buscar();
 }
 
@@ -662,6 +708,10 @@ function renderLista(lista){
         <div><span class="status-dot ${stClass(c.status||'Prospect')}"></span><span style="font-size:11px;color:var(--muted)">${c.status||'Prospect'}</span>${c.segmento?` <span style="font-size:10px;color:var(--muted)">• ${c.segmento}</span>`:''}</div>
         ${c.data_proximo_contato?`<span style="font-size:10px;color:var(--yellow)">📅 ${c.data_proximo_contato}</span>`:''}
       </div>
+      ${c.rede||c.bandeira?`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+        ${c.rede?`<span style="font-size:10px;background:#00e5ff11;border:1px solid var(--border);padding:2px 8px;border-radius:999px;color:var(--cyan)">🏢 ${c.rede}</span>`:''}
+        ${c.bandeira?`<span style="font-size:10px;background:#ffd34d11;border:1px solid #ffd34d33;padding:2px 8px;border-radius:999px;color:var(--yellow)">⛽ ${c.bandeira}</span>`:''}
+      </div>`:''}
     </div>`).join('');
 }
 
@@ -723,6 +773,8 @@ async function verCliente(id){
       <div class="detail-item"><div class="detail-item-label">WhatsApp</div><div class="detail-item-val"><a href="https://wa.me/55${(c.whatsapp||'').replace(/\D/g,'')}" style="color:var(--green)" target="_blank">${c.whatsapp||'—'}</a></div></div>
       <div class="detail-item"><div class="detail-item-label">E-mail</div><div class="detail-item-val" style="word-break:break-all">${c.email||'—'}</div></div>
       <div class="detail-item"><div class="detail-item-label">Cidade / UF</div><div class="detail-item-val">${c.cidade||'—'}${c.estado?' / '+c.estado:''}</div></div>
+      ${c.rede?`<div class="detail-item"><div class="detail-item-label">Rede</div><div class="detail-item-val" style="color:var(--cyan)">🏢 ${c.rede}</div></div>`:''}
+      ${c.bandeira?`<div class="detail-item"><div class="detail-item-label">Bandeira</div><div class="detail-item-val" style="color:var(--yellow)">⛽ ${c.bandeira}</div></div>`:''}
       ${c.data_proximo_contato?`<div class="detail-item"><div class="detail-item-label">Próx. Contato</div><div class="detail-item-val" style="color:var(--yellow)">${c.data_proximo_contato}</div></div>`:''}
       ${c.observacoes?`<div class="detail-item" style="flex-direction:column;align-items:flex-start;gap:6px"><div class="detail-item-label">Observações</div><div style="font-size:12px;color:var(--text)">${c.observacoes}</div></div>`:''}
     </div>
