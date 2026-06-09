@@ -3,386 +3,541 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#00e5ff">
+<meta name="theme-color" content="#0a1628">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OneClick CRM">
 <link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="https://fbgcafwoovwrtzdewclx.supabase.co/storage/v1/object/public/assets/LOGO.png">
 <title>OneClick CRM</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--cyan:#00e5ff;--green:#00ff99;--yellow:#ffd34d;--red:#ff3b5f;--card:#071b2edd;--bg1:#010712;--bg2:#06182a;--text:#e8f8ff;--muted:#9fdfff;--border:#00e5ff33}
-body{font-family:'Segoe UI',Arial,sans-serif;color:var(--text);background:linear-gradient(135deg,var(--bg1),var(--bg2) 60%,#020611);min-height:100vh;overflow-x:hidden}
-body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(#00e5ff0d 1px,transparent 1px),linear-gradient(90deg,#00e5ff0d 1px,transparent 1px);background-size:36px 36px;pointer-events:none;z-index:0}
-.login-screen{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bg1),var(--bg2));padding:20px}
-.login-screen::before{content:"";position:fixed;inset:0;background-image:linear-gradient(#00e5ff0d 1px,transparent 1px),linear-gradient(90deg,#00e5ff0d 1px,transparent 1px);background-size:36px 36px;pointer-events:none}
-.login-box{position:relative;z-index:1;background:#071b2eee;border:1px solid #00e5ff55;border-radius:24px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 0 60px #00e5ff22;text-align:center}
-.login-logo img{height:70px;filter:drop-shadow(0 0 12px #00e5ff) drop-shadow(0 0 28px #00e5ff88);margin-bottom:20px}
-.login-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:4px}
+:root{
+  --cyan:#00d4ff;--green:#00c97a;--yellow:#f5a623;--red:#e53935;--purple:#7c6ef5;
+  --bg:#0a1628;--bg2:#111f35;--bg3:#172440;--card:#1a2a42;
+  --text:#e8f0ff;--muted:#7a94b8;--border:#1e3050;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;overflow:hidden}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:32px 24px;width:100%;max-width:360px;text-align:center}
+.login-logo img{height:64px;filter:drop-shadow(0 0 10px rgba(0,212,255,.5));margin-bottom:16px}
+.login-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:3px}
 .login-title span{color:var(--cyan)}
-.login-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:28px}
-.login-group{text-align:left;margin-bottom:14px}
-.login-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px;display:block}
-.login-input{width:100%;background:#04111f;border:1px solid var(--border);border-radius:10px;padding:13px 14px;color:var(--text);font-size:16px;font-family:inherit;outline:none;transition:border-color .2s}
+.login-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+.login-group{text-align:left;margin-bottom:12px}
+.login-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;margin-bottom:5px;display:block}
+.login-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:16px;font-family:inherit;outline:none}
 .login-input:focus{border-color:var(--cyan)}
-.login-btn{width:100%;margin-top:10px;padding:14px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:15px;border:none;cursor:pointer;font-family:inherit}
-.login-error{background:#ff3b5f15;border:1px solid #ff3b5f44;border-radius:8px;padding:10px;color:var(--red);font-size:12px;margin-top:12px;display:none}
-.app{position:relative;z-index:1;display:none;flex-direction:column;min-height:100vh}
-.header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#071b2ef0;border-bottom:1px solid var(--border);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50}
-.brand{display:flex;align-items:center;gap:10px}
-.brand img{height:44px;filter:drop-shadow(0 0 8px #00e5ff)}
-.brand-name{font-size:15px;font-weight:800;color:#fff}
+.login-btn{width:100%;margin-top:8px;padding:13px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:14px;border:none;cursor:pointer;font-family:inherit}
+.login-error{background:rgba(229,57,53,.1);border:1px solid rgba(229,57,53,.3);border-radius:8px;padding:9px;color:var(--red);font-size:12px;margin-top:10px;display:none}
+
+/* APP */
+.app{position:fixed;inset:0;display:none;flex-direction:column}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + var(--safe-top)) 16px 10px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:50}
+.brand{display:flex;align-items:center;gap:8px}
+.brand img{height:38px;filter:drop-shadow(0 0 6px rgba(0,212,255,.4))}
+.brand-name{font-size:14px;font-weight:700;color:#fff}
 .brand-name span{color:var(--cyan)}
-.brand-sub{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.brand-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
 .header-right{display:flex;align-items:center;gap:8px}
-.dot-status{width:8px;height:8px;border-radius:50%;background:var(--yellow);animation:pulse 2s infinite}
-.dot-status.online{background:var(--green);box-shadow:0 0 6px var(--green)}
-.dot-status.offline{background:var(--red);animation:none}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--yellow);animation:pulse 2s infinite}
+.status-dot.online{background:var(--green)}
+.status-dot.offline{background:var(--red);animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.btn-logout{padding:7px 12px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit}
-.btn-novo-header{padding:7px 14px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:11px;border:none;cursor:pointer}
-.metrics-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 16px;background:#041426aa}
-.metric-mini{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center}
-.metric-mini-label{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:700;margin-bottom:4px}
-.metric-mini-val{font-size:20px;font-weight:900;color:var(--cyan);line-height:1}
-.metric-mini-val.green{color:var(--green)}
-.metric-mini-val.yellow{color:var(--yellow)}
-.filtros-section{padding:10px 16px;background:#041426cc;border-bottom:1px solid var(--border)}
-.filtros-row1{display:flex;gap:8px}
+.btn-sm{padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit}
+.btn-primary{background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:700;border:none;padding:7px 14px;border-radius:999px;font-size:11px;cursor:pointer}
+
+/* CONTEÚDO */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+/* BOTTOM NAV */
+.bottom-nav{display:flex;border-top:1px solid var(--border);padding-bottom:var(--safe-bottom);background:var(--bg2);flex-shrink:0}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-size:10px;font-family:inherit;transition:color .15s}
+.nav-btn.active{color:var(--cyan)}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* PÁGINAS */
+.page{display:none;min-height:100%}
+.page.active{display:block}
+
+/* MÉTRICAS */
+.metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:14px 16px}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}
+.metric-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:600;margin-bottom:6px}
+.metric-val{font-size:24px;font-weight:700;line-height:1}
+.metric-val.cyan{color:var(--cyan)}
+.metric-val.green{color:var(--green)}
+.metric-val.purple{color:var(--purple)}
+.metric-val.yellow{color:var(--yellow)}
+
+/* SEARCH BAR */
+.search-bar{padding:0 16px 12px;display:flex;gap:8px}
 .search-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px}
-.search-wrap:focus-within{border-color:var(--cyan)}
 .search-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:15px;flex:1;font-family:inherit;width:100%}
 .search-wrap input::placeholder{color:var(--muted)}
-.btn-buscar{padding:9px 16px;border-radius:10px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:12px;border:none;cursor:pointer;white-space:nowrap}
-.chips-section{padding:8px 16px;background:#041426cc;border-bottom:1px solid var(--border)}
-.chips-label{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;margin-bottom:6px}
-.chips-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.chips-row::-webkit-scrollbar{display:none}
-.chip{padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;display:flex;align-items:center;gap:4px}
-.chip.active{border-color:var(--cyan);background:#00e5ff15;color:var(--cyan)}
-.chip.chip-green.active{border-color:var(--green);background:#00ff9915;color:var(--green)}
-.chip.chip-purple.active{border-color:#b060ff;background:#b060ff15;color:#c088ff}
-.chip.chip-yellow.active{border-color:var(--yellow);background:#ffd34d15;color:var(--yellow)}
-.chip-count{background:#00e5ff22;color:var(--cyan);font-size:9px;font-weight:800;padding:1px 5px;border-radius:999px;min-width:18px;text-align:center}
-.chip.active .chip-count{background:#00e5ff33}
-.chip.chip-yellow.active .chip-count{background:#ffd34d33;color:var(--yellow)}
-.chip.chip-green.active .chip-count{background:#00ff9933;color:var(--green)}
-.chip.chip-purple.active .chip-count{background:#b060ff33;color:#c088ff}
-.filtros-extras{display:flex;gap:8px;padding:8px 16px;background:#041426cc;border-bottom:1px solid var(--border)}
-.select-filtro{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 10px;color:var(--muted);font-size:12px;font-family:inherit;cursor:pointer;outline:none;flex:1}
-.select-filtro:focus{border-color:var(--cyan)}
-.export-bar{display:flex;gap:6px;padding:8px 16px;background:#041426aa;border-bottom:1px solid var(--border)}
-.btn-export{flex:1;padding:8px 6px;border-radius:10px;font-size:10px;font-weight:700;border:none;cursor:pointer;font-family:inherit}
-.btn-export-email{background:#b060ff22;border:1px solid #b060ff44;color:#c088ff}
-.btn-export-wpp{background:#00ff9915;border:1px solid #00ff9944;color:var(--green)}
-.btn-export-csv{background:#00e5ff11;border:1px solid var(--border);color:var(--cyan)}
-.content{flex:1;padding:0 16px 100px}
-.results-info{font-size:11px;color:var(--muted);padding:8px 0 4px;display:flex;justify-content:space-between;align-items:center}
-.results-info strong{color:var(--cyan)}
-.client-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px;cursor:pointer;transition:all .15s;margin-bottom:10px}
-.client-card:active{background:#00e5ff08;transform:scale(.99)}
-.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.card-nome{font-size:14px;font-weight:700;color:var(--text);flex:1;margin-right:8px;line-height:1.3}
+.btn-filter{display:flex;align-items:center;gap:4px;padding:9px 12px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.btn-filter.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,.08)}
+
+/* CARDS CLIENTE */
+.client-list{padding:0 16px;display:flex;flex-direction:column;gap:8px;padding-bottom:16px}
+.client-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;cursor:pointer;transition:background .15s}
+.client-card:active{background:#1e3350}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.card-nome{font-size:13px;font-weight:600;color:var(--text);flex:1;margin-right:8px;line-height:1.3}
 .card-fantasia{font-size:11px;color:var(--muted);margin-top:2px}
-.card-mid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.card-tag{font-size:11px;color:var(--muted)}
-.card-tag.tel{color:var(--cyan)}
-.card-tag.email{color:#c088ff}
-.card-tag.wpp{color:var(--green)}
-.pipeline-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;white-space:nowrap}
-.p-prospect{background:#00e5ff15;color:var(--cyan);border:1px solid #00e5ff44}
-.p-contato{background:#ffd34d15;color:var(--yellow);border:1px solid #ffd34d44}
-.p-enviada{background:#b060ff15;color:#c088ff;border:1px solid #b060ff44}
-.p-negoc{background:#ff9d0015;color:#ffb040;border:1px solid #ff9d0044}
-.p-proposta{background:#ff6a0015;color:#ff8c40;border:1px solid #ff6a0044}
-.p-fechado{background:#00ff9915;color:var(--green);border:1px solid #00ff9944}
-.p-perdido{background:#ff3b5f15;color:var(--red);border:1px solid #ff3b5f44}
-.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
-.s-ativo{background:var(--green);box-shadow:0 0 4px var(--green)}
-.s-prospect{background:var(--cyan);box-shadow:0 0 4px var(--cyan)}
-.s-inativo{background:#666}
-.s-perdido{background:var(--red)}
-.paginacao{display:flex;align-items:center;justify-content:space-between;padding:14px 0 8px;gap:8px}
-.btn-pag{padding:10px 18px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--cyan);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.card-info{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--muted);margin-bottom:6px}
+.card-info .tel{color:var(--cyan)}
+.card-info .email{color:var(--purple)}
+.card-bottom{display:flex;justify-content:space-between;align-items:center}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:600;white-space:nowrap}
+.badge-blue{background:rgba(61,91,219,.2);color:#6b8ef5;border:1px solid rgba(61,91,219,.3)}
+.badge-green{background:rgba(0,201,122,.15);color:var(--green);border:1px solid rgba(0,201,122,.3)}
+.badge-yellow{background:rgba(245,166,35,.15);color:var(--yellow);border:1px solid rgba(245,166,35,.3)}
+.badge-purple{background:rgba(124,110,245,.15);color:var(--purple);border:1px solid rgba(124,110,245,.3)}
+.badge-orange{background:rgba(255,120,50,.15);color:#ff8c40;border:1px solid rgba(255,120,50,.3)}
+.badge-red{background:rgba(229,57,53,.15);color:var(--red);border:1px solid rgba(229,57,53,.3)}
+.seg-badge{font-size:10px;color:var(--muted)}
+.rede-badge{font-size:10px;padding:2px 7px;border-radius:999px;background:rgba(0,212,255,.08);color:var(--cyan);border:1px solid rgba(0,212,255,.2)}
+.band-badge{font-size:10px;padding:2px 7px;border-radius:999px;background:rgba(245,166,35,.08);color:var(--yellow);border:1px solid rgba(245,166,35,.2)}
+
+/* PAGINAÇÃO */
+.paginacao{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;gap:8px}
+.btn-pag{padding:8px 16px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--cyan);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
 .btn-pag:disabled{opacity:.4;cursor:not-allowed}
-.pag-info{font-size:12px;color:var(--muted);text-align:center;flex:1}
+.pag-info{font-size:11px;color:var(--muted);text-align:center;flex:1}
 .pag-info strong{color:var(--cyan)}
-.pag-nums{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:6px}
-.pag-num{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.pag-num.active{border-color:var(--cyan);background:#00e5ff15;color:var(--cyan)}
-.fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--cyan));border:none;cursor:pointer;box-shadow:0 0 24px #00e5ff55;display:flex;align-items:center;justify-content:center;font-size:26px;z-index:100}
+.pag-nums{display:flex;gap:5px;justify-content:center;margin-top:5px}
+.pag-num{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.pag-num.active{border-color:var(--cyan);background:rgba(0,212,255,.12);color:var(--cyan)}
+
+/* FAB */
+.fab{position:fixed;bottom:calc(70px + var(--safe-bottom));right:16px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--cyan));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;color:#001018;font-weight:700;z-index:40;box-shadow:0 4px 20px rgba(0,212,255,.3)}
 .fab:active{transform:scale(.93)}
-.modal-overlay{position:fixed;inset:0;background:#000000bb;z-index:200;display:flex;align-items:flex-end;justify-content:center}
-.modal{background:linear-gradient(135deg,#071b2e,#041426);border:1px solid #00e5ff55;border-radius:24px 24px 0 0;padding:20px 20px 32px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto}
-.modal-handle{width:40px;height:4px;background:#00e5ff44;border-radius:2px;margin:0 auto 16px}
-.modal-title{font-size:17px;font-weight:800;color:var(--cyan);margin-bottom:18px}
-.form-group{margin-bottom:14px}
-.form-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px;display:block}
-.form-input,.form-select,.form-textarea{width:100%;background:#04111f;border:1px solid var(--border);border-radius:10px;padding:12px 13px;color:var(--text);font-size:16px;font-family:inherit;outline:none;-webkit-appearance:none}
-.form-input:focus,.form-select:focus{border-color:var(--cyan)}
-.form-textarea{height:80px;resize:none}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.section-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--cyan);font-weight:700;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.modal-btns{display:flex;gap:10px;margin-top:20px}
-.btn-cancel{flex:1;padding:13px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;font-family:inherit}
-.btn-save{flex:2;padding:13px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:800;font-size:14px;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-save:disabled{opacity:.6}
-.detail-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.detail-avatar{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,#003a5c,#005f8a);border:1.5px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.detail-name{font-size:15px;font-weight:800;color:var(--text);line-height:1.2}
+
+/* HOJE */
+.section-title{font-size:13px;font-weight:600;color:var(--text);padding:14px 16px 8px}
+.agenda-card{background:var(--card);border-left:3px solid var(--cyan);border-radius:12px;padding:12px 14px;margin:0 16px 8px}
+.agenda-hora{font-size:11px;color:var(--muted);margin-bottom:3px}
+.agenda-nome{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.agenda-sub{font-size:11px;color:var(--muted);margin-bottom:8px}
+.agenda-btns{display:flex;gap:6px;flex-wrap:wrap}
+.btn-action{padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--cyan);font-size:11px;cursor:pointer;font-family:inherit}
+.btn-action.green{color:var(--green);border-color:rgba(0,201,122,.3)}
+.btn-action.purple{color:var(--purple);border-color:rgba(124,110,245,.3)}
+
+/* ROTEIRO */
+.roteiro-header{padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.roteiro-info{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin:0 16px 12px;font-size:12px;color:var(--muted);display:flex;gap:16px}
+.roteiro-info span{display:flex;align-items:center;gap:4px}
+.roteiro-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin:0 16px 8px;display:flex;align-items:center;gap:10px}
+.roteiro-num{width:28px;height:28px;border-radius:50%;background:rgba(61,91,219,.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#6b8ef5;flex-shrink:0}
+.roteiro-nome{font-size:13px;font-weight:600;color:var(--text)}
+.roteiro-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.btn-ia{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:rgba(124,110,245,.15);border:1px solid rgba(124,110,245,.3);color:var(--purple);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+
+/* DASHBOARD */
+.dash-section{padding:0 16px 14px}
+.dash-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-label{font-size:11px;color:var(--muted);width:85px;flex-shrink:0}
+.bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px}
+.bar-val{font-size:11px;color:var(--muted);min-width:30px;text-align:right}
+.funnel-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.funnel-row:last-child{border:none}
+
+/* CONFIG */
+.profile-box{display:flex;align-items:center;gap:12px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;margin:14px 16px}
+.avatar{width:46px;height:46px;border-radius:50%;background:rgba(61,91,219,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#6b8ef5;flex-shrink:0}
+.config-item{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin:0 16px 8px;cursor:pointer}
+.config-item-left{display:flex;align-items:center;gap:10px}
+.config-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+
+/* MODAL FILTROS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:20px 20px calc(20px + var(--safe-bottom));width:100%;max-width:600px;max-height:85vh;overflow-y:auto}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px}
+.filter-section{margin-bottom:16px}
+.filter-section-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;margin-bottom:8px}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.chip.active{border-color:var(--cyan);background:rgba(0,212,255,.1);color:var(--cyan)}
+.chip.active-green{border-color:var(--green);background:rgba(0,201,122,.1);color:var(--green)}
+.chip.active-purple{border-color:var(--purple);background:rgba(124,110,245,.1);color:var(--purple)}
+.modal-btns{display:flex;gap:10px;margin-top:16px}
+.btn-modal-cancel{flex:1;padding:12px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit}
+.btn-modal-apply{flex:2;padding:12px;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--cyan));color:#001018;font-weight:700;font-size:13px;border:none;cursor:pointer;font-family:inherit}
+
+/* MODAL DETALHE */
+.detail-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.detail-avatar{width:48px;height:48px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.detail-name{font-size:15px;font-weight:700;color:var(--text);line-height:1.2}
 .detail-seg{font-size:12px;color:var(--muted);margin-top:3px}
-.detail-items{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-.detail-item{background:#04111f;border:1px solid var(--border);border-radius:12px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center}
-.detail-item-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}
-.detail-item-val{font-size:13px;color:var(--text);font-weight:500;text-align:right;max-width:65%}
-.ia-box{background:#00e5ff08;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px}
-.ia-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--cyan);font-weight:700;margin-bottom:10px}
-/* EDITAR SEGMENTO */
-.edit-seg-box{background:#04111f;border:1px solid #ffd34d44;border-radius:14px;padding:14px;margin-bottom:14px}
-.edit-seg-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--yellow);font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.detail-items{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.detail-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.detail-item-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:600}
+.detail-item-val{font-size:12px;color:var(--text);font-weight:500;text-align:right;max-width:60%;word-break:break-all}
+.edit-seg-box{background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.2);border-radius:12px;padding:12px;margin-bottom:12px}
+.edit-seg-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--yellow);font-weight:600;margin-bottom:8px}
 .edit-seg-row{display:flex;gap:8px}
-.edit-seg-select{flex:1;background:#071b2e;border:1px solid #ffd34d44;border-radius:10px;padding:10px 12px;color:var(--text);font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none}
-.btn-seg-save{padding:10px 16px;border-radius:10px;background:linear-gradient(90deg,var(--yellow),#ff9d00);color:#001018;font-weight:800;font-size:12px;border:none;cursor:pointer;white-space:nowrap}
+.edit-seg-select{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-size:13px;font-family:inherit;outline:none;-webkit-appearance:none}
+.btn-seg-save{padding:9px 14px;border-radius:8px;background:linear-gradient(90deg,var(--yellow),#ff9d00);color:#001018;font-weight:700;font-size:12px;border:none;cursor:pointer;white-space:nowrap}
+.ia-box{background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:12px;padding:12px}
+.ia-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--cyan);font-weight:600;margin-bottom:8px}
+
+/* MODAL NOVO */
+.form-group{margin-bottom:12px}
+.form-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:600;margin-bottom:5px;display:block}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:11px 12px;color:var(--text);font-size:15px;font-family:inherit;outline:none;-webkit-appearance:none}
+.form-input:focus,.form-select:focus{border-color:var(--cyan)}
+.form-textarea{height:70px;resize:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-section{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--cyan);font-weight:600;margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+
+/* EXPORTAR */
+.export-bar{display:flex;gap:6px;padding:0 16px 12px}
+.btn-export{flex:1;padding:9px 6px;border-radius:10px;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:inherit}
+.btn-exp-email{background:rgba(124,110,245,.15);border:1px solid rgba(124,110,245,.3);color:var(--purple)}
+.btn-exp-wpp{background:rgba(0,201,122,.15);border:1px solid rgba(0,201,122,.3);color:var(--green)}
+.btn-exp-csv{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+
+/* LOADING */
 .loading-state{padding:48px 20px;text-align:center;color:var(--muted);font-size:13px}
 .spinner{display:inline-block;width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
-.spinner-sm{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
+.spinner-sm{display:inline-block;width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:999;animation:toastIn .3s;pointer-events:none;white-space:nowrap}
-.toast-ok{background:#00ff9920;border:1px solid var(--green);color:var(--green)}
-.toast-err{background:#ff3b5f20;border:1px solid var(--red);color:var(--red)}
-@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .empty-state{padding:60px 20px;text-align:center;color:var(--muted)}
-.hidden{display:none!important}
 
-/* PAINEL DE SEGMENTOS */
-.seg-painel{display:none;padding:10px 16px 0}
-.seg-painel-title{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;margin-bottom:8px}
-.seg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
-.seg-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .15s}
-.seg-card:active{background:#00e5ff08}
-.seg-card-icon{font-size:20px}
-.seg-card-info{flex:1}
-.seg-card-nome{font-size:11px;font-weight:700;color:var(--text)}
-.seg-card-total{font-size:18px;font-weight:900;color:var(--cyan)}
+/* TOAST */
+.toast{position:fixed;bottom:calc(80px + var(--safe-bottom));left:50%;transform:translateX(-50%);padding:11px 18px;border-radius:10px;font-size:12px;font-weight:600;z-index:999;animation:toastIn .3s;pointer-events:none;white-space:nowrap}
+.toast-ok{background:rgba(0,201,122,.15);border:1px solid rgba(0,201,122,.3);color:var(--green)}
+.toast-err{background:rgba(229,57,53,.15);border:1px solid rgba(229,57,53,.3);color:var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* RESULTADOS INFO */
+.results-info{font-size:11px;color:var(--muted);padding:6px 16px 8px;display:flex;justify-content:space-between}
+.results-info strong{color:var(--cyan)}
+
+.hidden{display:none!important}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-logo"><img src="https://fbgcafwoovwrtzdewclx.supabase.co/storage/v1/object/public/assets/LOGO.png"></div>
     <div class="login-title">ONE<span>CLICK</span> CRM</div>
-    <div class="login-sub">Acesso Restrito • TI Enterprise</div>
-    <div class="login-group">
-      <label class="login-label">Usuário</label>
-      <input class="login-input" type="text" id="l-user" placeholder="Digite seu usuário" autocomplete="username">
-    </div>
-    <div class="login-group">
-      <label class="login-label">Senha</label>
-      <input class="login-input" type="password" id="l-pass" placeholder="Digite sua senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')fazerLogin()">
-    </div>
+    <div class="login-sub">Acesso Restrito · TI Enterprise</div>
+    <div class="login-group"><label class="login-label">Usuário</label><input class="login-input" type="text" id="l-user" placeholder="Digite seu usuário" autocomplete="username"></div>
+    <div class="login-group"><label class="login-label">Senha</label><input class="login-input" type="password" id="l-pass" placeholder="Digite sua senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')fazerLogin()"></div>
     <button class="login-btn" onclick="fazerLogin()">Entrar no CRM</button>
     <div class="login-error" id="login-error">⚠️ Usuário ou senha incorretos.</div>
   </div>
 </div>
 
+<!-- APP -->
 <div class="app" id="app">
   <header class="header">
     <div class="brand">
       <img src="https://fbgcafwoovwrtzdewclx.supabase.co/storage/v1/object/public/assets/LOGO.png">
-      <div>
-        <div class="brand-name">ONE<span>CLICK</span> CRM</div>
-        <div class="brand-sub">TI Enterprise</div>
-      </div>
+      <div><div class="brand-name">ONE<span>CLICK</span> CRM</div><div class="brand-sub">TI Enterprise</div></div>
     </div>
     <div class="header-right">
-      <div class="dot-status" id="status-dot"></div>
-      <button class="btn-novo-header" onclick="abrirNovo()">+ Novo</button>
-      <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+      <div class="status-dot" id="status-dot"></div>
+      <button class="btn-primary" onclick="abrirNovo()">+ Novo</button>
+      <button class="btn-sm" onclick="fazerLogout()">Sair</button>
     </div>
   </header>
 
-  <div class="metrics-strip">
-    <div class="metric-mini"><div class="metric-mini-label">Total</div><div class="metric-mini-val" id="m-total">—</div></div>
-    <div class="metric-mini"><div class="metric-mini-label">c/ Email</div><div class="metric-mini-val" style="color:#c088ff" id="m-email">—</div></div>
-    <div class="metric-mini"><div class="metric-mini-label">c/ WhatsApp</div><div class="metric-mini-val green" id="m-wpp">—</div></div>
-    <div class="metric-mini"><div class="metric-mini-label">Fechados</div><div class="metric-mini-val yellow" id="m-fechados">—</div></div>
-  </div>
+  <div class="content" id="main-content">
 
-  <!-- PAINEL DE SEGMENTOS COM TOTAIS -->
-  <div class="seg-painel" id="seg-painel">
-    <div class="seg-painel-title">📊 Leads por Segmento</div>
-    <div class="seg-grid" id="seg-grid"></div>
-  </div>
-
-  <div class="filtros-section">
-    <div class="filtros-row1">
-      <div class="search-wrap">
-        <span style="color:var(--muted)">🔍</span>
-        <input type="search" id="search" placeholder="Buscar nome, cidade, CNPJ..." onkeydown="if(event.key==='Enter')buscar()">
+    <!-- PÁGINA CLIENTES -->
+    <div class="page active" id="page-clientes">
+      <div class="metrics-grid">
+        <div class="metric-card"><div class="metric-label">Total</div><div class="metric-val cyan" id="m-total">—</div></div>
+        <div class="metric-card"><div class="metric-label">c/ WhatsApp</div><div class="metric-val green" id="m-wpp">—</div></div>
+        <div class="metric-card"><div class="metric-label">c/ Email</div><div class="metric-val purple" id="m-email">—</div></div>
+        <div class="metric-card"><div class="metric-label">Fechados</div><div class="metric-val yellow" id="m-fechados">—</div></div>
       </div>
-      <button class="btn-buscar" onclick="buscar()">Buscar</button>
-    </div>
-  </div>
-
-  <div class="chips-section">
-    <div class="chips-label">Pipeline</div>
-    <div class="chips-row" id="chips-pipeline">
-      <div class="chip active" onclick="setChip(this,'pipeline','')">Todos</div>
-      <div class="chip" onclick="setChip(this,'pipeline','Em Prospeccao')">🔵 Prospecção</div>
-      <div class="chip" onclick="setChip(this,'pipeline','Contato Feito')">🟡 Contato</div>
-      <div class="chip" onclick="setChip(this,'pipeline','Apresentacao Enviada')">🟣 Apresentação</div>
-      <div class="chip" onclick="setChip(this,'pipeline','Em Negociacao')">🟠 Negociação</div>
-      <div class="chip" onclick="setChip(this,'pipeline','Proposta Enviada')">🟤 Proposta</div>
-      <div class="chip chip-green" onclick="setChip(this,'pipeline','Fechado')">✅ Fechado</div>
-      <div class="chip" onclick="setChip(this,'pipeline','Perdido')" style="border-color:#ff3b5f33">❌ Perdido</div>
-    </div>
-  </div>
-
-  <div class="chips-section">
-    <div class="chips-label">Segmento <span style="color:var(--cyan);font-size:9px;cursor:pointer" onclick="togglePainel()">📊 ver totais</span></div>
-    <div class="chips-row" id="chips-seg">
-      <div class="chip active" onclick="setChip(this,'seg','')">🌐 Todos</div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Farmácia')" data-seg="Farmácia">💊 Farmácia <span class="chip-count" id="cnt-1">—</span></div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Médico / Clínica')" data-seg="Médico / Clínica">👨‍⚕️ Médico/Clínica <span class="chip-count" id="cnt-4">—</span></div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Hospital')" data-seg="Hospital">🏥 Hospital <span class="chip-count" id="cnt-5">—</span></div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Odontologia')" data-seg="Odontologia">🦷 Odontologia <span class="chip-count" id="cnt-6">—</span></div>
-      <div class="chip chip-yellow" onclick="setChip(this,'seg','Laboratório')" data-seg="Laboratório">🔬 Laboratório <span class="chip-count" id="cnt-7">—</span></div>
-      <div class="chip chip-green" onclick="setChip(this,'seg','Mercado / Supermercado')" data-seg="Mercado / Supermercado">🛒 Mercado <span class="chip-count" id="cnt-2">—</span></div>
-      <div class="chip chip-green" onclick="setChip(this,'seg','Restaurante / Lanchonete')" data-seg="Restaurante / Lanchonete">🍽️ Restaurante <span class="chip-count" id="cnt-8">—</span></div>
-      <div class="chip chip-green" onclick="setChip(this,'seg','Comércio / Varejo')" data-seg="Comércio / Varejo">🏪 Com. Varejo <span class="chip-count" id="cnt-16">—</span></div>
-      <div class="chip chip-purple" onclick="setChip(this,'seg','Tecnologia / TI')" data-seg="Tecnologia / TI">💻 TI <span class="chip-count" id="cnt-18">—</span></div>
-      <div class="chip chip-purple" onclick="setChip(this,'seg','Contabilidade')" data-seg="Contabilidade">📊 Contab. <span class="chip-count" id="cnt-14">—</span></div>
-      <div class="chip chip-purple" onclick="setChip(this,'seg','Advocacia / Escritório Jurídico')" data-seg="Advocacia / Escritório Jurídico">⚖️ Advocacia <span class="chip-count" id="cnt-13">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Posto de Gasolina')" data-seg="Posto de Gasolina">⛽ Posto <span class="chip-count" id="cnt-3">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Academia / Fitness')" data-seg="Academia / Fitness">💪 Academia <span class="chip-count" id="cnt-11">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Indústria')" data-seg="Indústria">🏭 Indústria <span class="chip-count" id="cnt-17">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Transporte / Logística')" data-seg="Transporte / Logística">🚚 Transporte <span class="chip-count" id="cnt-19">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Salão de Beleza')" data-seg="Salão de Beleza">💇 Salão <span class="chip-count" id="cnt-12">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Hotel / Pousada')" data-seg="Hotel / Pousada">🏨 Hotel <span class="chip-count" id="cnt-9">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Escola / Faculdade')" data-seg="Escola / Faculdade">🎓 Escola <span class="chip-count" id="cnt-10">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Imobiliária')" data-seg="Imobiliária">🏠 Imobiliária <span class="chip-count" id="cnt-15">—</span></div>
-      <div class="chip" onclick="setChip(this,'seg','Outros')" data-seg="Outros">📋 Outros <span class="chip-count" id="cnt-20">—</span></div>
-    </div>
-  </div>
-
-  <div class="chips-section" style="border-bottom:none">
-    <div class="chips-label">Filtros Especiais</div>
-    <div class="chips-row">
-      <div class="chip chip-purple" id="chip-email" onclick="toggleEspecial('email')">📧 Com Email</div>
-      <div class="chip chip-green" id="chip-wpp" onclick="toggleEspecial('wpp')">💬 Com WhatsApp</div>
-      <div class="chip" id="chip-sp" onclick="toggleEstado('SP')">📍 SP</div>
-      <div class="chip" id="chip-mg" onclick="toggleEstado('MG')">📍 MG</div>
-      <div class="chip" id="chip-rj" onclick="toggleEstado('RJ')">📍 RJ</div>
-    </div>
-  </div>
-
-  <!-- FILTROS BANDEIRA -->
-  <div class="chips-section" style="border-bottom:none">
-    <div class="chips-label">Bandeira <span style="font-size:9px;color:var(--muted)">(Postos)</span></div>
-    <div class="chips-row" id="chips-bandeira">
-      <div class="chip" onclick="setChipExtra(this,'bandeira','')">⛽ Todas</div>
-      <div class="chip" onclick="setChipExtra(this,'bandeira','Ipiranga')">🟡 Ipiranga</div>
-      <div class="chip" onclick="setChipExtra(this,'bandeira','Shell')">🔴 Shell</div>
-      <div class="chip" onclick="setChipExtra(this,'bandeira','BR Petrobras')">🟢 BR</div>
-      <div class="chip" onclick="setChipExtra(this,'bandeira','ALE')">🔵 ALE</div>
-      <div class="chip" onclick="setChipExtra(this,'bandeira','Bandeira Branca')">⚪ Branca</div>
-      <div class="chip" onclick="setChipExtra(this,'bandeira','ESSO')">🟠 ESSO</div>
-    </div>
-  </div>
-
-  <div class="filtros-extras">
-    <select class="select-filtro" id="f-rede" onchange="buscar()">
-      <option value="">Todas as Redes</option>
-      <option>Ipiranga</option>
-      <option>REDE ESA</option>
-      <option>Rede Duque</option>
-      <option>Raia Drogasil</option>
-      <option>MC Projetos</option>
-      <option>REDE VIDA</option>
-      <option>Sandra (Sincopetro)</option>
-      <option>REDE CAMPEÃO</option>
-      <option>Gusmão</option>
-      <option>Volney</option>
-      <option>Éllu</option>
-      <option>JBS</option>
-      <option>Primers</option>
-    </select>
-    <select class="select-filtro" id="f-estado" onchange="buscar()">
-      <option value="">Todos os Estados</option>
-      <option>SP</option><option>MG</option><option>RJ</option><option>GO</option>
-      <option>PR</option><option>SC</option><option>RS</option><option>BA</option>
-      <option>PB</option><option>PE</option><option>CE</option><option>MT</option>
-      <option>MS</option><option>PA</option><option>AM</option><option>DF</option><option>ES</option>
-    </select>
-    <select class="select-filtro" id="f-status" onchange="buscar()">
-      <option value="">Todos os Status</option>
-      <option>Prospect</option><option>Ativo</option>
-      <option>Inativo</option><option>Perdido</option><option>Suspenso</option>
-    </select>
-    <button class="btn-buscar" onclick="limparFiltros()" style="background:#00e5ff11;border:1px solid var(--border);color:var(--muted);box-shadow:none;padding:8px 12px;font-size:11px">🗑️ Limpar</button>
-  </div>
-
-  <div class="export-bar">
-    <button class="btn-export btn-export-email" onclick="exportarEmails()">📧 Emails</button>
-    <button class="btn-export btn-export-wpp" onclick="exportarWhatsApp()">💬 WhatsApp</button>
-    <button class="btn-export btn-export-csv" onclick="exportarCSV()">📊 CSV</button>
-  </div>
-
-  <div class="content">
-    <div class="results-info" id="results-info"></div>
-    <div id="client-list"><div class="loading-state"><div class="spinner"></div><br>Carregando...</div></div>
-    <div class="paginacao" id="paginacao" style="display:none">
-      <button class="btn-pag" id="btn-prev" onclick="irPagina(paginaAtual-1)">← Ant.</button>
-      <div>
-        <div class="pag-info">Pág. <strong id="pag-atual">1</strong> / <strong id="pag-total">1</strong></div>
-        <div class="pag-nums" id="pag-nums"></div>
+      <div class="search-bar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--muted)" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="search" id="search" placeholder="Buscar nome, cidade, CNPJ..." onkeydown="if(event.key==='Enter')buscar()">
+        </div>
+        <button class="btn-filter" id="btn-filtro" onclick="abrirFiltros()">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54Z"/></svg>
+          Filtros
+        </button>
       </div>
-      <button class="btn-pag" id="btn-next" onclick="irPagina(paginaAtual+1)">Próx. →</button>
+      <div class="export-bar">
+        <button class="btn-export btn-exp-email" onclick="exportarEmails()">📧 Emails</button>
+        <button class="btn-export btn-exp-wpp" onclick="exportarWhatsApp()">💬 WhatsApp</button>
+        <button class="btn-export btn-exp-csv" onclick="exportarCSV()">📊 CSV</button>
+      </div>
+      <div class="results-info" id="results-info"></div>
+      <div class="client-list" id="client-list"><div class="loading-state"><div class="spinner"></div><br>Carregando...</div></div>
+      <div class="paginacao" id="paginacao" style="display:none">
+        <button class="btn-pag" id="btn-prev" onclick="irPagina(paginaAtual-1)">← Ant.</button>
+        <div><div class="pag-info">Pág. <strong id="pag-atual">1</strong> / <strong id="pag-total">1</strong></div><div class="pag-nums" id="pag-nums"></div></div>
+        <button class="btn-pag" id="btn-next" onclick="irPagina(paginaAtual+1)">Próx. →</button>
+      </div>
     </div>
+
+    <!-- PÁGINA HOJE -->
+    <div class="page" id="page-hoje">
+      <div class="section-title" id="hoje-titulo">Hoje</div>
+      <div id="hoje-lista"><div class="loading-state"><div class="spinner"></div><br>Carregando agenda...</div></div>
+    </div>
+
+    <!-- PÁGINA ROTEIRO -->
+    <div class="page" id="page-roteiro">
+      <div class="roteiro-header">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">Roteiro IA</div>
+          <div style="font-size:11px;color:var(--muted)">SP + MG · Otimizado por IA</div>
+        </div>
+        <button class="btn-ia" onclick="gerarRoteiro()">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+          Gerar Roteiro
+        </button>
+      </div>
+      <div class="roteiro-info">
+        <span id="roteiro-visitas">— visitas</span>
+        <span id="roteiro-km">— km</span>
+        <span id="roteiro-tempo">— min</span>
+      </div>
+      <div id="roteiro-lista"><div class="empty-state"><div style="font-size:36px;margin-bottom:8px">🗺️</div><div style="font-size:13px;color:var(--text);margin-bottom:4px">Nenhum roteiro gerado</div><div style="font-size:11px">Clique em Gerar Roteiro para a IA criar o roteiro otimizado do dia</div></div></div>
+    </div>
+
+    <!-- PÁGINA DASHBOARD -->
+    <div class="page" id="page-dashboard">
+      <div class="section-title">Dashboard</div>
+      <div class="dash-section">
+        <div class="dash-title">Leads por segmento</div>
+        <div id="dash-segmentos"><div class="loading-state" style="padding:20px"><div class="spinner"></div></div></div>
+      </div>
+      <div class="dash-section">
+        <div class="dash-title">Funil de pipeline</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px" id="dash-pipeline">
+          <div class="loading-state" style="padding:10px"><div class="spinner"></div></div>
+        </div>
+      </div>
+      <div class="dash-section">
+        <div class="dash-title">Distribuição por estado</div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px" id="dash-estados">
+          <div class="loading-state" style="padding:10px"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PÁGINA CONFIG -->
+    <div class="page" id="page-config">
+      <div class="profile-box">
+        <div class="avatar" id="cfg-avatar">RS</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text)" id="cfg-nome">Ronie Silva</div>
+          <div style="font-size:12px;color:var(--muted)">Diretor Comercial · Admin</div>
+          <div style="font-size:11px;color:var(--cyan);margin-top:2px">crm-api.oneclicksolucoes.com.br</div>
+        </div>
+      </div>
+      <div style="padding:0 16px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:600">Módulos</div>
+      <div class="config-item" onclick="toast('Em breve: gestão de usuários e representantes','ok')">
+        <div class="config-item-left">
+          <div class="config-icon" style="background:rgba(61,91,219,.15)">👥</div>
+          <div><div style="font-size:13px;color:var(--text)">Representantes</div><div style="font-size:11px;color:var(--muted)">Gerenciar usuários e acessos</div></div>
+        </div>
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--muted)" fill="none" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <div class="config-item" onclick="toast('Em breve: configurar workflows n8n e OpenClaw','ok')">
+        <div class="config-item-left">
+          <div class="config-icon" style="background:rgba(124,110,245,.15)">🤖</div>
+          <div><div style="font-size:13px;color:var(--text)">Automações</div><div style="font-size:11px;color:var(--muted)">n8n · OpenClaw · WhatsApp</div></div>
+        </div>
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--muted)" fill="none" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <div class="config-item" onclick="toast('Em breve: campanhas WhatsApp e Email','ok')">
+        <div class="config-item-left">
+          <div class="config-icon" style="background:rgba(0,201,122,.15)">📣</div>
+          <div><div style="font-size:13px;color:var(--text)">Campanhas</div><div style="font-size:11px;color:var(--muted)">WhatsApp · Email · Instagram</div></div>
+        </div>
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--muted)" fill="none" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <div class="config-item" onclick="toast('Em breve: folders Unicpharma e OneClick','ok')">
+        <div class="config-item-left">
+          <div class="config-icon" style="background:rgba(0,212,255,.1)">📋</div>
+          <div><div style="font-size:13px;color:var(--text)">Apresentações</div><div style="font-size:11px;color:var(--muted)">Folders Unicpharma · OneClick</div></div>
+        </div>
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--muted)" fill="none" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <div class="config-item" onclick="exportarCSV()">
+        <div class="config-item-left">
+          <div class="config-icon" style="background:rgba(245,166,35,.1)">📊</div>
+          <div><div style="font-size:13px;color:var(--text)">Exportar Base</div><div style="font-size:11px;color:var(--muted)">CSV completo de clientes</div></div>
+        </div>
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--muted)" fill="none" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+      <div style="text-align:center;padding:20px;font-size:10px;color:var(--muted)">OneClick CRM v2.0 · crm-api.oneclicksolucoes.com.br</div>
+    </div>
+
   </div>
 
-  <button class="fab" onclick="abrirNovo()">＋</button>
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" id="nav-clientes" onclick="setPage('clientes')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Clientes
+    </button>
+    <button class="nav-btn" id="nav-hoje" onclick="setPage('hoje')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Hoje
+    </button>
+    <button class="nav-btn" id="nav-roteiro" onclick="setPage('roteiro')">
+      <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      Roteiro
+    </button>
+    <button class="nav-btn" id="nav-dashboard" onclick="setPage('dashboard')">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-btn" id="nav-config" onclick="setPage('config')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Config
+    </button>
+  </nav>
+
+  <button class="fab" onclick="abrirNovo()">+</button>
 </div>
 
-<!-- MODAL NOVO -->
+<!-- MODAL FILTROS -->
+<div class="modal-overlay hidden" id="modal-filtros" onclick="fecharSeOverlay(event,'modal-filtros')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Filtros</div>
+    <div class="filter-section">
+      <div class="filter-section-title">Pipeline</div>
+      <div class="chips-wrap" id="chips-pipeline">
+        <div class="chip active" onclick="setChip(this,'pipeline','')">Todos</div>
+        <div class="chip" onclick="setChip(this,'pipeline','Em Prospeccao')">Prospecção</div>
+        <div class="chip" onclick="setChip(this,'pipeline','Contato Feito')">Contato</div>
+        <div class="chip" onclick="setChip(this,'pipeline','Apresentacao Enviada')">Apresentação</div>
+        <div class="chip" onclick="setChip(this,'pipeline','Em Negociacao')">Negociação</div>
+        <div class="chip" onclick="setChip(this,'pipeline','Proposta Enviada')">Proposta</div>
+        <div class="chip" onclick="setChip(this,'pipeline','Fechado')">✓ Fechado</div>
+        <div class="chip" onclick="setChip(this,'pipeline','Perdido')">Perdido</div>
+      </div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">Segmento</div>
+      <div class="chips-wrap" id="chips-seg">
+        <div class="chip active" onclick="setChip(this,'seg','')">Todos</div>
+        <div class="chip" onclick="setChip(this,'seg','Farmácia')">💊 Farmácia</div>
+        <div class="chip" onclick="setChip(this,'seg','Médico / Clínica')">👨‍⚕️ Médico</div>
+        <div class="chip" onclick="setChip(this,'seg','Hospital')">🏥 Hospital</div>
+        <div class="chip" onclick="setChip(this,'seg','Odontologia')">🦷 Odonto</div>
+        <div class="chip" onclick="setChip(this,'seg','Laboratório')">🔬 Lab</div>
+        <div class="chip" onclick="setChip(this,'seg','Mercado / Supermercado')">🛒 Mercado</div>
+        <div class="chip" onclick="setChip(this,'seg','Comércio / Varejo')">🏪 Varejo</div>
+        <div class="chip" onclick="setChip(this,'seg','Posto de Gasolina')">⛽ Posto</div>
+        <div class="chip" onclick="setChip(this,'seg','Tecnologia / TI')">💻 TI</div>
+        <div class="chip" onclick="setChip(this,'seg','Industria')">🏭 Indústria</div>
+        <div class="chip" onclick="setChip(this,'seg','Transporte / Logística')">🚚 Transporte</div>
+        <div class="chip" onclick="setChip(this,'seg','Academia / Fitness')">💪 Academia</div>
+        <div class="chip" onclick="setChip(this,'seg','Outros')">📋 Outros</div>
+      </div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">Bandeira (Postos)</div>
+      <div class="chips-wrap" id="chips-bandeira">
+        <div class="chip active" onclick="setChip(this,'bandeira','')">Todas</div>
+        <div class="chip" onclick="setChip(this,'bandeira','Ipiranga')">🟡 Ipiranga</div>
+        <div class="chip" onclick="setChip(this,'bandeira','Shell')">🔴 Shell</div>
+        <div class="chip" onclick="setChip(this,'bandeira','BR Petrobras')">🟢 BR</div>
+        <div class="chip" onclick="setChip(this,'bandeira','ALE')">🔵 ALE</div>
+        <div class="chip" onclick="setChip(this,'bandeira','Bandeira Branca')">⚪ Branca</div>
+      </div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">Estado</div>
+      <div class="chips-wrap" id="chips-estado">
+        <div class="chip active" onclick="setChip(this,'estado','')">Todos</div>
+        <div class="chip" onclick="setChip(this,'estado','SP')">SP</div>
+        <div class="chip" onclick="setChip(this,'estado','MG')">MG</div>
+        <div class="chip" onclick="setChip(this,'estado','RJ')">RJ</div>
+        <div class="chip" onclick="setChip(this,'estado','PR')">PR</div>
+        <div class="chip" onclick="setChip(this,'estado','SC')">SC</div>
+        <div class="chip" onclick="setChip(this,'estado','RS')">RS</div>
+        <div class="chip" onclick="setChip(this,'estado','GO')">GO</div>
+        <div class="chip" onclick="setChip(this,'estado','BA')">BA</div>
+        <div class="chip" onclick="setChip(this,'estado','ES')">ES</div>
+      </div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-section-title">Contato</div>
+      <div class="chips-wrap">
+        <div class="chip" id="chip-email" onclick="toggleChipEsp('email')">📧 Com Email</div>
+        <div class="chip" id="chip-wpp" onclick="toggleChipEsp('wpp')">💬 Com WhatsApp</div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-modal-cancel" onclick="limparFiltros()">Limpar</button>
+      <button class="btn-modal-apply" onclick="aplicarFiltros()">Aplicar Filtros</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE -->
+<div class="modal-overlay hidden" id="modal-detalhe" onclick="fecharSeOverlay(event,'modal-detalhe')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="d-content"></div>
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="btn-modal-cancel" onclick="fecharModal('modal-detalhe')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO CLIENTE -->
 <div class="modal-overlay hidden" id="modal-novo" onclick="fecharSeOverlay(event,'modal-novo')">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">⊕ Novo Cliente</div>
-    <div class="section-label">Empresa</div>
+    <div class="modal-title">Novo Cliente</div>
+    <div class="form-section">Empresa</div>
     <div class="form-group"><label class="form-label">Razão Social *</label><input class="form-input" id="f-razao" placeholder="Nome oficial"></div>
     <div class="form-group"><label class="form-label">Nome Fantasia</label><input class="form-input" id="f-fantasia" placeholder="Como é conhecido"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">CNPJ</label><input class="form-input" id="f-cnpj" placeholder="00.000.000/0001-00" type="tel"></div>
-      <div class="form-group"><label class="form-label">Porte</label>
-        <select class="form-select" id="f-porte"><option value="">—</option><option>MEI</option><option>Micro</option><option>Pequeno</option><option>Medio</option><option>Grande</option></select>
+      <div class="form-group"><label class="form-label">Segmento</label>
+        <select class="form-select" id="f-seg">
+          <option value="">Selecione...</option>
+          <option>Farmácia</option><option>Médico / Clínica</option><option>Hospital</option>
+          <option>Odontologia</option><option>Laboratório</option><option>Mercado / Supermercado</option>
+          <option>Posto de Gasolina</option><option>Restaurante / Lanchonete</option>
+          <option>Academia / Fitness</option><option>Comércio / Varejo</option>
+          <option>Indústria</option><option>Tecnologia / TI</option>
+          <option>Transporte / Logística</option><option>Outros</option>
+        </select>
       </div>
     </div>
-    <div class="form-group"><label class="form-label">Segmento</label>
-      <select class="form-select" id="f-seg">
-        <option value="">Selecione...</option>
-        <option>Farmácia</option><option>Médico / Clínica</option><option>Hospital</option>
-        <option>Odontologia</option><option>Laboratório</option><option>Mercado / Supermercado</option>
-        <option>Posto de Gasolina</option><option>Restaurante / Lanchonete</option><option>Hotel / Pousada</option>
-        <option>Escola / Faculdade</option><option>Academia / Fitness</option><option>Salão de Beleza</option>
-        <option>Advocacia / Escritório Jurídico</option><option>Contabilidade</option><option>Imobiliária</option>
-        <option>Comércio / Varejo</option><option>Indústria</option><option>Tecnologia / TI</option>
-        <option>Transporte / Logística</option><option>Outros</option>
-      </select>
-    </div>
-    <div class="section-label">Contato</div>
+    <div class="form-section">Contato</div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" id="f-tel" placeholder="(11) 3333-4444" type="tel"></div>
       <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="f-wpp" placeholder="(11) 99999-9999" type="tel"></div>
     </div>
     <div class="form-group"><label class="form-label">E-mail</label><input class="form-input" id="f-email" placeholder="contato@empresa.com.br" type="email"></div>
-    <div class="section-label">Localização</div>
+    <div class="form-section">Localização</div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Cidade</label><input class="form-input" id="f-cidade" placeholder="São Paulo"></div>
       <div class="form-group"><label class="form-label">UF</label><input class="form-input" id="f-estado-form" placeholder="SP" maxlength="2"></div>
     </div>
-    <div class="section-label">CRM</div>
+    <div class="form-section">CRM</div>
     <div class="form-group"><label class="form-label">Pipeline</label>
       <select class="form-select" id="f-pipe">
         <option value="Em Prospeccao">Em Prospecção</option>
@@ -397,19 +552,8 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
     <div class="form-group"><label class="form-label">Próximo Contato</label><input class="form-input" type="date" id="f-prox"></div>
     <div class="form-group"><label class="form-label">Observações</label><textarea class="form-textarea" id="f-obs" placeholder="Anotações..."></textarea></div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="fecharModal('modal-novo')">Cancelar</button>
-      <button class="btn-save" id="btn-salvar" onclick="salvarCliente()">💾 Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL DETALHE -->
-<div class="modal-overlay hidden" id="modal-detalhe" onclick="fecharSeOverlay(event,'modal-detalhe')">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div id="d-content"></div>
-    <div class="modal-btns" style="margin-top:16px">
-      <button class="btn-cancel" onclick="fecharModal('modal-detalhe')">Fechar</button>
+      <button class="btn-modal-cancel" onclick="fecharModal('modal-novo')">Cancelar</button>
+      <button class="btn-modal-apply" id="btn-salvar" onclick="salvarCliente()">💾 Salvar</button>
     </div>
   </div>
 </div>
@@ -417,15 +561,14 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 <script>
 const API='https://crm-api.oneclicksolucoes.com.br';
 const H={'Content-Type':'application/json'};
-const USUARIOS=[{user:'ronie',pass:'Natura123!@#',nome:'Ronie Silva'}];
+const USUARIOS=[{user:'ronie',pass:'Natura123!@#',nome:'Ronie Silva',iniciais:'RS'}];
 const POR_PAGINA=50;
 
 let paginaAtual=1,totalPaginas=1;
 let filtroPipe='',filtroSeg='',filtroSegId=null;
-let filtroEmail=false,filtroWpp=false,filtroEstado='';
-let filtroBandeira='',filtroRede='';
+let filtroEmail=false,filtroWpp=false,filtroEstado='',filtroBandeira='';
 let clientesCache=[],segmentosCache=[];
-let painelAberto=false;
+let paginaAtiva='clientes';
 
 // AUTH
 function fazerLogin(){
@@ -437,6 +580,8 @@ function fazerLogin(){
     sessionStorage.setItem('crm_auth',JSON.stringify(found));
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
+    document.getElementById('cfg-nome').textContent=found.nome;
+    document.getElementById('cfg-avatar').textContent=found.iniciais||found.nome.substring(0,2).toUpperCase();
     inicializar();
   }else{
     document.getElementById('login-error').style.display='block';
@@ -450,14 +595,30 @@ function fazerLogout(){
   document.getElementById('l-user').value='';document.getElementById('l-pass').value='';
 }
 function verificarSessao(){
-  if(sessionStorage.getItem('crm_auth')){
+  const s=sessionStorage.getItem('crm_auth');
+  if(s){
+    const u=JSON.parse(s);
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='flex';
+    document.getElementById('cfg-nome').textContent=u.nome;
+    document.getElementById('cfg-avatar').textContent=u.iniciais||u.nome.substring(0,2).toUpperCase();
     inicializar();
   }
 }
 
-// API LOCAL
+// NAVEGAÇÃO
+function setPage(nome){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+nome).classList.add('active');
+  document.getElementById('nav-'+nome).classList.add('active');
+  document.getElementById('main-content').scrollTop=0;
+  paginaAtiva=nome;
+  if(nome==='hoje')carregarHoje();
+  if(nome==='dashboard')carregarDashboard();
+}
+
+// API
 async function apiGet(path){
   const r=await fetch(API+path,{headers:H});
   if(!r.ok)throw new Error(await r.text());
@@ -475,101 +636,58 @@ async function apiPatch(path,body){
 }
 
 async function inicializar(){
-  await Promise.all([carregarMetricas(),carregarTotaisSegmentos(),buscar()]);
+  await Promise.all([carregarMetricas(),carregarSegmentos(),buscar()]);
 }
 
 async function carregarMetricas(){
   try{
-    const data=await apiGet('/api/clientes/metricas');
-    document.getElementById('m-total').textContent=parseInt(data.total).toLocaleString('pt-BR');
-    document.getElementById('m-email').textContent=parseInt(data.com_email).toLocaleString('pt-BR');
-    document.getElementById('m-wpp').textContent=parseInt(data.com_whatsapp).toLocaleString('pt-BR');
-    document.getElementById('m-fechados').textContent=parseInt(data.fechados).toLocaleString('pt-BR');
-    document.getElementById('status-dot').className='dot-status online';
-  }catch(e){document.getElementById('status-dot').className='dot-status offline';}
+    const d=await apiGet('/api/clientes/metricas');
+    document.getElementById('m-total').textContent=parseInt(d.total).toLocaleString('pt-BR');
+    document.getElementById('m-wpp').textContent=parseInt(d.com_whatsapp).toLocaleString('pt-BR');
+    document.getElementById('m-email').textContent=parseInt(d.com_email).toLocaleString('pt-BR');
+    document.getElementById('m-fechados').textContent=parseInt(d.fechados).toLocaleString('pt-BR');
+    document.getElementById('status-dot').className='status-dot online';
+  }catch(e){document.getElementById('status-dot').className='status-dot offline';}
 }
 
-async function carregarTotaisSegmentos(){
+async function carregarSegmentos(){
   try{
-    const data=await apiGet('/api/clientes/por-segmento');
-    segmentosCache=data;
-    data.forEach(s=>{
-      const el=document.getElementById('cnt-'+s.id);
-      if(el&&s.total>0) el.textContent=s.total>999?(Math.round(s.total/1000)+'k'):s.total;
-    });
-    const segEmojis={'Farmácia':'💊','Médico / Clínica':'👨‍⚕️','Hospital':'🏥','Odontologia':'🦷','Laboratório':'🔬','Mercado / Supermercado':'🛒','Restaurante / Lanchonete':'🍽️','Comércio / Varejo':'🏪','Tecnologia / TI':'💻','Contabilidade':'📊','Advocacia / Escritório Jurídico':'⚖️','Posto de Gasolina':'⛽','Academia / Fitness':'💪','Indústria':'🏭','Transporte / Logística':'🚚','Salão de Beleza':'💇','Hotel / Pousada':'🏨','Escola / Faculdade':'🎓','Imobiliária':'🏠','Outros':'📋'};
-    const grid=document.getElementById('seg-grid');
-    grid.innerHTML=data.filter(s=>s.total>0).map(s=>`
-      <div class="seg-card" onclick="filtrarPorSegmento('${s.nome}')">
-        <div class="seg-card-icon">${segEmojis[s.nome]||'📋'}</div>
-        <div class="seg-card-info">
-          <div class="seg-card-nome">${s.nome}</div>
-          <div class="seg-card-total">${parseInt(s.total).toLocaleString('pt-BR')}</div>
-        </div>
-      </div>`).join('');
-  }catch(e){console.error('Erro segmentos:',e);}
+    const d=await apiGet('/api/clientes/por-segmento');
+    segmentosCache=d;
+  }catch(e){}
 }
 
-function togglePainel(){
-  painelAberto=!painelAberto;
-  document.getElementById('seg-painel').style.display=painelAberto?'block':'none';
-}
-
-function filtrarPorSegmento(nome){
-  filtroSeg=nome;
-  // Ativar chip correspondente
-  document.querySelectorAll('#chips-seg .chip').forEach(c=>{
-    c.classList.toggle('active',c.dataset.seg===nome);
-  });
-  if(painelAberto)togglePainel();
-  buscar();
+function montarQueryParams(){
+  const params=new URLSearchParams();
+  const busca=document.getElementById('search').value.trim();
+  if(busca)params.set('busca',busca);
+  if(filtroPipe)params.set('pipeline',filtroPipe);
+  if(filtroSegId)params.set('segmento_id',filtroSegId);
+  if(filtroEstado)params.set('estado',filtroEstado);
+  if(filtroEmail)params.set('email','true');
+  if(filtroWpp)params.set('whatsapp','true');
+  if(filtroBandeira)params.set('bandeira',filtroBandeira);
+  return params;
 }
 
 async function resolverSegId(nome){
   if(!nome){filtroSegId=null;return;}
   const found=segmentosCache.find(s=>s.nome===nome);
-  if(found){filtroSegId=found.id;return;}
-  try{
-    const data=await apiGet('/api/segmentos');
-    const seg=data.find(s=>s.nome===nome);
-    filtroSegId=seg?seg.id:null;
-  }catch(e){filtroSegId=null;}
-}
-
-function montarQueryParams(){
-  const busca=document.getElementById('search').value.trim();
-  const estado=document.getElementById('f-estado').value||filtroEstado;
-  const status=document.getElementById('f-status').value;
-  const rede=document.getElementById('f-rede').value||filtroRede;
-  const params=new URLSearchParams();
-  if(busca) params.set('busca',busca);
-  if(filtroPipe) params.set('pipeline',filtroPipe);
-  if(filtroSegId) params.set('segmento_id',filtroSegId);
-  if(estado) params.set('estado',estado);
-  if(status) params.set('status',status);
-  if(filtroEmail) params.set('email','true');
-  if(filtroWpp) params.set('whatsapp','true');
-  if(filtroBandeira) params.set('bandeira',filtroBandeira);
-  if(rede) params.set('rede',rede);
-  return params;
+  filtroSegId=found?found.id:null;
 }
 
 async function buscar(resetPagina=true){
   if(resetPagina)paginaAtual=1;
-  if(filtroSeg)await resolverSegId(filtroSeg);
-  else filtroSegId=null;
+  await resolverSegId(filtroSeg);
   await carregarPagina();
 }
-
-async function contarResultados(){}
 
 async function carregarPagina(){
   document.getElementById('client-list').innerHTML='<div class="loading-state"><div class="spinner"></div><br>Carregando...</div>';
   try{
     const params=montarQueryParams();
-    const offset=(paginaAtual-1)*POR_PAGINA;
     params.set('limit',POR_PAGINA);
-    params.set('offset',offset);
+    params.set('offset',(paginaAtual-1)*POR_PAGINA);
     const data=await apiGet(`/api/clientes?${params.toString()}`);
     totalPaginas=data.total_paginas||1;
     clientesCache=(data.clientes||[]).map(c=>({...c,segmento:c.segmento_nome||''}));
@@ -579,14 +697,14 @@ async function carregarPagina(){
     renderLista(clientesCache);
     renderPaginacao();
   }catch(e){
-    document.getElementById('client-list').innerHTML=`<div class="loading-state" style="color:var(--red)">⚠️ Erro ao carregar.<br><button class="btn-buscar" onclick="buscar()" style="margin-top:12px">Tentar novamente</button></div>`;
+    document.getElementById('client-list').innerHTML=`<div class="loading-state" style="color:var(--red)">⚠️ Erro ao carregar.<br><button class="btn-sm" onclick="buscar()" style="margin-top:12px">Tentar novamente</button></div>`;
   }
 }
 
 function irPagina(p){
   if(p<1||p>totalPaginas)return;
-  paginaAtual=p;carregarPagina();contarResultados();
-  window.scrollTo({top:0,behavior:'smooth'});
+  paginaAtual=p;carregarPagina();
+  document.getElementById('main-content').scrollTop=0;
 }
 
 function renderPaginacao(){
@@ -608,67 +726,13 @@ function renderPaginacao(){
   }
 }
 
-function setChip(el,tipo,val){
-  const grupoId=tipo==='pipeline'?'chips-pipeline':'chips-seg';
-  document.querySelectorAll(`#${grupoId} .chip`).forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  if(tipo==='pipeline')filtroPipe=val;
-  else{filtroSeg=val;}
-  buscar();
-}
-
-function toggleEspecial(tipo){
-  if(tipo==='email'){filtroEmail=!filtroEmail;document.getElementById('chip-email').classList.toggle('active',filtroEmail);}
-  else{filtroWpp=!filtroWpp;document.getElementById('chip-wpp').classList.toggle('active',filtroWpp);}
-  buscar();
-}
-
-function toggleEstado(est){
-  const ids={'SP':'chip-sp','MG':'chip-mg','RJ':'chip-rj'};
-  if(filtroEstado===est){
-    filtroEstado='';
-    document.getElementById(ids[est]).classList.remove('active');
-    document.getElementById('f-estado').value='';
-  }else{
-    filtroEstado=est;
-    Object.values(ids).forEach(id=>document.getElementById(id).classList.remove('active'));
-    document.getElementById(ids[est]).classList.add('active');
-    document.getElementById('f-estado').value=est;
-  }
-  buscar();
-}
-
-function setChipExtra(el,tipo,val){
-  const grupoId=tipo==='bandeira'?'chips-bandeira':'chips-rede';
-  document.querySelectorAll(`#${grupoId} .chip`).forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  if(tipo==='bandeira') filtroBandeira=val;
-  else filtroRede=val;
-  buscar();
-}
-
-function limparFiltros(){
-  filtroPipe='';filtroSeg='';filtroSegId=null;filtroEmail=false;filtroWpp=false;filtroEstado='';
-  filtroBandeira='';filtroRede='';
-  document.getElementById('search').value='';
-  document.getElementById('f-estado').value='';
-  document.getElementById('f-status').value='';
-  document.getElementById('f-rede').value='';
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-  document.querySelector('#chips-pipeline .chip').classList.add('active');
-  document.querySelector('#chips-seg .chip').classList.add('active');
-  document.querySelector('#chips-bandeira .chip').classList.add('active');
-  buscar();
-}
-
-function pipeClass(p){return{'Em Prospeccao':'p-prospect','Contato Feito':'p-contato','Apresentacao Enviada':'p-enviada','Em Negociacao':'p-negoc','Proposta Enviada':'p-proposta','Fechado':'p-fechado','Perdido':'p-perdido'}[p]||'p-prospect';}
+function pipeClass(p){return{'Em Prospeccao':'badge-blue','Contato Feito':'badge-yellow','Apresentacao Enviada':'badge-purple','Em Negociacao':'badge-orange','Proposta Enviada':'badge-orange','Fechado':'badge-green','Perdido':'badge-red'}[p]||'badge-blue';}
 function pipeLabel(p){return{'Em Prospeccao':'Prospecção','Contato Feito':'Contato','Apresentacao Enviada':'Apresentação','Em Negociacao':'Negociação','Proposta Enviada':'Proposta','Fechado':'✓ Fechado','Perdido':'Perdido'}[p]||p;}
-function stClass(s){return{Ativo:'s-ativo',Prospect:'s-prospect',Inativo:'s-inativo',Perdido:'s-perdido'}[s]||'s-prospect';}
 function segEmoji(s){return{'Farmácia':'💊','Mercado / Supermercado':'🛒','Posto de Gasolina':'⛽','Médico / Clínica':'👨‍⚕️','Hospital':'🏥','Odontologia':'🦷','Laboratório':'🔬','Restaurante / Lanchonete':'🍽️','Hotel / Pousada':'🏨','Escola / Faculdade':'🎓','Academia / Fitness':'💪','Salão de Beleza':'💇','Advocacia / Escritório Jurídico':'⚖️','Contabilidade':'📊','Imobiliária':'🏠','Comércio / Varejo':'🏪','Indústria':'🏭','Tecnologia / TI':'💻','Transporte / Logística':'🚚','Outros':'📋'}[s]||'📋';}
 
 function renderLista(lista){
   const el=document.getElementById('client-list');
-  if(!lista.length){el.innerHTML=`<div class="empty-state"><div style="font-size:48px;margin-bottom:12px">📋</div><div style="color:var(--text);font-size:14px;margin-bottom:4px">Nenhum cliente encontrado</div><div style="font-size:12px">Ajuste os filtros ou cadastre um novo</div></div>`;return;}
+  if(!lista.length){el.innerHTML=`<div class="empty-state"><div style="font-size:36px;margin-bottom:8px">📋</div><div style="font-size:13px;color:var(--text);margin-bottom:4px">Nenhum cliente encontrado</div><div style="font-size:11px">Ajuste os filtros ou cadastre um novo</div></div>`;return;}
   el.innerHTML=lista.map(c=>`
     <div class="client-card" onclick="verCliente(${c.id})">
       <div class="card-top">
@@ -676,28 +740,57 @@ function renderLista(lista){
           <div class="card-nome">${segEmoji(c.segmento)} ${c.razao_social||''}</div>
           ${c.nome_fantasia&&c.nome_fantasia!==c.razao_social?`<div class="card-fantasia">${c.nome_fantasia}</div>`:''}
         </div>
-        <span class="pipeline-badge ${pipeClass(c.pipeline||'Em Prospeccao')}">${pipeLabel(c.pipeline||'Em Prospeccao')}</span>
+        <span class="badge ${pipeClass(c.pipeline||'Em Prospeccao')}">${pipeLabel(c.pipeline||'Em Prospeccao')}</span>
       </div>
-      <div class="card-mid">
-        ${c.cidade?`<span class="card-tag">📍 ${c.cidade}${c.estado?' / '+c.estado:''}</span>`:''}
-        ${c.telefone?`<span class="card-tag tel">📞 ${c.telefone}</span>`:''}
-        ${c.email?`<span class="card-tag email">📧 ${c.email}</span>`:''}
+      <div class="card-info">
+        ${c.cidade?`<span>📍 ${c.cidade}${c.estado?' / '+c.estado:''}</span>`:''}
+        ${c.telefone?`<span class="tel">📞 ${c.telefone}</span>`:''}
+        ${c.email?`<span class="email">📧 ${c.email}</span>`:''}
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><span class="status-dot ${stClass(c.status||'Prospect')}"></span><span style="font-size:11px;color:var(--muted)">${c.status||'Prospect'}</span>${c.segmento?` <span style="font-size:10px;color:var(--muted)">• ${c.segmento}</span>`:''}</div>
-        ${c.data_proximo_contato?`<span style="font-size:10px;color:var(--yellow)">📅 ${c.data_proximo_contato}</span>`:''}
+      <div class="card-bottom">
+        <span class="seg-badge">${c.segmento||'—'}</span>
+        <div style="display:flex;gap:4px">
+          ${c.rede?`<span class="rede-badge">🏢 ${c.rede}</span>`:''}
+          ${c.bandeira?`<span class="band-badge">⛽ ${c.bandeira}</span>`:''}
+          ${c.data_proximo_contato?`<span style="font-size:10px;color:var(--yellow)">📅 ${c.data_proximo_contato}</span>`:''}
+        </div>
       </div>
-      ${c.rede||c.bandeira?`<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
-        ${c.rede?`<span style="font-size:10px;background:#00e5ff11;border:1px solid var(--border);padding:2px 8px;border-radius:999px;color:var(--cyan)">🏢 ${c.rede}</span>`:''}
-        ${c.bandeira?`<span style="font-size:10px;background:#ffd34d11;border:1px solid #ffd34d33;padding:2px 8px;border-radius:999px;color:var(--yellow)">⛽ ${c.bandeira}</span>`:''}
-      </div>`:''}
     </div>`).join('');
 }
 
-function abrirNovo(){document.getElementById('modal-novo').classList.remove('hidden');}
+// FILTROS
+function abrirFiltros(){document.getElementById('modal-filtros').classList.remove('hidden');}
+function setChip(el,tipo,val){
+  const mapa={pipeline:'chips-pipeline',seg:'chips-seg',bandeira:'chips-bandeira',estado:'chips-estado'};
+  document.querySelectorAll(`#${mapa[tipo]} .chip`).forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  if(tipo==='pipeline')filtroPipe=val;
+  else if(tipo==='seg')filtroSeg=val;
+  else if(tipo==='bandeira')filtroBandeira=val;
+  else if(tipo==='estado')filtroEstado=val;
+}
+function toggleChipEsp(tipo){
+  if(tipo==='email'){filtroEmail=!filtroEmail;document.getElementById('chip-email').classList.toggle('active',filtroEmail);}
+  else{filtroWpp=!filtroWpp;document.getElementById('chip-wpp').classList.toggle('active',filtroWpp);}
+}
+function aplicarFiltros(){fecharModal('modal-filtros');buscar();}
+function limparFiltros(){
+  filtroPipe='';filtroSeg='';filtroSegId=null;filtroEmail=false;filtroWpp=false;filtroEstado='';filtroBandeira='';
+  document.getElementById('search').value='';
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  document.querySelector('#chips-pipeline .chip').classList.add('active');
+  document.querySelector('#chips-seg .chip').classList.add('active');
+  document.querySelector('#chips-bandeira .chip').classList.add('active');
+  document.querySelector('#chips-estado .chip').classList.add('active');
+  document.getElementById('btn-filtro').classList.remove('active');
+}
+
+// MODAIS
 function fecharModal(id){document.getElementById(id).classList.add('hidden');}
 function fecharSeOverlay(e,id){if(e.target===e.currentTarget)fecharModal(id);}
+function abrirNovo(){document.getElementById('modal-novo').classList.remove('hidden');document.getElementById('f-razao').focus();}
 
+// NOVO CLIENTE
 async function salvarCliente(){
   const razao=document.getElementById('f-razao').value.trim();
   if(!razao){toast('Informe a Razão Social!','err');return;}
@@ -706,14 +799,10 @@ async function salvarCliente(){
   btn.innerHTML='<div class="spinner-sm"></div>';btn.disabled=true;
   try{
     let segId=null;
-    if(segNome){
-      const found=segmentosCache.find(s=>s.nome===segNome);
-      if(found)segId=found.id;
-    }
+    if(segNome){const found=segmentosCache.find(s=>s.nome===segNome);if(found)segId=found.id;}
     await apiPost('/api/clientes',{
       razao_social:razao,nome_fantasia:document.getElementById('f-fantasia').value||null,
       cnpj:document.getElementById('f-cnpj').value||null,segmento_id:segId,
-      porte:document.getElementById('f-porte').value||null,
       telefone:document.getElementById('f-tel').value||null,
       whatsapp:document.getElementById('f-wpp').value||null,
       email:document.getElementById('f-email').value||null,
@@ -726,56 +815,49 @@ async function salvarCliente(){
     });
     toast('✅ Cliente salvo!','ok');fecharModal('modal-novo');
     ['f-razao','f-fantasia','f-cnpj','f-tel','f-wpp','f-email','f-cidade','f-estado-form','f-obs','f-prox'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-    document.getElementById('f-seg').value='';document.getElementById('f-porte').value='';
-    document.getElementById('f-pipe').value='Em Prospeccao';
+    document.getElementById('f-seg').value='';document.getElementById('f-pipe').value='Em Prospeccao';
     await inicializar();
-  }catch(e){toast('Erro: '+e.message.substring(0,60),'err');}
+  }catch(e){toast('Erro: '+e.message.substring(0,50),'err');}
   finally{btn.innerHTML='💾 Salvar';btn.disabled=false;}
 }
 
+// DETALHE
 async function verCliente(id){
   const c=clientesCache.find(x=>x.id===id);if(!c)return;
   document.getElementById('modal-detalhe').classList.remove('hidden');
-
-  const opcoesSegs = segmentosCache.map(s=>`<option value="${s.id}" ${c.segmento_id===s.id?'selected':''}>${segEmoji(s.nome)} ${s.nome}</option>`).join('');
-
+  const opcoesSegs=segmentosCache.map(s=>`<option value="${s.id}" ${c.segmento_id===s.id?'selected':''}>${segEmoji(s.nome)} ${s.nome}</option>`).join('');
   document.getElementById('d-content').innerHTML=`
     <div class="detail-header">
       <div class="detail-avatar">${segEmoji(c.segmento)}</div>
-      <div><div class="detail-name">${c.razao_social}</div><div class="detail-seg">${c.segmento||'—'}${c.cidade?' • '+c.cidade:''}</div></div>
+      <div><div class="detail-name">${c.razao_social}</div><div class="detail-seg">${c.segmento||'—'}${c.cidade?' · '+c.cidade:''}</div></div>
     </div>
     <div class="detail-items">
-      <div class="detail-item"><div class="detail-item-label">Pipeline</div><div class="detail-item-val"><span class="pipeline-badge ${pipeClass(c.pipeline||'Em Prospeccao')}">${pipeLabel(c.pipeline||'Em Prospeccao')}</span></div></div>
+      <div class="detail-item"><div class="detail-item-label">Pipeline</div><div class="detail-item-val"><span class="badge ${pipeClass(c.pipeline||'Em Prospeccao')}">${pipeLabel(c.pipeline||'Em Prospeccao')}</span></div></div>
       <div class="detail-item"><div class="detail-item-label">CNPJ/CPF</div><div class="detail-item-val">${c.cnpj||c.cpf||'—'}</div></div>
       <div class="detail-item"><div class="detail-item-label">Telefone</div><div class="detail-item-val"><a href="tel:${c.telefone||''}" style="color:var(--cyan)">${c.telefone||'—'}</a></div></div>
       <div class="detail-item"><div class="detail-item-label">WhatsApp</div><div class="detail-item-val"><a href="https://wa.me/55${(c.whatsapp||'').replace(/\D/g,'')}" style="color:var(--green)" target="_blank">${c.whatsapp||'—'}</a></div></div>
-      <div class="detail-item"><div class="detail-item-label">E-mail</div><div class="detail-item-val" style="word-break:break-all">${c.email||'—'}</div></div>
+      <div class="detail-item"><div class="detail-item-label">E-mail</div><div class="detail-item-val">${c.email||'—'}</div></div>
       <div class="detail-item"><div class="detail-item-label">Cidade / UF</div><div class="detail-item-val">${c.cidade||'—'}${c.estado?' / '+c.estado:''}</div></div>
       ${c.rede?`<div class="detail-item"><div class="detail-item-label">Rede</div><div class="detail-item-val" style="color:var(--cyan)">🏢 ${c.rede}</div></div>`:''}
       ${c.bandeira?`<div class="detail-item"><div class="detail-item-label">Bandeira</div><div class="detail-item-val" style="color:var(--yellow)">⛽ ${c.bandeira}</div></div>`:''}
       ${c.data_proximo_contato?`<div class="detail-item"><div class="detail-item-label">Próx. Contato</div><div class="detail-item-val" style="color:var(--yellow)">${c.data_proximo_contato}</div></div>`:''}
-      ${c.observacoes?`<div class="detail-item" style="flex-direction:column;align-items:flex-start;gap:6px"><div class="detail-item-label">Observações</div><div style="font-size:12px;color:var(--text)">${c.observacoes}</div></div>`:''}
+      ${c.observacoes?`<div class="detail-item" style="flex-direction:column;align-items:flex-start;gap:5px"><div class="detail-item-label">Observações</div><div style="font-size:12px;color:var(--text)">${c.observacoes}</div></div>`:''}
     </div>
-    <!-- EDITAR SEGMENTO -->
     <div class="edit-seg-box">
       <div class="edit-seg-label">✏️ Corrigir Segmento</div>
       <div class="edit-seg-row">
-        <select class="edit-seg-select" id="edit-seg-${id}">
-          <option value="">Selecione...</option>
-          ${opcoesSegs}
-        </select>
+        <select class="edit-seg-select" id="edit-seg-${id}"><option value="">Selecione...</option>${opcoesSegs}</select>
         <button class="btn-seg-save" onclick="salvarSegmento(${id})">Salvar</button>
       </div>
     </div>
     <div class="ia-box">
       <div class="ia-label">🤖 Sugestão de Vendas IA</div>
-      <div id="ia-txt" style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px"><div class="spinner-sm"></div> Analisando...</div>
+      <div id="ia-txt" style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px"><div class="spinner-sm"></div> Analisando...</div>
     </div>`;
-
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Consultor de vendas OneClick Soluções TI Enterprise SP. Serviços: Monitoramento TI, Infraestrutura, Segurança, Cloud & Backup, Banco de Dados, BI.\nCliente: ${c.razao_social} | Segmento: ${c.segmento||'N/A'} | ${c.cidade||'N/A'}/${c.estado||'N/A'} | Pipeline: ${c.pipeline||'N/A'}\nObs: ${c.observacoes||'Nenhuma'}\nPT-BR, direto, máx 4 linhas: 1.Melhor serviço 2.Argumento principal 3.Próxima ação`}]})});
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`Consultor de vendas OneClick Soluções TI Enterprise SP. Serviços: Monitoramento TI, Infraestrutura, Segurança, Cloud & Backup, Banco de Dados, BI. Também representa Unicpharma (manipulados, vitaminas, suplementos, dermato, cosméticos).\nCliente: ${c.razao_social} | Segmento: ${c.segmento||'N/A'} | ${c.cidade||'N/A'}/${c.estado||'N/A'} | Pipeline: ${c.pipeline||'N/A'}\nObs: ${c.observacoes||'Nenhuma'}\nPT-BR, direto, máx 4 linhas: 1.Melhor produto/serviço (TI ou Unicpharma) 2.Argumento principal 3.Próxima ação`}]})});
     const d=await resp.json();
-    document.getElementById('ia-txt').innerHTML=`<span style="line-height:1.7;white-space:pre-wrap">${d.content?.[0]?.text||'Indisponível.'}</span>`;
+    document.getElementById('ia-txt').innerHTML=`<span style="line-height:1.6;white-space:pre-wrap">${d.content?.[0]?.text||'Indisponível.'}</span>`;
   }catch(e){document.getElementById('ia-txt').innerHTML='Sugestão IA indisponível.';}
 }
 
@@ -787,52 +869,152 @@ async function salvarSegmento(clienteId){
     await apiPatch(`/api/clientes/${clienteId}`,{segmento_id:parseInt(novoSegId)});
     toast('✅ Segmento atualizado!','ok');
     fecharModal('modal-detalhe');
-    await Promise.all([carregarTotaisSegmentos(),carregarPagina()]);
+    await carregarPagina();
   }catch(e){toast('Erro ao salvar','err');}
 }
 
+// HOJE
+async function carregarHoje(){
+  const hoje=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  document.getElementById('hoje-titulo').textContent=`Hoje · ${hoje}`;
+  try{
+    const data=await apiGet('/api/visitas/hoje');
+    const lista=document.getElementById('hoje-lista');
+    if(!data.length){
+      lista.innerHTML=`<div class="empty-state"><div style="font-size:36px;margin-bottom:8px">📅</div><div style="font-size:13px;color:var(--text);margin-bottom:4px">Nenhuma visita hoje</div><div style="font-size:11px">Use o módulo Roteiro para gerar visitas com IA</div></div>`;
+      return;
+    }
+    lista.innerHTML=data.map(v=>`
+      <div class="agenda-card" style="border-left-color:${v.status==='Concluída'?'var(--green)':v.status==='Em andamento'?'var(--yellow)':'var(--cyan)'}">
+        <div class="agenda-hora">${v.horario_previsto||'—'} · ${v.status}</div>
+        <div class="agenda-nome">${v.razao_social}</div>
+        <div class="agenda-sub">${v.segmento_nome||'—'} · ${v.cidade||''}${v.estado?' / '+v.estado:''}</div>
+        <div class="agenda-btns">
+          ${v.status==='Agendada'?`<button class="btn-action" onclick="checkin(${v.id})">Check-in</button>`:''}
+          ${v.telefone?`<button class="btn-action green" onclick="window.open('https://wa.me/55${(v.telefone).replace(/\D/g,'')}','_blank')">WhatsApp</button>`:''}
+          ${v.status==='Em andamento'?`<button class="btn-action purple" onclick="checkout(${v.id})">Finalizar</button>`:''}
+        </div>
+      </div>`).join('');
+  }catch(e){
+    document.getElementById('hoje-lista').innerHTML='<div class="loading-state" style="color:var(--red)">⚠️ Erro ao carregar agenda</div>';
+  }
+}
+
+async function checkin(id){
+  try{await apiPatch(`/api/visitas/${id}/checkin`,{});toast('✅ Check-in registrado!','ok');carregarHoje();}
+  catch(e){toast('Erro no check-in','err');}
+}
+async function checkout(id){
+  const resultado=prompt('Resultado da visita:');
+  if(!resultado)return;
+  try{await apiPatch(`/api/visitas/${id}/checkout`,{resultado,proxima_visita:''});toast('✅ Visita finalizada!','ok');carregarHoje();}
+  catch(e){toast('Erro no checkout','err');}
+}
+
+// ROTEIRO IA
+async function gerarRoteiro(){
+  document.getElementById('roteiro-lista').innerHTML='<div class="loading-state"><div class="spinner"></div><br>Gerando roteiro com IA...</div>';
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:`Você é um sistema de roteiro de visitas comerciais para representantes da OneClick Soluções e Unicpharma em SP e MG.\n\nGere um roteiro fictício mas realista para hoje com 6-8 visitas em São Paulo (zona sul ou oeste), priorizando farmácias e clínicas médicas.\n\nRetorne APENAS um JSON válido com este formato:\n{"visitas":[{"ordem":1,"nome":"Farmácia X","segmento":"Farmácia","endereco":"Rua Y, 123 - Bairro","horario":"09:00","distancia_km":2.3,"prioridade":"alta","motivo":"Último contato há 30 dias"},...],"total_km":45.2,"duracao_min":480}\n\nPrioridade: alta=cliente quente, media=follow-up normal, baixa=prospecção nova`}]})});
+    const d=await resp.json();
+    const txt=d.content?.[0]?.text||'{}';
+    const clean=txt.replace(/```json|```/g,'').trim();
+    const roteiro=JSON.parse(clean);
+    document.getElementById('roteiro-visitas').textContent=`${roteiro.visitas?.length||0} visitas`;
+    document.getElementById('roteiro-km').textContent=`${roteiro.total_km||0} km`;
+    document.getElementById('roteiro-tempo').textContent=`${Math.round((roteiro.duracao_min||0)/60)}h ${(roteiro.duracao_min||0)%60}min`;
+    const cores={alta:'var(--yellow)',media:'var(--cyan)',baixa:'var(--muted)'};
+    document.getElementById('roteiro-lista').innerHTML=(roteiro.visitas||[]).map(v=>`
+      <div class="roteiro-item">
+        <div class="roteiro-num">${v.ordem}</div>
+        <div style="flex:1">
+          <div class="roteiro-nome">${v.nome}</div>
+          <div class="roteiro-sub">${v.horario} · ${v.endereco}</div>
+          <div style="font-size:10px;color:${cores[v.prioridade]||'var(--muted)'};margin-top:2px">${v.motivo}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--muted)">${v.distancia_km}km</div>
+          <span class="badge ${v.prioridade==='alta'?'badge-yellow':v.prioridade==='media'?'badge-blue':'badge-red'}" style="font-size:9px">${v.prioridade}</span>
+        </div>
+      </div>`).join('');
+  }catch(e){
+    document.getElementById('roteiro-lista').innerHTML='<div class="loading-state" style="color:var(--red)">⚠️ Erro ao gerar roteiro. Tente novamente.</div>';
+  }
+}
+
+// DASHBOARD
+async function carregarDashboard(){
+  try{
+    const segs=await apiGet('/api/clientes/por-segmento');
+    const max=Math.max(...segs.map(s=>parseInt(s.total)));
+    const cores=['#3b5bdb','#7c6ef5','#00c97a','#f5a623','#00d4ff','#e53935','#ff8c40'];
+    document.getElementById('dash-segmentos').innerHTML=segs.filter(s=>parseInt(s.total)>0).slice(0,8).map((s,i)=>`
+      <div class="bar-row">
+        <div class="bar-label" style="font-size:10px">${s.nome.substring(0,12)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(parseInt(s.total)/max*100)}%;background:${cores[i%cores.length]}"></div></div>
+        <div class="bar-val">${parseInt(s.total).toLocaleString('pt-BR')}</div>
+      </div>`).join('');
+
+    const met=await apiGet('/api/clientes/metricas');
+    const total=parseInt(met.total);
+    const pipes=[
+      {label:'Prospecção',val:total,cor:'var(--cyan)'},
+      {label:'Contato feito',val:0,cor:'var(--yellow)'},
+      {label:'Negociação',val:0,cor:'var(--purple)'},
+      {label:'Proposta',val:0,cor:'var(--yellow)'},
+      {label:'Fechados',val:parseInt(met.fechados),cor:'var(--green)'},
+    ];
+    document.getElementById('dash-pipeline').innerHTML=pipes.map(p=>`
+      <div class="funnel-row">
+        <span style="color:var(--muted)">${p.label}</span>
+        <span style="font-weight:600;color:${p.cor}">${p.val.toLocaleString('pt-BR')}</span>
+      </div>`).join('');
+
+    const estados=[{e:'SP',pct:72},{e:'MG',pct:18},{e:'RJ',pct:4},{e:'Outros',pct:6}];
+    document.getElementById('dash-estados').innerHTML=estados.map(e=>`
+      <div class="bar-row">
+        <div class="bar-label">${e.e}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${e.pct}%;background:var(--cyan)"></div></div>
+        <div class="bar-val">${e.pct}%</div>
+      </div>`).join('');
+  }catch(e){}
+}
+
+// EXPORTAR
 async function exportarEmails(){
   toast('Buscando emails...','ok');
   try{
     let todos=[],offset=0,total=1;
     while(offset<total){
       const d=await apiGet(`/api/clientes?email=true&limit=1000&offset=${offset}`);
-      total=d.total;
-      todos=[...todos,...(d.clientes||[])];
-      offset+=1000;
-      if(d.clientes?.length<1000)break;
+      total=d.total;todos=[...todos,...(d.clientes||[])];
+      if(d.clientes?.length<1000)break;offset+=1000;
     }
     copiarOuDownload(todos.map(c=>c.email).filter(Boolean).join('\n'),'emails_clientes.txt');
     toast(`✅ ${todos.length} emails!`,'ok');
   }catch(e){toast('Erro','err');}
 }
-
 async function exportarWhatsApp(){
   toast('Buscando WhatsApp...','ok');
   try{
     let todos=[],offset=0,total=1;
     while(offset<total){
       const d=await apiGet(`/api/clientes?whatsapp=true&limit=1000&offset=${offset}`);
-      total=d.total;
-      todos=[...todos,...(d.clientes||[])];
-      offset+=1000;
-      if(d.clientes?.length<1000)break;
+      total=d.total;todos=[...todos,...(d.clientes||[])];
+      if(d.clientes?.length<1000)break;offset+=1000;
     }
     copiarOuDownload(todos.map(c=>`${c.razao_social}\t${c.whatsapp}`).join('\n'),'whatsapp_clientes.txt');
     toast(`✅ ${todos.length} WhatsApp!`,'ok');
   }catch(e){toast('Erro','err');}
 }
-
 async function exportarCSV(){
   toast('Gerando CSV...','ok');
   try{
     let todos=[],offset=0,total=1;
     while(offset<total){
       const d=await apiGet(`/api/clientes?limit=1000&offset=${offset}`);
-      total=d.total;
-      todos=[...todos,...(d.clientes||[])];
-      offset+=1000;
-      if(d.clientes?.length<1000)break;
+      total=d.total;todos=[...todos,...(d.clientes||[])];
+      if(d.clientes?.length<1000)break;offset+=1000;
     }
     const header='Razão Social;Nome Fantasia;CNPJ;CPF;Telefone;WhatsApp;Email;Cidade;Estado;Pipeline;Status;Rede;Bandeira';
     const rows=todos.map(c=>[c.razao_social,c.nome_fantasia,c.cnpj,c.cpf,c.telefone,c.whatsapp,c.email,c.cidade,c.estado,c.pipeline,c.status,c.rede,c.bandeira].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(';'));
@@ -840,7 +1022,6 @@ async function exportarCSV(){
     toast(`✅ ${todos.length} registros!`,'ok');
   }catch(e){toast('Erro','err');}
 }
-
 function copiarOuDownload(txt,nome){
   try{
     const blob=new Blob(['\ufeff'+txt],{type:'text/plain;charset=utf-8'});
