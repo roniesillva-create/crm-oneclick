@@ -415,9 +415,8 @@ body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(
 </div>
 
 <script>
-const SUPA='https://fbgcafwoovwrtzdewclx.supabase.co';
-const KEY='sb_publishable_ctaS6OQJleKbEPsvERbvnA_j9DIAbsv';
-const H={'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY,'Prefer':'return=representation'};
+const API='https://crm-api.oneclicksolucoes.com.br';
+const H={'Content-Type':'application/json'};
 const USUARIOS=[{user:'ronie',pass:'Natura123!@#',nome:'Ronie Silva'}];
 const POR_PAGINA=50;
 
@@ -458,18 +457,21 @@ function verificarSessao(){
   }
 }
 
-async function api(path,method='GET',body=null){
-  const opts={method,headers:H};
-  if(body)opts.body=JSON.stringify(body);
-  const r=await fetch(SUPA+path,opts);
+// API LOCAL
+async function apiGet(path){
+  const r=await fetch(API+path,{headers:H});
+  if(!r.ok)throw new Error(await r.text());
+  return r.json();
+}
+async function apiPost(path,body){
+  const r=await fetch(API+path,{method:'POST',headers:H,body:JSON.stringify(body)});
   if(!r.ok)throw new Error(await r.text());
   return r.status===204?null:r.json();
 }
-async function apiCount(path){
-  const r=await fetch(SUPA+path,{headers:{...H,'Prefer':'count=exact','Range':'0-0'}});
-  const ct=r.headers.get('content-range');
-  if(ct){const m=ct.match(/\/(\d+)/);if(m)return parseInt(m[1]);}
-  return 0;
+async function apiPatch(path,body){
+  const r=await fetch(API+path,{method:'PATCH',headers:H,body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(await r.text());
+  return r.json();
 }
 
 async function inicializar(){
@@ -478,56 +480,33 @@ async function inicializar(){
 
 async function carregarMetricas(){
   try{
-    const [total,comEmail,comWpp,fechados]=await Promise.all([
-      apiCount('/rest/v1/clientes?select=id'),
-      apiCount('/rest/v1/clientes?select=id&email=not.is.null&email=neq.'),
-      apiCount('/rest/v1/clientes?select=id&whatsapp=not.is.null&whatsapp=neq.'),
-      apiCount('/rest/v1/clientes?select=id&pipeline=eq.Fechado')
-    ]);
-    document.getElementById('m-total').textContent=total.toLocaleString('pt-BR');
-    document.getElementById('m-email').textContent=comEmail.toLocaleString('pt-BR');
-    document.getElementById('m-wpp').textContent=comWpp.toLocaleString('pt-BR');
-    document.getElementById('m-fechados').textContent=fechados.toLocaleString('pt-BR');
+    const data=await apiGet('/api/clientes/metricas');
+    document.getElementById('m-total').textContent=parseInt(data.total).toLocaleString('pt-BR');
+    document.getElementById('m-email').textContent=parseInt(data.com_email).toLocaleString('pt-BR');
+    document.getElementById('m-wpp').textContent=parseInt(data.com_whatsapp).toLocaleString('pt-BR');
+    document.getElementById('m-fechados').textContent=parseInt(data.fechados).toLocaleString('pt-BR');
     document.getElementById('status-dot').className='dot-status online';
   }catch(e){document.getElementById('status-dot').className='dot-status offline';}
 }
 
 async function carregarTotaisSegmentos(){
   try{
-    // Buscar segmentos primeiro
-    const segsData = await api('/rest/v1/segmentos?select=id,nome&order=nome');
-    segmentosCache = segsData||[];
-
-    // Contar cada segmento em paralelo de forma eficiente
-    const contagem = {};
-    await Promise.all(segmentosCache.map(async s=>{
-      try{
-        const total = await apiCount(`/rest/v1/clientes?select=id&segmento_id=eq.${s.id}`);
-        if(total>0) contagem[s.id]=total;
-      }catch(e){}
-    }));
-
-    // Atualizar chips com totais
-    Object.entries(contagem).forEach(([id,total])=>{
-      const el=document.getElementById('cnt-'+id);
-      if(el) el.textContent=total>999?(Math.round(total/1000)+'k'):total;
+    const data=await apiGet('/api/clientes/por-segmento');
+    segmentosCache=data;
+    data.forEach(s=>{
+      const el=document.getElementById('cnt-'+s.id);
+      if(el&&s.total>0) el.textContent=s.total>999?(Math.round(s.total/1000)+'k'):s.total;
     });
-
-    // Montar painel de segmentos
     const segEmojis={'Farmácia':'💊','Médico / Clínica':'👨‍⚕️','Hospital':'🏥','Odontologia':'🦷','Laboratório':'🔬','Mercado / Supermercado':'🛒','Restaurante / Lanchonete':'🍽️','Comércio / Varejo':'🏪','Tecnologia / TI':'💻','Contabilidade':'📊','Advocacia / Escritório Jurídico':'⚖️','Posto de Gasolina':'⛽','Academia / Fitness':'💪','Indústria':'🏭','Transporte / Logística':'🚚','Salão de Beleza':'💇','Hotel / Pousada':'🏨','Escola / Faculdade':'🎓','Imobiliária':'🏠','Outros':'📋'};
-    
-    const grid = document.getElementById('seg-grid');
-    grid.innerHTML = segmentosCache
-      .filter(s=>contagem[s.id]>0)
-      .sort((a,b)=>(contagem[b.id]||0)-(contagem[a.id]||0))
-      .map(s=>`
-        <div class="seg-card" onclick="filtrarPorSegmento('${s.nome}')">
-          <div class="seg-card-icon">${segEmojis[s.nome]||'📋'}</div>
-          <div class="seg-card-info">
-            <div class="seg-card-nome">${s.nome}</div>
-            <div class="seg-card-total">${(contagem[s.id]||0).toLocaleString('pt-BR')}</div>
-          </div>
-        </div>`).join('');
+    const grid=document.getElementById('seg-grid');
+    grid.innerHTML=data.filter(s=>s.total>0).map(s=>`
+      <div class="seg-card" onclick="filtrarPorSegmento('${s.nome}')">
+        <div class="seg-card-icon">${segEmojis[s.nome]||'📋'}</div>
+        <div class="seg-card-info">
+          <div class="seg-card-nome">${s.nome}</div>
+          <div class="seg-card-total">${parseInt(s.total).toLocaleString('pt-BR')}</div>
+        </div>
+      </div>`).join('');
   }catch(e){console.error('Erro segmentos:',e);}
 }
 
@@ -551,52 +530,52 @@ async function resolverSegId(nome){
   const found=segmentosCache.find(s=>s.nome===nome);
   if(found){filtroSegId=found.id;return;}
   try{
-    const d=await api(`/rest/v1/segmentos?nome=eq.${encodeURIComponent(nome)}&select=id`);
-    filtroSegId=d&&d.length?d[0].id:null;
+    const data=await apiGet('/api/segmentos');
+    const seg=data.find(s=>s.nome===nome);
+    filtroSegId=seg?seg.id:null;
   }catch(e){filtroSegId=null;}
 }
 
-function montarQuery(soCount=false){
-  let q=soCount?'/rest/v1/clientes?select=id':'/rest/v1/clientes?select=*,segmentos(nome)';
+function montarQueryParams(){
   const busca=document.getElementById('search').value.trim();
   const estado=document.getElementById('f-estado').value||filtroEstado;
   const status=document.getElementById('f-status').value;
   const rede=document.getElementById('f-rede').value||filtroRede;
-  if(busca) q+=`&or=(razao_social.ilike.*${encodeURIComponent(busca)}*,nome_fantasia.ilike.*${encodeURIComponent(busca)}*,cidade.ilike.*${encodeURIComponent(busca)}*,cnpj.ilike.*${encodeURIComponent(busca)}*,email.ilike.*${encodeURIComponent(busca)}*,rede.ilike.*${encodeURIComponent(busca)}*)`;
-  if(filtroPipe) q+=`&pipeline=eq.${encodeURIComponent(filtroPipe)}`;
-  if(filtroSegId) q+=`&segmento_id=eq.${filtroSegId}`;
-  if(estado) q+=`&estado=eq.${estado}`;
-  if(status) q+=`&status=eq.${encodeURIComponent(status)}`;
-  if(filtroEmail) q+=`&email=not.is.null&email=neq.`;
-  if(filtroWpp) q+=`&whatsapp=not.is.null&whatsapp=neq.`;
-  if(filtroBandeira) q+=`&bandeira=eq.${encodeURIComponent(filtroBandeira)}`;
-  if(rede) q+=`&rede=eq.${encodeURIComponent(rede)}`;
-  return q;
+  const params=new URLSearchParams();
+  if(busca) params.set('busca',busca);
+  if(filtroPipe) params.set('pipeline',filtroPipe);
+  if(filtroSegId) params.set('segmento_id',filtroSegId);
+  if(estado) params.set('estado',estado);
+  if(status) params.set('status',status);
+  if(filtroEmail) params.set('email','true');
+  if(filtroWpp) params.set('whatsapp','true');
+  if(filtroBandeira) params.set('bandeira',filtroBandeira);
+  if(rede) params.set('rede',rede);
+  return params;
 }
 
 async function buscar(resetPagina=true){
   if(resetPagina)paginaAtual=1;
   if(filtroSeg)await resolverSegId(filtroSeg);
   else filtroSegId=null;
-  await Promise.all([contarResultados(),carregarPagina()]);
+  await carregarPagina();
 }
 
-async function contarResultados(){
-  try{
-    const total=await apiCount(montarQuery(true));
-    totalPaginas=Math.ceil(total/POR_PAGINA)||1;
-    document.getElementById('results-info').innerHTML=
-      `<span>Encontrados: <strong>${total.toLocaleString('pt-BR')}</strong></span>
-       <span style="color:var(--muted)">Pág ${paginaAtual}/${totalPaginas}</span>`;
-  }catch(e){}
-}
+async function contarResultados(){}
 
 async function carregarPagina(){
   document.getElementById('client-list').innerHTML='<div class="loading-state"><div class="spinner"></div><br>Carregando...</div>';
   try{
+    const params=montarQueryParams();
     const offset=(paginaAtual-1)*POR_PAGINA;
-    const data=await api(montarQuery(false)+`&order=razao_social.asc&limit=${POR_PAGINA}&offset=${offset}`);
-    clientesCache=(data||[]).map(c=>({...c,segmento:c.segmentos?.nome||''}));
+    params.set('limit',POR_PAGINA);
+    params.set('offset',offset);
+    const data=await apiGet(`/api/clientes?${params.toString()}`);
+    totalPaginas=data.total_paginas||1;
+    clientesCache=(data.clientes||[]).map(c=>({...c,segmento:c.segmento_nome||''}));
+    document.getElementById('results-info').innerHTML=
+      `<span>Encontrados: <strong>${parseInt(data.total).toLocaleString('pt-BR')}</strong></span>
+       <span style="color:var(--muted)">Pág ${paginaAtual}/${totalPaginas}</span>`;
     renderLista(clientesCache);
     renderPaginacao();
   }catch(e){
@@ -730,9 +709,8 @@ async function salvarCliente(){
     if(segNome){
       const found=segmentosCache.find(s=>s.nome===segNome);
       if(found)segId=found.id;
-      else{const s=await api(`/rest/v1/segmentos?nome=eq.${encodeURIComponent(segNome)}&select=id`);if(s&&s.length)segId=s[0].id;}
     }
-    await api('/rest/v1/clientes','POST',{
+    await apiPost('/api/clientes',{
       razao_social:razao,nome_fantasia:document.getElementById('f-fantasia').value||null,
       cnpj:document.getElementById('f-cnpj').value||null,segmento_id:segId,
       porte:document.getElementById('f-porte').value||null,
@@ -806,11 +784,7 @@ async function salvarSegmento(clienteId){
   const novoSegId=sel?.value;
   if(!novoSegId){toast('Selecione um segmento!','err');return;}
   try{
-    await fetch(SUPA+'/rest/v1/clientes?id=eq.'+clienteId,{
-      method:'PATCH',
-      headers:H,
-      body:JSON.stringify({segmento_id:parseInt(novoSegId)})
-    });
+    await apiPatch(`/api/clientes/${clienteId}`,{segmento_id:parseInt(novoSegId)});
     toast('✅ Segmento atualizado!','ok');
     fecharModal('modal-detalhe');
     await Promise.all([carregarTotaisSegmentos(),carregarPagina()]);
@@ -820,11 +794,13 @@ async function salvarSegmento(clienteId){
 async function exportarEmails(){
   toast('Buscando emails...','ok');
   try{
-    let todos=[],offset=0;
-    while(true){
-      const d=await api(`/rest/v1/clientes?select=razao_social,email&email=not.is.null&email=neq.&order=razao_social.asc&limit=1000&offset=${offset}`);
-      if(!d||!d.length)break;todos=[...todos,...d];
-      if(d.length<1000)break;offset+=1000;
+    let todos=[],offset=0,total=1;
+    while(offset<total){
+      const d=await apiGet(`/api/clientes?email=true&limit=1000&offset=${offset}`);
+      total=d.total;
+      todos=[...todos,...(d.clientes||[])];
+      offset+=1000;
+      if(d.clientes?.length<1000)break;
     }
     copiarOuDownload(todos.map(c=>c.email).filter(Boolean).join('\n'),'emails_clientes.txt');
     toast(`✅ ${todos.length} emails!`,'ok');
@@ -834,11 +810,13 @@ async function exportarEmails(){
 async function exportarWhatsApp(){
   toast('Buscando WhatsApp...','ok');
   try{
-    let todos=[],offset=0;
-    while(true){
-      const d=await api(`/rest/v1/clientes?select=razao_social,whatsapp&whatsapp=not.is.null&whatsapp=neq.&order=razao_social.asc&limit=1000&offset=${offset}`);
-      if(!d||!d.length)break;todos=[...todos,...d];
-      if(d.length<1000)break;offset+=1000;
+    let todos=[],offset=0,total=1;
+    while(offset<total){
+      const d=await apiGet(`/api/clientes?whatsapp=true&limit=1000&offset=${offset}`);
+      total=d.total;
+      todos=[...todos,...(d.clientes||[])];
+      offset+=1000;
+      if(d.clientes?.length<1000)break;
     }
     copiarOuDownload(todos.map(c=>`${c.razao_social}\t${c.whatsapp}`).join('\n'),'whatsapp_clientes.txt');
     toast(`✅ ${todos.length} WhatsApp!`,'ok');
@@ -848,14 +826,16 @@ async function exportarWhatsApp(){
 async function exportarCSV(){
   toast('Gerando CSV...','ok');
   try{
-    let todos=[],offset=0;
-    while(true){
-      const d=await api(`/rest/v1/clientes?select=razao_social,nome_fantasia,cnpj,cpf,telefone,whatsapp,email,cidade,estado,pipeline,status&order=razao_social.asc&limit=1000&offset=${offset}`);
-      if(!d||!d.length)break;todos=[...todos,...d];
-      if(d.length<1000)break;offset+=1000;
+    let todos=[],offset=0,total=1;
+    while(offset<total){
+      const d=await apiGet(`/api/clientes?limit=1000&offset=${offset}`);
+      total=d.total;
+      todos=[...todos,...(d.clientes||[])];
+      offset+=1000;
+      if(d.clientes?.length<1000)break;
     }
-    const header='Razão Social;Nome Fantasia;CNPJ;CPF;Telefone;WhatsApp;Email;Cidade;Estado;Pipeline;Status';
-    const rows=todos.map(c=>[c.razao_social,c.nome_fantasia,c.cnpj,c.cpf,c.telefone,c.whatsapp,c.email,c.cidade,c.estado,c.pipeline,c.status].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(';'));
+    const header='Razão Social;Nome Fantasia;CNPJ;CPF;Telefone;WhatsApp;Email;Cidade;Estado;Pipeline;Status;Rede;Bandeira';
+    const rows=todos.map(c=>[c.razao_social,c.nome_fantasia,c.cnpj,c.cpf,c.telefone,c.whatsapp,c.email,c.cidade,c.estado,c.pipeline,c.status,c.rede,c.bandeira].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(';'));
     copiarOuDownload(header+'\n'+rows.join('\n'),'clientes_oneclick.csv');
     toast(`✅ ${todos.length} registros!`,'ok');
   }catch(e){toast('Erro','err');}
