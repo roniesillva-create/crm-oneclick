@@ -425,8 +425,7 @@ input,select,textarea{font-family:inherit}
 
 <script>
 const API_BASE='https://crm-api.oneclicksolucoes.com.br';
-const ANTHROPIC_API_KEY=''; // <-- chave Anthropic p/ ativar IA (ideal: mover p/ backend crm-api)
-const IA_MODEL='claude-sonnet-4-20250514';
+// chave da IA fica no backend (/api/ia) — nunca no front
 const USUARIOS=[{user:'ronie',pass:'Natura123!@#',nome:'Ronie Silva',mail:'ronie@oneclicksolucoes.com.br'}];
 
 const LOGO_SVG='<svg class="logo-mark" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00F5D4"/><stop offset="1" stop-color="#2D8CFF"/></linearGradient></defs><path d="M24 3l16 6v11c0 10-6.8 18.4-16 22-9.2-3.6-16-12-16-22V9l16-6z" fill="none" stroke="url(#lg)" stroke-width="2.4"/><circle cx="24" cy="22" r="6" fill="none" stroke="#00E5FF" stroke-width="2.4"/><path d="M24 16v-3M24 31v3M30 22h3M15 22h3" stroke="#00E5FF" stroke-width="2.4" stroke-linecap="round"/></svg>';
@@ -476,12 +475,10 @@ async function apiPost(p,b){const r=await fetch(API_BASE+p,{method:'POST',header
 async function apiPatch(p,b){const r=await fetch(API_BASE+p,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
 
 async function chamarIA(prompt,maxTokens){
-  if(!ANTHROPIC_API_KEY)throw new Error('Configure ANTHROPIC_API_KEY no topo do script');
-  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:IA_MODEL,max_tokens:maxTokens||700,messages:[{role:'user',content:prompt}]})});
-  if(!r.ok)throw new Error('IA HTTP '+r.status);
-  const d=await r.json();return (d.content||[]).map(b=>b.type==='text'?b.text:'').join('\n').trim();
+  const r=await fetch(API_BASE+'/api/ia',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,max_tokens:maxTokens||800})});
+  const d=await r.json();
+  if(!r.ok||d.erro)throw new Error('IA indisponível');
+  return d.texto||'';
 }
 
 const SEG_EMOJI={'Farmácia':'💊','Mercado/Supermercado':'🛒','Posto de Gasolina':'⛽','Médico/Clínica':'🩺','Hospital':'🏥','Odontologia':'🦷','Laboratório':'🔬','Restaurante/Lanchonete':'🍽️','Academia/Fitness':'🏋️','Comércio/Varejo':'🏪','Indústria':'🏭','Tecnologia/TI':'💻','Transporte/Logística':'🚚','Outros':'📦'};
@@ -700,7 +697,6 @@ async function gerarRoteiro(){
   initMapa();
   const btn=document.getElementById('btn-rota');btn.innerHTML='<span class="spinner-sm"></span>';btn.disabled=true;
   try{
-    if(!ANTHROPIC_API_KEY){renderRoteiro(ROTA_MOCK.visitas,ROTA_MOCK.resumo);toast('Roteiro preview (ative a IA p/ otimizar)','ok');return;}
     let base=clientesCache.slice(0,15).map(c=>c.razao_social+' ('+(c.segmento||'')+', '+(c.cidade||'')+'/'+(c.estado||'')+')').join('; ')||LEADS_MOCK.map(c=>c.razao_social+' ('+c.segmento+', '+c.cidade+'/'+c.estado+')').join('; ');
     const prompt='Monte um roteiro de visitas comerciais otimizado para hoje em SP/MG (OneClick/Unicpharma). Clientes: '+base+'. Selecione de 4 a 6, ordene por proximidade e prioridade. Responda APENAS JSON: {"resumo":{"visitas":N,"distancia":"X km","tempo":"Xh","novos":N},"visitas":[{"ordem":1,"cliente":"...","cidade":"...","horario":"09:00","prioridade":"Alta","motivo":"...","lat":-23.55,"lng":-46.63}]}. Coordenadas reais aproximadas.';
     const txt=await chamarIA(prompt,1300);const j=JSON.parse(txt.replace(/```json|```/g,'').trim());
@@ -763,7 +759,7 @@ async function perguntarIA(texto){
   const feed=document.getElementById('ai-feed');feed.innerHTML='<span class="spinner-sm"></span> Pensando...';
   const prompt='Você é a OneClick AI, assistente comercial da OneClick Soluções (TI enterprise) e da Unicpharma (manipulados, vitaminas, suplementos, dermatocosméticos), atuando em SP e MG. Base: ~48 mil leads (farmácias, médicos/clínicas, hospitais, postos). Responda objetiva e prática em português. Pergunta: '+q;
   try{const t=await chamarIA(prompt,800);feed.textContent=t;}
-  catch(e){feed.innerHTML='<span style="color:var(--warn)">⚠ '+esc(e.message)+'</span>\n\nDica: defina ANTHROPIC_API_KEY no topo do script (ideal: via backend crm-api).';}
+  catch(e){feed.innerHTML='<span style="color:var(--warn)">⚠ IA indisponível no momento. Tente novamente.</span>';}
 }
 
 function abrirQuickActions(){document.getElementById('modal-qa').classList.remove('hidden');}
