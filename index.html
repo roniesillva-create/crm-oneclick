@@ -249,7 +249,7 @@ input,select,textarea{font-family:inherit}
   <div class="login-card">
     <div class="brand"><span id="logo-login"></span><b>ONE<span>CLICK</span> CRM</b></div>
     <div class="login-sub">ENTERPRISE v4 · Sua TI sob Controle</div>
-    <div class="fld"><label>Usuário</label><input id="lg-user" autocomplete="username" placeholder="usuário"></div>
+    <div class="fld"><label>Usuário</label><input id="lg-user" autocomplete="username" placeholder="email" type="email"></div>
     <div class="fld"><label>Senha</label><input id="lg-pass" type="password" autocomplete="current-password" placeholder="senha"></div>
     <button class="btn-primary" onclick="fazerLogin()">Entrar</button>
     <div class="login-err" id="lg-err"></div>
@@ -344,6 +344,14 @@ input,select,textarea{font-family:inherit}
     </div>
   </div>
 
+  <div class="page" id="pg-reps">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <div><div class="ptitle">Representantes</div><div class="subdate" style="margin:3px 0 0">Gerencie usuários e acessos</div></div>
+      <button class="btn-ai" onclick="abrirNovoRep()" style="padding:11px 15px;flex:0 0 auto">+ Novo</button>
+    </div>
+    <div id="reps-lista"><div class="spinner"></div></div>
+  </div>
+
   <div class="page" id="pg-mais">
     <div class="ptitle" style="margin-bottom:14px">Mais</div>
     <div class="mais-prof"><div class="av">RS</div><div><div class="nm" id="mais-nome">Ronie Silva</div><div class="rl">Diretor Comercial · Admin</div><div class="rl" id="mais-mail">ronie@oneclicksolucoes.com.br</div></div></div>
@@ -352,7 +360,7 @@ input,select,textarea{font-family:inherit}
     <div class="mais-row" onclick="irPara('atividades')"><div class="mi">🗓️</div><div class="mt"><div class="n">Atividades</div><div class="d">Agenda e tarefas</div></div><span class="arr">›</span></div>
     <div class="mais-row" onclick="irPara('ai')"><div class="mi">🤖</div><div class="mt"><div class="n">OneClick AI</div><div class="d">Assistente comercial</div></div><span class="arr">›</span></div>
     <div class="sec-title">Gestão</div>
-    <div class="mais-row" onclick="emBreve()"><div class="mi">👥</div><div class="mt"><div class="n">Representantes</div><div class="d">Usuários e acessos</div></div><span class="arr">›</span></div>
+    <div class="mais-row" id="mais-reps" onclick="irPara('reps')"><div class="mi">👥</div><div class="mt"><div class="n">Representantes</div><div class="d">Usuários e acessos</div></div><span class="arr">›</span></div>
     <div class="mais-row" onclick="emBreve()"><div class="mi">⚡</div><div class="mt"><div class="n">Automações</div><div class="d">n8n · OpenClaw · WhatsApp</div></div><span class="arr">›</span></div>
     <div class="mais-row" onclick="emBreve()"><div class="mi">📣</div><div class="mt"><div class="n">Campanhas</div><div class="d">WhatsApp · Email · Instagram</div></div><span class="arr">›</span></div>
     <div class="mais-row" onclick="emBreve()"><div class="mi">📑</div><div class="mt"><div class="n">Apresentações</div><div class="d">Folders Unicpharma · OneClick</div></div><span class="arr">›</span></div>
@@ -423,10 +431,24 @@ input,select,textarea{font-family:inherit}
   </div>
 </div>
 
+<div class="modal hidden" id="modal-rep">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="sheet-head"><h2 id="rep-titulo">Novo representante</h2><button class="x" onclick="fecharModal('modal-rep')">✕</button></div>
+    <input type="hidden" id="rep-id">
+    <div class="fld"><label>Nome *</label><input id="rep-nome"></div>
+    <div class="fld"><label>Email *</label><input id="rep-email" type="email"></div>
+    <div class="fld"><label>Senha <span id="rep-senha-hint" style="color:var(--txt3);font-weight:400"></span></label><input id="rep-senha" type="text" placeholder="defina uma senha"></div>
+    <div class="fld"><label>Papel</label><select id="rep-papel"><option value="representante">Representante</option><option value="admin">Admin</option></select></div>
+    <div class="fld"><label>Status</label><select id="rep-ativo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
+    <button class="btn-primary" id="btn-rep" onclick="salvarRep()">💾 Salvar</button>
+  </div>
+</div>
+
 <script>
 const API_BASE='https://crm-api.oneclicksolucoes.com.br';
 // chave da IA fica no backend (/api/ia) — nunca no front
-const USUARIOS=[{user:'ronie',pass:'Natura123!@#',nome:'Ronie Silva',mail:'ronie@oneclicksolucoes.com.br'}];
+let TOKEN=null; // JWT do backend
 
 const LOGO_SVG='<svg class="logo-mark" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00F5D4"/><stop offset="1" stop-color="#2D8CFF"/></linearGradient></defs><path d="M24 3l16 6v11c0 10-6.8 18.4-16 22-9.2-3.6-16-12-16-22V9l16-6z" fill="none" stroke="url(#lg)" stroke-width="2.4"/><circle cx="24" cy="22" r="6" fill="none" stroke="#00E5FF" stroke-width="2.4"/><path d="M24 16v-3M24 31v3M30 22h3M15 22h3" stroke="#00E5FF" stroke-width="2.4" stroke-linecap="round"/></svg>';
 function robotSVG(){return '<svg class="robot" viewBox="0 0 120 120" fill="none"><defs><linearGradient id="rb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7B4DFF"/><stop offset="1" stop-color="#2D8CFF"/></linearGradient></defs><rect x="28" y="34" width="64" height="54" rx="18" fill="url(#rb)"/><rect x="34" y="42" width="52" height="38" rx="13" fill="#0B1733"/><circle cx="49" cy="61" r="7" fill="#00E5FF"/><circle cx="71" cy="61" r="7" fill="#00E5FF"/><circle cx="51" cy="59" r="2.2" fill="#fff"/><circle cx="73" cy="59" r="2.2" fill="#fff"/><path d="M52 73c3 3 13 3 16 0" stroke="#00F5D4" stroke-width="2.6" stroke-linecap="round"/><rect x="56" y="20" width="8" height="12" rx="4" fill="#7B4DFF"/><circle cx="60" cy="18" r="5" fill="#00F5D4"/><rect x="20" y="50" width="9" height="24" rx="4.5" fill="#5B6BFF"/><rect x="91" y="50" width="9" height="24" rx="4.5" fill="#5B6BFF"/></svg>';}
@@ -470,9 +492,12 @@ let filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:
 let pagina=0;const LIMIT=50;
 let mapa=null,mapaLayer=null,dashRendered=false;
 
-async function apiGet(p){const r=await fetch(API_BASE+p);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
-async function apiPost(p,b){const r=await fetch(API_BASE+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
-async function apiPatch(p,b){const r=await fetch(API_BASE+p,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+function authHeaders(extra){const h=extra||{};if(TOKEN)h['Authorization']='Bearer '+TOKEN;return h;}
+function trata401(r){if(r.status===401){sessaoExpirada();throw new Error('401');}}
+async function apiGet(p){const r=await fetch(API_BASE+p,{headers:authHeaders()});trata401(r);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+async function apiPost(p,b){const r=await fetch(API_BASE+p,{method:'POST',headers:authHeaders({'Content-Type':'application/json'}),body:JSON.stringify(b)});trata401(r);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+async function apiPatch(p,b){const r=await fetch(API_BASE+p,{method:'PATCH',headers:authHeaders({'Content-Type':'application/json'}),body:JSON.stringify(b)});trata401(r);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+function sessaoExpirada(){TOKEN=null;sessao=null;sessionStorage.removeItem('crm_sessao');sessionStorage.removeItem('crm_token');document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');toast('Sessão expirada, faça login','err');}
 
 async function chamarIA(prompt,maxTokens){
   const r=await fetch(API_BASE+'/api/ia',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,max_tokens:maxTokens||800})});
@@ -482,25 +507,32 @@ async function chamarIA(prompt,maxTokens){
 }
 
 const SEG_EMOJI={'Farmácia':'💊','Mercado/Supermercado':'🛒','Posto de Gasolina':'⛽','Médico/Clínica':'🩺','Hospital':'🏥','Odontologia':'🦷','Laboratório':'🔬','Restaurante/Lanchonete':'🍽️','Academia/Fitness':'🏋️','Comércio/Varejo':'🏪','Indústria':'🏭','Tecnologia/TI':'💻','Transporte/Logística':'🚚','Outros':'📦'};
-function segEmoji(n){return SEG_EMOJI[n]||'🏢';}
+function segIcone(s){return (s&&s.icone)||SEG_EMOJI[(s&&s.nome)||s]||'🏢';}
+function segEmoji(n){if(n&&typeof n==='object')return segIcone(n);const m=segmentosCache.find(x=>x.nome===n);return (m&&m.icone)||SEG_EMOJI[n]||'🏢';}
 const PIPE_COR={'Em Prospeccao':'#7B61FF','Prospecção':'#7B61FF','Contato Feito':'#00B8FF','Negociacao':'#FFB020','Negociação':'#FFB020','Proposta':'#FF6B35','Fechado':'#22C55E','Fechados':'#22C55E','Perdido':'#EF4444'};
 function pipeCor(p){return PIPE_COR[p]||'#254A7D';}
 function pill(p){const c=pipeCor(p);return '<span class="pill" style="background:'+c+'22;color:'+c+'">'+(p||'—')+'</span>';}
 function esc(s){return (s==null?'':String(s)).replace(/[<>&"]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[m]));}
 function fmt(n){return (n||0).toLocaleString('pt-BR');}
 
-function fazerLogin(){
-  const u=document.getElementById('lg-user').value.trim(),p=document.getElementById('lg-pass').value;
-  const f=USUARIOS.find(x=>x.user===u&&x.pass===p);
-  if(!f){document.getElementById('lg-err').textContent='Usuário ou senha incorretos';return;}
-  sessao={user:f.user,nome:f.nome,mail:f.mail};
-  sessionStorage.setItem('crm_sessao',JSON.stringify(sessao));entrarApp();
+async function fazerLogin(){
+  const email=document.getElementById('lg-user').value.trim(),senha=document.getElementById('lg-pass').value;
+  const err=document.getElementById('lg-err');err.textContent='';
+  if(!email||!senha){err.textContent='Informe email e senha';return;}
+  try{
+    const r=await fetch(API_BASE+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,senha})});
+    const d=await r.json();
+    if(!r.ok){err.textContent=d.erro||'Credenciais inválidas';return;}
+    TOKEN=d.token;sessao={id:d.usuario.id,nome:d.usuario.nome,mail:d.usuario.email,papel:d.usuario.papel};
+    sessionStorage.setItem('crm_token',TOKEN);sessionStorage.setItem('crm_sessao',JSON.stringify(sessao));
+    entrarApp();
+  }catch(e){err.textContent='Erro de conexão com o servidor';}
 }
 function sair(){sessionStorage.removeItem('crm_sessao');location.reload();}
 function verificarSessao(){
   document.getElementById('logo-login').innerHTML=LOGO_SVG;
-  const s=sessionStorage.getItem('crm_sessao');
-  if(s){try{sessao=JSON.parse(s);entrarApp();return;}catch(e){}}
+  const s=sessionStorage.getItem('crm_sessao'),t=sessionStorage.getItem('crm_token');
+  if(s&&t){try{sessao=JSON.parse(s);TOKEN=t;entrarApp();return;}catch(e){}}
   document.getElementById('login').classList.remove('hidden');
 }
 function entrarApp(){
@@ -512,6 +544,7 @@ function entrarApp(){
   document.getElementById('home-nome').textContent=sessao.nome.split(' ')[0];
   document.getElementById('mais-nome').textContent=sessao.nome;
   document.getElementById('mais-mail').textContent=sessao.mail||'';
+  document.getElementById('mais-reps').style.display=(sessao.papel==='admin')?'flex':'none';
   document.getElementById('home-data').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   inicializar();
 }
@@ -525,6 +558,7 @@ function irPara(pg){
   if(pg==='roteiro'){initMapa();if(!mapaLayer)renderRoteiro(ROTA_MOCK.visitas,ROTA_MOCK.resumo);}
   if(pg==='dashboard'&&!dashRendered)renderDashboard();
   if(pg==='atividades')renderAtividades('todas');
+  if(pg==='reps')carregarReps();
 }
 
 async function inicializar(){
@@ -767,6 +801,68 @@ function fecharModal(id){document.getElementById(id).classList.add('hidden');}
 function emBreve(){toast('Módulo em breve','ok');}
 function toast(msg,tipo){const t=document.createElement('div');t.className='toast toast-'+(tipo==='ok'?'ok':'err');t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden');}));
+
+
+/* ===== REPRESENTANTES (admin) ===== */
+let repsCache=[];
+async function carregarReps(){
+  const box=document.getElementById('reps-lista');box.innerHTML='<div class="spinner"></div>';
+  try{
+    const r=await apiGet('/api/usuarios');repsCache=r.usuarios||[];
+    box.innerHTML=repsCache.map(repCard).join('');
+  }catch(e){box.innerHTML='<div class="empty">Erro ao carregar ('+esc(e.message)+')</div>';}
+}
+function repCard(u){
+  const cor=u.papel==='admin'?'#00E5FF':'#7B61FF';
+  const st=u.ativo?'<span class="pill" style="background:#22C55E22;color:#22C55E">Ativo</span>':'<span class="pill" style="background:#EF444422;color:#EF4444">Inativo</span>';
+  return '<div class="lead-card" style="border-left-color:'+cor+'">'+
+    '<div class="lc-top" onclick="editarRep('+u.id+')"><div class="lc-av">'+(u.papel==='admin'?'\u2B50':'\U0001F464')+'</div>'+
+    '<div class="lc-info"><div class="lc-name">'+esc(u.nome)+'</div><div class="lc-meta">'+esc(u.email)+' \u00b7 '+esc(u.papel)+'</div></div>'+st+'</div>'+
+    '<div class="lc-actions"><button class="qa call" onclick="event.stopPropagation();editarRep('+u.id+')">\u270F\uFE0F</button>'+
+    '<button class="qa" style="color:'+(u.ativo?'#EF4444':'#22C55E')+'" onclick="event.stopPropagation();toggleRep('+u.id+','+(!u.ativo)+')">'+(u.ativo?'\u23FB':'\u2713')+'</button></div></div>';
+}
+function abrirNovoRep(){
+  document.getElementById('rep-titulo').textContent='Novo representante';
+  document.getElementById('rep-id').value='';
+  document.getElementById('rep-nome').value='';document.getElementById('rep-email').value='';
+  document.getElementById('rep-senha').value='';document.getElementById('rep-senha-hint').textContent='(obrigat\u00f3ria)';
+  document.getElementById('rep-papel').value='representante';document.getElementById('rep-ativo').value='true';
+  document.getElementById('modal-rep').classList.remove('hidden');
+}
+function editarRep(id){
+  const u=repsCache.find(x=>x.id===id);if(!u)return;
+  document.getElementById('rep-titulo').textContent='Editar '+u.nome;
+  document.getElementById('rep-id').value=u.id;
+  document.getElementById('rep-nome').value=u.nome;document.getElementById('rep-email').value=u.email;
+  document.getElementById('rep-senha').value='';document.getElementById('rep-senha-hint').textContent='(deixe vazio p/ manter)';
+  document.getElementById('rep-papel').value=u.papel;document.getElementById('rep-ativo').value=String(u.ativo);
+  document.getElementById('modal-rep').classList.remove('hidden');
+}
+async function salvarRep(){
+  const id=document.getElementById('rep-id').value;
+  const nome=document.getElementById('rep-nome').value.trim();
+  const email=document.getElementById('rep-email').value.trim();
+  const senha=document.getElementById('rep-senha').value;
+  const papel=document.getElementById('rep-papel').value;
+  const ativo=document.getElementById('rep-ativo').value==='true';
+  if(!nome||!email){toast('Nome e email obrigat\u00f3rios','err');return;}
+  const btn=document.getElementById('btn-rep');btn.innerHTML='<span class="spinner-sm"></span>';btn.disabled=true;
+  try{
+    if(id){
+      const body={nome,email,papel,ativo};if(senha)body.senha=senha;
+      await apiPatch('/api/usuarios/'+id,body);
+    }else{
+      if(!senha){toast('Defina uma senha','err');btn.innerHTML='\U0001F4BE Salvar';btn.disabled=false;return;}
+      await apiPost('/api/usuarios',{nome,email,senha,papel});
+    }
+    toast('Salvo com sucesso','ok');fecharModal('modal-rep');carregarReps();
+  }catch(e){toast('Erro: '+esc(e.message),'err');}
+  finally{btn.innerHTML='\U0001F4BE Salvar';btn.disabled=false;}
+}
+async function toggleRep(id,novo){
+  try{await apiPatch('/api/usuarios/'+id,{ativo:novo});toast(novo?'Ativado':'Desativado','ok');carregarReps();}
+  catch(e){toast('Erro ao alterar','err');}
+}
 
 verificarSessao();
 </script>
