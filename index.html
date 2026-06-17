@@ -500,9 +500,10 @@ async function apiPatch(p,b){const r=await fetch(API_BASE+p,{method:'PATCH',head
 function sessaoExpirada(){TOKEN=null;sessao=null;sessionStorage.removeItem('crm_sessao');sessionStorage.removeItem('crm_token');document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');toast('Sessão expirada, faça login','err');}
 
 async function chamarIA(prompt,maxTokens){
-  const r=await fetch(API_BASE+'/api/ia',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,max_tokens:maxTokens||800})});
-  const d=await r.json();
-  if(!r.ok||d.erro)throw new Error('IA indisponível');
+  const r=await fetch(API_BASE+'/api/ia',{method:'POST',headers:authHeaders({'Content-Type':'application/json'}),body:JSON.stringify({prompt,max_tokens:maxTokens||800})});
+  if(r.status===401){sessaoExpirada();throw new Error('Sessão expirada');}
+  let d={};try{d=await r.json();}catch(e){}
+  if(!r.ok||d.erro){const det=(d.erro&&(d.erro.error&&d.erro.error.message||d.erro.message||d.erro))||('HTTP '+r.status);throw new Error(typeof det==='string'?det:JSON.stringify(det));}
   return d.texto||'';
 }
 
@@ -816,16 +817,16 @@ function repCard(u){
   const cor=u.papel==='admin'?'#00E5FF':'#7B61FF';
   const st=u.ativo?'<span class="pill" style="background:#22C55E22;color:#22C55E">Ativo</span>':'<span class="pill" style="background:#EF444422;color:#EF4444">Inativo</span>';
   return '<div class="lead-card" style="border-left-color:'+cor+'">'+
-    '<div class="lc-top" onclick="editarRep('+u.id+')"><div class="lc-av">'+(u.papel==='admin'?'\u2B50':'\U0001F464')+'</div>'+
-    '<div class="lc-info"><div class="lc-name">'+esc(u.nome)+'</div><div class="lc-meta">'+esc(u.email)+' \u00b7 '+esc(u.papel)+'</div></div>'+st+'</div>'+
-    '<div class="lc-actions"><button class="qa call" onclick="event.stopPropagation();editarRep('+u.id+')">\u270F\uFE0F</button>'+
-    '<button class="qa" style="color:'+(u.ativo?'#EF4444':'#22C55E')+'" onclick="event.stopPropagation();toggleRep('+u.id+','+(!u.ativo)+')">'+(u.ativo?'\u23FB':'\u2713')+'</button></div></div>';
+    '<div class="lc-top" onclick="editarRep('+u.id+')"><div class="lc-av">'+(u.papel==='admin'?'⭐':'👤')+'</div>'+
+    '<div class="lc-info"><div class="lc-name">'+esc(u.nome)+'</div><div class="lc-meta">'+esc(u.email)+' · '+esc(u.papel)+'</div></div>'+st+'</div>'+
+    '<div class="lc-actions"><button class="qa call" onclick="event.stopPropagation();editarRep('+u.id+')">✏️</button>'+
+    '<button class="qa" style="color:'+(u.ativo?'#EF4444':'#22C55E')+'" onclick="event.stopPropagation();toggleRep('+u.id+','+(!u.ativo)+')">'+(u.ativo?'⏻':'✓')+'</button></div></div>';
 }
 function abrirNovoRep(){
   document.getElementById('rep-titulo').textContent='Novo representante';
   document.getElementById('rep-id').value='';
   document.getElementById('rep-nome').value='';document.getElementById('rep-email').value='';
-  document.getElementById('rep-senha').value='';document.getElementById('rep-senha-hint').textContent='(obrigat\u00f3ria)';
+  document.getElementById('rep-senha').value='';document.getElementById('rep-senha-hint').textContent='(obrigatória)';
   document.getElementById('rep-papel').value='representante';document.getElementById('rep-ativo').value='true';
   document.getElementById('modal-rep').classList.remove('hidden');
 }
@@ -845,19 +846,19 @@ async function salvarRep(){
   const senha=document.getElementById('rep-senha').value;
   const papel=document.getElementById('rep-papel').value;
   const ativo=document.getElementById('rep-ativo').value==='true';
-  if(!nome||!email){toast('Nome e email obrigat\u00f3rios','err');return;}
+  if(!nome||!email){toast('Nome e email obrigatórios','err');return;}
   const btn=document.getElementById('btn-rep');btn.innerHTML='<span class="spinner-sm"></span>';btn.disabled=true;
   try{
     if(id){
       const body={nome,email,papel,ativo};if(senha)body.senha=senha;
       await apiPatch('/api/usuarios/'+id,body);
     }else{
-      if(!senha){toast('Defina uma senha','err');btn.innerHTML='\U0001F4BE Salvar';btn.disabled=false;return;}
+      if(!senha){toast('Defina uma senha','err');btn.innerHTML='💾 Salvar';btn.disabled=false;return;}
       await apiPost('/api/usuarios',{nome,email,senha,papel});
     }
     toast('Salvo com sucesso','ok');fecharModal('modal-rep');carregarReps();
   }catch(e){toast('Erro: '+esc(e.message),'err');}
-  finally{btn.innerHTML='\U0001F4BE Salvar';btn.disabled=false;}
+  finally{btn.innerHTML='💾 Salvar';btn.disabled=false;}
 }
 async function toggleRep(id,novo){
   try{await apiPatch('/api/usuarios/'+id,{ativo:novo});toast(novo?'Ativado':'Desativado','ok');carregarReps();}
