@@ -246,6 +246,22 @@ input,select,textarea{font-family:inherit}
 .empty{text-align:center;color:var(--txt3);padding:40px 18px;font-size:14px;line-height:1.5}
 .toast{position:fixed;left:50%;bottom:130px;transform:translateX(-50%);z-index:99;padding:12px 20px;border-radius:13px;font-size:13px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fade .2s;max-width:90%;text-align:center}
 .toast-ok{background:var(--ok);color:#02111F}.toast-err{background:var(--err);color:#fff}
+.pflags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.pflag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;line-height:1.4}
+.pflag.pf-cota{background:rgba(0,245,212,.16);color:var(--cyan-neon);border:1px solid rgba(0,245,212,.35)}
+.pflag.pf-manip{background:rgba(255,107,179,.16);color:#FF6BB3;border:1px solid rgba(255,107,179,.35)}
+.flag-opts{display:flex;gap:10px;margin-top:6px}
+.flag-chip{flex:1;display:flex;align-items:center;gap:8px;padding:11px 12px;border-radius:14px;border:1px solid var(--border-soft);background:rgba(9,26,54,.86);font-size:12px;font-weight:600;color:var(--txt2);cursor:pointer;transition:.15s}
+.flag-chip input{width:16px;height:16px;accent-color:var(--cyan);flex:0 0 auto}
+.flag-chip.on{border-color:var(--cyan);background:rgba(0,229,255,.1);color:var(--txt)}
+.checkout-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.co-opt{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:14px 8px;font-size:12px;font-weight:700;color:var(--txt2);text-align:center}
+.co-opt:active{background:var(--bg-card-hover);border-color:var(--cyan)}
+.co-opt .ci{font-size:20px}
+.md-txt h2,.md-txt h3,.md-txt h4{color:var(--cyan);font-weight:800;margin:12px 0 5px}
+.md-txt h2{font-size:16px}.md-txt h3{font-size:14px}.md-txt h4{font-size:13px}
+.md-txt ul{margin:6px 0 6px 18px}
+.md-txt p{margin:0 0 8px}
 </style>
 </head>
 <body>
@@ -432,6 +448,12 @@ input,select,textarea{font-family:inherit}
     <div class="fld"><label>Estado (UF)</label><input id="f-estado-form" maxlength="2"></div>
     <div class="fld"><label>Pipeline</label><select id="f-pipe"><option>Em Prospeccao</option><option>Contato Feito</option><option>Negociacao</option><option>Proposta</option><option>Fechado</option><option>Perdido</option></select></div>
     <div class="fld"><label>Observações</label><textarea id="f-obs" rows="2"></textarea></div>
+    <div class="fld"><label>Flags de produto</label>
+      <div class="flag-opts">
+        <label class="flag-chip" id="chip-cota"><input type="checkbox" id="f-cotacao" onchange="document.getElementById('chip-cota').classList.toggle('on',this.checked)">💊 Usa CotaçãoNaMão</label>
+        <label class="flag-chip" id="chip-manip"><input type="checkbox" id="f-manip" onchange="document.getElementById('chip-manip').classList.toggle('on',this.checked)">🧪 Revende Manipulados</label>
+      </div>
+    </div>
     <button class="btn-primary" id="btn-salvar" onclick="salvarLead()">💾 Salvar lead</button>
   </div>
 </div>
@@ -446,7 +468,32 @@ input,select,textarea{font-family:inherit}
     <div class="fld"><label>Senha <span id="rep-senha-hint" style="color:var(--txt3);font-weight:400"></span></label><input id="rep-senha" type="text" placeholder="defina uma senha"></div>
     <div class="fld"><label>Papel</label><select id="rep-papel"><option value="representante">Representante</option><option value="admin">Admin</option></select></div>
     <div class="fld"><label>Status</label><select id="rep-ativo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
+    <div class="fld"><label>Cidade (região de atuação)</label><input id="rep-cidade" placeholder="ex: Ribeirão Preto"></div>
+    <div class="fld"><label>Estado (UF)</label><input id="rep-estado" maxlength="2" placeholder="ex: SP" style="text-transform:uppercase"></div>
     <button class="btn-primary" id="btn-rep" onclick="salvarRep()">💾 Salvar</button>
+  </div>
+</div>
+
+<div class="modal hidden" id="modal-sugestao">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="sheet-head"><h2>🤖 Sugestão de abordagem</h2><button class="x" onclick="fecharModal('modal-sugestao')">✕</button></div>
+    <div id="sug-content"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<div class="modal hidden" id="modal-checkout">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="sheet-head"><h2>Check-out da visita</h2><button class="x" onclick="fecharModal('modal-checkout')">✕</button></div>
+    <div class="subdate" id="co-cliente" style="margin:-6px 0 14px"></div>
+    <div class="fld"><label>Produto oferecido</label></div>
+    <div class="checkout-opts">
+      <button class="co-opt" onclick="confirmarCheckout('cotacao')"><span class="ci">💊</span>Cotação de Medicamentos</button>
+      <button class="co-opt" onclick="confirmarCheckout('manipulados')"><span class="ci">🧪</span>Manipulados</button>
+      <button class="co-opt" onclick="confirmarCheckout('ambos')"><span class="ci">🤝</span>Ambos</button>
+      <button class="co-opt" onclick="confirmarCheckout('nenhum')"><span class="ci">🚫</span>Nenhum</button>
+    </div>
   </div>
 </div>
 
@@ -475,9 +522,9 @@ const LEADS_MOCK=[
   {id:7,razao_social:'POSTO SHELL SELECT CENTRO',segmento:'Posto de Gasolina',cidade:'Uberlândia',estado:'MG',pipeline:'Em Prospeccao',bandeira:'Shell',telefone:'(34) 3210-9000',whatsapp:'3432109000',email:'posto@shellcentro.com',when:'2 dias'},
   {id:8,razao_social:'HOSPITAL SANTA CLARA',segmento:'Hospital',cidade:'Belo Horizonte',estado:'MG',pipeline:'Negociacao',telefone:'(31) 3500-4000',whatsapp:'3135004000',email:'compras@santaclara.com.br',when:'2 dias'}];
 const VISITAS_MOCK=[
-  {id:1,razao_social:'Farmácia São Paulo',segmento:'Farmácia',cidade:'Av. Paulista, 1374 · SP',horario:'09:30',km:'15 km'},
-  {id:2,razao_social:'Hospital Santa Clara',segmento:'Hospital',cidade:'Rua da Consolação, 221 · SP',horario:'11:00',km:'22 km'},
-  {id:3,razao_social:'Drogaria Mais Saúde',segmento:'Farmácia',cidade:'Rua Augusta, 645 · SP',horario:'14:00',km:'8 km'}];
+  {id:1,razao_social:'Farmácia São Paulo',segmento:'Farmácia',cidade:'Av. Paulista, 1374 · SP',horario:'09:30',km:'15 km',mock:true},
+  {id:2,razao_social:'Hospital Santa Clara',segmento:'Hospital',cidade:'Rua da Consolação, 221 · SP',horario:'11:00',km:'22 km',mock:true},
+  {id:3,razao_social:'Drogaria Mais Saúde',segmento:'Farmácia',cidade:'Rua Augusta, 645 · SP',horario:'14:00',km:'8 km',mock:true}];
 const ROTA_MOCK={resumo:{visitas:12,distancia:'87 km',tempo:'3h42',novos:4},visitas:[
   {ordem:1,cliente:'Farmácia São Paulo',cidade:'Av. Paulista',horario:'09:30',prioridade:'Alta',motivo:'Renovar parceria Unicpharma',lat:-23.5614,lng:-46.6559},
   {ordem:2,cliente:'Clínica Bela Vista',cidade:'Bela Vista',horario:'10:30',prioridade:'Alta',motivo:'Apresentar dermatocosméticos',lat:-23.5577,lng:-46.6440},
@@ -520,6 +567,23 @@ function pipeCor(p){return PIPE_COR[p]||'#254A7D';}
 function pill(p){const c=pipeCor(p);return '<span class="pill" style="background:'+c+'22;color:'+c+'">'+(p||'—')+'</span>';}
 function esc(s){return (s==null?'':String(s)).replace(/[<>&"]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[m]));}
 function fmt(n){return (n||0).toLocaleString('pt-BR');}
+function flagsBadges(c){
+  if(!c)return '';
+  let h='';
+  if(c.usa_cotacaonamao)h+='<span class="pflag pf-cota">💊 CotaçãoNaMão</span>';
+  if(c.revende_manipulados)h+='<span class="pflag pf-manip">🧪 Manipulados</span>';
+  return h?'<div class="pflags">'+h+'</div>':'';
+}
+function mdToHtml(md){
+  if(!md)return '';
+  let h=esc(md);
+  h=h.replace(/^### (.*)$/gm,'<h4>$1</h4>').replace(/^## (.*)$/gm,'<h3>$1</h3>').replace(/^# (.*)$/gm,'<h2>$1</h2>');
+  h=h.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  h=h.replace(/(^|\n)[-*] (.*)/g,'$1<li>$2</li>');
+  h=h.replace(/(<li>[\s\S]*?<\/li>\n?)+/g,m=>'<ul>'+m.replace(/\n/g,'')+'</ul>');
+  h=h.split(/\n{2,}/).map(par=>/^<(h2|h3|h4|ul)/.test(par.trim())?par:'<p>'+par.replace(/\n/g,'<br>')+'</p>').join('');
+  return h;
+}
 
 async function fazerLogin(){
   const email=document.getElementById('lg-user').value.trim(),senha=document.getElementById('lg-pass').value;
@@ -587,9 +651,27 @@ function renderKPIs(m){
     kpiCard('c-amber','✅',fmt(k.fechados!=null?k.fechados:KPIS.fechados),'Fechados','↑ '+KPIS.tr_fech);
 }
 function kpiCard(cls,ic,v,l,tr){return '<div class="kpi '+cls+'"><div class="ic '+cls+'">'+ic+'</div><div class="v">'+v+'</div><div class="l">'+l+'</div><div class="tr up">'+tr+'</div></div>';}
+let visitasHomeCache=[];
 function renderVisitas(arr){
-  document.getElementById('home-visitas').innerHTML=arr.slice(0,3).map(v=>
-    '<div class="visit-row"><div class="vi">'+segEmoji(v.segmento)+'</div><div class="vt"><div class="vn">'+esc(v.razao_social)+'</div><div class="vs">'+esc(v.segmento)+' · '+esc(v.cidade)+'</div></div><div class="vr"><div class="h">'+esc(v.horario)+'</div><div class="km">'+esc(v.km)+'</div></div></div>').join('');
+  visitasHomeCache=arr.slice(0,3);
+  document.getElementById('home-visitas').innerHTML=visitasHomeCache.map((v,i)=>
+    '<div class="visit-row"><div class="vi">'+segEmoji(v.segmento)+'</div><div class="vt"><div class="vn">'+esc(v.razao_social)+'</div><div class="vs">'+esc(v.segmento)+' · '+esc(v.cidade)+'</div></div><div class="vr"><div class="h">'+esc(v.horario)+'</div><div class="km">'+esc(v.km)+'</div></div>'+
+    '<button class="qa" style="color:var(--ok);border-color:rgba(34,197,94,.4)" title="Check-out da visita" onclick="event.stopPropagation();abrirCheckoutHome('+i+')">✅</button></div>').join('');
+}
+function abrirCheckoutHome(i){const v=visitasHomeCache[i];if(!v)return;abrirCheckout(v.id,v.razao_social,v.mock);}
+let checkoutCtx=null;
+function abrirCheckout(visitaId,nomeCliente,isMock){
+  if(visitaId==null||isMock===true){toast('Check-out indisponível: esta visita ainda não tem registro no backend','err');return;}
+  checkoutCtx={visitaId};
+  document.getElementById('co-cliente').textContent=nomeCliente||'';
+  document.getElementById('modal-checkout').classList.remove('hidden');
+}
+async function confirmarCheckout(produto){
+  if(!checkoutCtx)return;
+  try{
+    await apiPatch('/api/visitas/'+checkoutCtx.visitaId+'/checkout',{produto_oferecido:produto});
+    toast('Check-out registrado','ok');fecharModal('modal-checkout');checkoutCtx=null;
+  }catch(e){toast('Erro no check-out: '+esc(e.message),'err');}
 }
 async function carregarLeadsRecentes(){
   let arr=LEADS_MOCK;
@@ -602,7 +684,7 @@ function leadCard(c){
   return '<div class="lead-card" style="border-left-color:'+cor+'">'+
     '<div class="lc-top" onclick="verCliente('+c.id+')"><div class="lc-av">'+segEmoji(seg)+'</div>'+
     '<div class="lc-info"><div class="lc-name">'+esc(c.razao_social||c.nome_fantasia||'Sem nome')+'</div>'+
-    '<div class="lc-meta">'+esc(seg||'—')+(c.cidade?' · '+esc(c.cidade):'')+(c.estado?'/'+esc(c.estado):'')+'</div></div>'+pill(c.pipeline)+'</div>'+
+    '<div class="lc-meta">'+esc(seg||'—')+(c.cidade?' · '+esc(c.cidade):'')+(c.estado?'/'+esc(c.estado):'')+'</div>'+flagsBadges(c)+'</div>'+pill(c.pipeline)+'</div>'+
     '<div class="lc-actions">'+
     (wpp?'<button class="qa wpp" onclick="event.stopPropagation();window.open(\'https://wa.me/55'+wpp+'\')">💬</button>':'')+
     (tel?'<button class="qa call" onclick="event.stopPropagation();window.open(\'tel:'+tel+'\')">📞</button>':'')+
@@ -670,7 +752,7 @@ function renderDetalhe(c){
   const wpp=(c.whatsapp||c.telefone||'').replace(/\D/g,'');const tel=(c.telefone||'').replace(/\D/g,'');
   const opc=segmentosCache.map(s=>'<option value="'+s.id+'" '+(c.segmento_id===s.id?'selected':'')+'>'+segEmoji(s.nome)+' '+esc(s.nome)+'</option>').join('');
   document.getElementById('d-content').innerHTML=
-    '<div class="dt-card"><div class="dt-head"><div class="dt-av">'+segEmoji(seg)+'</div><div style="flex:1;min-width:0"><div class="dt-name">'+esc(c.razao_social||c.nome_fantasia||'Sem nome')+'</div><div style="margin:7px 0">'+pill(c.pipeline)+'</div><div class="dt-seg">'+esc(seg||'—')+(c.cidade?' · '+esc(c.cidade):'')+(c.estado?'/'+esc(c.estado):'')+'</div></div></div>'+
+    '<div class="dt-card"><div class="dt-head"><div class="dt-av">'+segEmoji(seg)+'</div><div style="flex:1;min-width:0"><div class="dt-name">'+esc(c.razao_social||c.nome_fantasia||'Sem nome')+'</div><div style="margin:7px 0">'+pill(c.pipeline)+'</div><div class="dt-seg">'+esc(seg||'—')+(c.cidade?' · '+esc(c.cidade):'')+(c.estado?'/'+esc(c.estado):'')+'</div>'+flagsBadges(c)+'</div></div></div>'+
     '<div class="dt-actions">'+
     '<button class="dt-act wpp" '+(wpp?'':'disabled style=opacity:.4')+' onclick="window.open(\'https://wa.me/55'+wpp+'\')"><span class="ai">💬</span>WhatsApp</button>'+
     '<button class="dt-act call" '+(tel?'':'disabled style=opacity:.4')+' onclick="window.open(\'tel:'+tel+'\')"><span class="ai">📞</span>Ligar</button>'+
@@ -686,7 +768,11 @@ function renderDetalhe(c){
       '<div class="info-row"><span class="k">Segmento</span><span class="v">'+esc(seg||'—')+'</span></div>'+
       '<div class="info-row"><span class="k">Origem</span><span class="v">'+esc(c.fonte_lead||'Indicação')+'</span></div>'+
       '<div class="info-row"><span class="k">Responsável</span><span class="v">'+esc(c.responsavel||sessao.nome)+'</span></div></div>'+
-      '<div class="edit-seg-box"><label>Alterar segmento</label><div class="row"><select id="d-seg">'+opc+'</select><button class="btn-sec" onclick="salvarSegmento('+c.id+')">Salvar</button></div></div></div>'+
+      '<div class="edit-seg-box"><label>Alterar segmento</label><div class="row"><select id="d-seg">'+opc+'</select><button class="btn-sec" onclick="salvarSegmento('+c.id+')">Salvar</button></div></div>'+
+      '<div class="edit-seg-box"><label>Flags de produto</label><div class="flag-opts">'+
+        '<label class="flag-chip'+(c.usa_cotacaonamao?' on':'')+'"><input type="checkbox" id="d-cota" '+(c.usa_cotacaonamao?'checked':'')+' onchange="this.parentElement.classList.toggle(\'on\',this.checked);salvarFlags('+c.id+')">💊 CotaçãoNaMão</label>'+
+        '<label class="flag-chip'+(c.revende_manipulados?' on':'')+'"><input type="checkbox" id="d-manip" '+(c.revende_manipulados?'checked':'')+' onchange="this.parentElement.classList.toggle(\'on\',this.checked);salvarFlags('+c.id+')">🧪 Manipulados</label>'+
+      '</div></div></div>'+
     '<div id="dt-tl" class="hidden">'+
       '<div class="tl-item"><div class="tl-dot"></div><div><div class="tl-txt">Lead criado</div><div class="tl-time">Hoje 11:30 · por '+esc(sessao.nome)+'</div></div></div>'+
       '<div class="tl-item"><div class="tl-dot" style="background:#22C55E"></div><div><div class="tl-txt">Mensagem enviada no WhatsApp</div><div class="tl-time">Hoje 11:45</div></div></div>'+
@@ -694,6 +780,7 @@ function renderDetalhe(c){
       '<div class="tl-item"><div class="tl-dot" style="background:#FF6B35"></div><div><div class="tl-txt">Proposta enviada</div><div class="tl-time">Ontem 16:20</div></div></div></div>'+
     '<div id="dt-ativ" class="hidden"><div class="empty">Sem atividades registradas para este lead.</div></div>'+
     '<button class="btn-analyze" onclick="analisarIA('+c.id+')">✨ Analisar com IA</button>'+
+    '<button class="btn-analyze" style="background:var(--grad-primary);color:#02111F;box-shadow:var(--glow-cyan);margin-top:9px" onclick="sugerirProduto('+c.id+')">🤖 Sugerir abordagem de produto</button>'+
     '<div id="ia-result" style="margin-top:12px"></div>';
 }
 function dtTab(el,t){
@@ -719,13 +806,33 @@ async function salvarLead(){
   const segId=document.getElementById('f-seg').value?parseInt(document.getElementById('f-seg').value):null;
   const btn=document.getElementById('btn-salvar');btn.innerHTML='<span class="spinner-sm"></span>';btn.disabled=true;
   try{
-    await apiPost('/api/clientes',{razao_social:razao,nome_fantasia:val('f-fantasia'),cnpj:val('f-cnpj'),segmento_id:segId,telefone:val('f-tel'),whatsapp:val('f-wpp'),email:val('f-email'),cidade:val('f-cidade'),estado:val('f-estado-form'),pipeline:document.getElementById('f-pipe').value||'Em Prospeccao',fonte_lead:'Manual',responsavel:sessao.nome,status:'Prospect',observacoes:val('f-obs')});
+    await apiPost('/api/clientes',{razao_social:razao,nome_fantasia:val('f-fantasia'),cnpj:val('f-cnpj'),segmento_id:segId,telefone:val('f-tel'),whatsapp:val('f-wpp'),email:val('f-email'),cidade:val('f-cidade'),estado:val('f-estado-form'),pipeline:document.getElementById('f-pipe').value||'Em Prospeccao',fonte_lead:'Manual',responsavel:sessao.nome,status:'Prospect',observacoes:val('f-obs'),usa_cotacaonamao:document.getElementById('f-cotacao').checked,revende_manipulados:document.getElementById('f-manip').checked});
     toast('Lead salvo com sucesso','ok');fecharModal('modal-novo');limparForm();carregarLeadsRecentes();if(clientesCache.length)buscarClientes(0);
   }catch(e){toast('Preview: lead não salvo (API offline)','err');fecharModal('modal-novo');limparForm();}
   finally{btn.innerHTML='💾 Salvar lead';btn.disabled=false;}
 }
 function val(id){return document.getElementById(id).value||null;}
-function limparForm(){['f-razao','f-fantasia','f-cnpj','f-tel','f-wpp','f-email','f-cidade','f-estado-form','f-obs'].forEach(i=>{const e=document.getElementById(i);if(e)e.value='';});document.getElementById('f-seg').value='';}
+function limparForm(){['f-razao','f-fantasia','f-cnpj','f-tel','f-wpp','f-email','f-cidade','f-estado-form','f-obs'].forEach(i=>{const e=document.getElementById(i);if(e)e.value='';});document.getElementById('f-seg').value='';
+  document.getElementById('f-cotacao').checked=false;document.getElementById('f-manip').checked=false;
+  document.getElementById('chip-cota').classList.remove('on');document.getElementById('chip-manip').classList.remove('on');
+}
+async function salvarFlags(id){
+  const cota=document.getElementById('d-cota').checked;
+  const manip=document.getElementById('d-manip').checked;
+  try{
+    await apiPatch('/api/clientes/'+id,{usa_cotacaonamao:cota,revende_manipulados:manip});
+    const c=clientesCache.find(x=>x.id===id);if(c){c.usa_cotacaonamao=cota;c.revende_manipulados=manip;}
+    toast('Flags atualizadas','ok');
+  }catch(e){toast('Preview: não persistido (API offline)','err');}
+}
+async function sugerirProduto(clienteId){
+  document.getElementById('modal-sugestao').classList.remove('hidden');
+  const box=document.getElementById('sug-content');box.innerHTML='<div class="spinner"></div>';
+  try{
+    const r=await apiPost('/api/ia',{modo:'sugestao_produto',cliente_id:clienteId});
+    box.innerHTML='<div class="ai-feed md-txt" style="white-space:normal">'+mdToHtml(r.texto||'Sem sugestão disponível.')+'</div>';
+  }catch(e){box.innerHTML='<div class="ai-feed" style="color:var(--warn)">⚠ Não foi possível gerar a sugestão. '+esc(e.message)+'</div>';}
+}
 
 function initMapa(){
   if(mapa)return;
@@ -733,31 +840,63 @@ function initMapa(){
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(mapa);
   setTimeout(()=>mapa.invalidateSize(),250);
 }
+let rotaVisitasAtual=[],proximaVisitaAtual=null;
 async function gerarRoteiro(){
   initMapa();
   const btn=document.getElementById('btn-rota');btn.innerHTML='<span class="spinner-sm"></span>';btn.disabled=true;
   try{
-    let base=clientesCache.slice(0,15).map(c=>c.razao_social+' ('+(c.segmento||'')+', '+(c.cidade||'')+'/'+(c.estado||'')+')').join('; ')||LEADS_MOCK.map(c=>c.razao_social+' ('+c.segmento+', '+c.cidade+'/'+c.estado+')').join('; ');
-    const prompt='Monte um roteiro de visitas comerciais otimizado para hoje em SP/MG (OneClick/Unicpharma). Clientes: '+base+'. Selecione de 4 a 6, ordene por proximidade e prioridade. Responda APENAS JSON: {"resumo":{"visitas":N,"distancia":"X km","tempo":"Xh","novos":N},"visitas":[{"ordem":1,"cliente":"...","cidade":"...","horario":"09:00","prioridade":"Alta","motivo":"...","lat":-23.55,"lng":-46.63}]}. Coordenadas reais aproximadas.';
+    let carteira=[];
+    try{const r=await apiGet('/api/clientes?limit=50');carteira=r.clientes||[];}catch(e){}
+    if(!carteira.length)carteira=clientesCache.length?clientesCache.slice(0,15):LEADS_MOCK;
+    let base=carteira.slice(0,50).map(c=>{
+      const flags=[];if(c.usa_cotacaonamao)flags.push('usa CotaçãoNaMão');if(c.revende_manipulados)flags.push('revende Manipulados');
+      return (c.razao_social||c.nome_fantasia||'')+' (id:'+c.id+', '+(c.segmento||c.segmento_nome||'')+', '+(c.cidade||'')+'/'+(c.estado||'')+(flags.length?', '+flags.join(' + '):'')+')';
+    }).join('; ');
+    const prompt='Monte um roteiro de visitas comerciais otimizado para hoje na carteira do representante (OneClick/Unicpharma). Clientes da carteira: '+base+'. Selecione de 4 a 6, ordene por proximidade e prioridade — priorize considerando quem já usa CotaçãoNaMão ou revende Manipulados para reforçar a oferta certa. Responda APENAS JSON: {"resumo":{"visitas":N,"distancia":"X km","tempo":"Xh","novos":N},"visitas":[{"ordem":1,"cliente_id":123,"cliente":"...","cidade":"...","horario":"09:00","prioridade":"Alta","motivo":"...","lat":-23.55,"lng":-46.63}]}. Coordenadas reais aproximadas.';
     const txt=await chamarIA(prompt,1300);const j=JSON.parse(txt.replace(/```json|```/g,'').trim());
-    renderRoteiro(j.visitas||[],j.resumo);
-  }catch(e){renderRoteiro(ROTA_MOCK.visitas,ROTA_MOCK.resumo);toast('IA indisponível — preview exibido','err');}
+    renderRoteiro(j.visitas||[],j.resumo,carteira);
+  }catch(e){renderRoteiro(ROTA_MOCK.visitas,ROTA_MOCK.resumo,[]);toast('IA indisponível — preview exibido','err');}
   finally{btn.innerHTML='✨ Gerar roteiro';btn.disabled=false;}
 }
-function renderRoteiro(visitas,resumo){
+function renderRoteiro(visitas,resumo,carteira){
   initMapa();
   if(mapaLayer)mapa.removeLayer(mapaLayer);mapaLayer=L.layerGroup().addTo(mapa);
   const r=resumo||ROTA_MOCK.resumo;
   document.getElementById('rt-vis').textContent=r.visitas;document.getElementById('rt-dist').textContent=r.distancia;
   document.getElementById('rt-tempo').textContent=r.tempo;document.getElementById('rt-novos').textContent=r.novos;
+  carteira=carteira||[];
+  rotaVisitasAtual=visitas;
+  function achaCliente(v){
+    if(v.cliente_id!=null)return carteira.find(c=>c.id===v.cliente_id);
+    const alvo=(v.cliente||'').trim().toLowerCase();
+    if(!alvo)return null;
+    return carteira.find(c=>(c.razao_social||c.nome_fantasia||'').trim().toLowerCase()===alvo);
+  }
   const pts=[];
   visitas.forEach(v=>{if(v.lat&&v.lng){
     const mk=L.circleMarker([v.lat,v.lng],{radius:11,color:'#00E5FF',fillColor:'#7B4DFF',fillOpacity:.95,weight:2}).addTo(mapaLayer);
-    mk.bindPopup('<b>'+v.ordem+'. '+esc(v.cliente)+'</b><br>'+esc(v.cidade||'')+' · '+esc(v.horario||''));pts.push([v.lat,v.lng]);}});
+    const cli=achaCliente(v);
+    mk.bindPopup('<b>'+v.ordem+'. '+esc(v.cliente)+'</b><br>'+esc(v.cidade||'')+' · '+esc(v.horario||'')+(cli?flagsBadges(cli):''));
+    pts.push([v.lat,v.lng]);}});
   if(pts.length){L.polyline(pts,{color:'#00F5D4',weight:3,opacity:.75}).addTo(mapaLayer);mapa.fitBounds(pts,{padding:[40,40]});}
   const n=visitas[0];
-  document.getElementById('next-visit').innerHTML=n?'<div class="next-visit"><div class="nv-h">📍 Próxima visita</div><div class="nv-body"><div class="nv-av">🏢</div><div style="flex:1"><div class="nv-name">'+esc(n.cliente)+'</div><div class="nv-sub">'+esc(n.cidade||'')+' · '+esc(n.horario||'')+'</div></div></div><button class="btn-nav" onclick="window.open(\'https://www.google.com/maps/dir/?api=1&destination='+(n.lat||'')+','+(n.lng||'')+'\')">🧭 Iniciar navegação</button></div>':'';
-  document.getElementById('rota-lista').innerHTML=visitas.map(v=>'<div class="rota-item"><div class="rota-ord">'+(v.ordem||'•')+'</div><div style="flex:1"><div style="font-weight:700;font-size:14px">'+esc(v.cliente||'')+'</div><div style="color:var(--txt3);font-size:12px;margin:2px 0 4px">'+esc(v.cidade||'')+' · <span style="color:var(--cyan);font-weight:700">'+esc(v.horario||'')+'</span> · '+esc(v.prioridade||'')+'</div><div style="font-size:12px;color:var(--txt2)">'+esc(v.motivo||'')+'</div></div></div>').join('');
+  proximaVisitaAtual=n||null;
+  const nCli=n?achaCliente(n):null;
+  document.getElementById('next-visit').innerHTML=n?'<div class="next-visit"><div class="nv-h">📍 Próxima visita</div><div class="nv-body"><div class="nv-av">🏢</div><div style="flex:1"><div class="nv-name">'+esc(n.cliente)+'</div><div class="nv-sub">'+esc(n.cidade||'')+' · '+esc(n.horario||'')+'</div>'+(nCli?flagsBadges(nCli):'')+'</div></div>'+
+    '<div style="display:flex;gap:9px;margin-top:14px">'+
+    '<button class="btn-nav" style="margin-top:0;flex:1" onclick="window.open(\'https://www.google.com/maps/dir/?api=1&destination='+(n.lat||'')+','+(n.lng||'')+'\')">🧭 Navegar</button>'+
+    (nCli?'<button class="btn-nav" style="margin-top:0;flex:0 0 auto;background:var(--grad-ai);color:#fff;box-shadow:var(--glow-ai);padding:13px 16px" title="Sugerir abordagem" onclick="sugerirProduto('+nCli.id+')">🤖</button>':'')+
+    '<button class="btn-nav" style="margin-top:0;flex:0 0 auto;background:var(--bg-card);color:var(--ok);box-shadow:none;border:1px solid rgba(34,197,94,.4);padding:13px 16px" title="Check-out da visita" onclick="abrirCheckout(proximaVisitaAtual&&proximaVisitaAtual.id,proximaVisitaAtual&&proximaVisitaAtual.cliente)">✅</button>'+
+    '</div></div>':'';
+  document.getElementById('rota-lista').innerHTML=visitas.map((v,idx)=>{
+    const cli=achaCliente(v);
+    return '<div class="rota-item"><div class="rota-ord">'+(v.ordem||'•')+'</div><div style="flex:1"><div style="font-weight:700;font-size:14px">'+esc(v.cliente||'')+'</div><div style="color:var(--txt3);font-size:12px;margin:2px 0 4px">'+esc(v.cidade||'')+' · <span style="color:var(--cyan);font-weight:700">'+esc(v.horario||'')+'</span> · '+esc(v.prioridade||'')+'</div><div style="font-size:12px;color:var(--txt2)">'+esc(v.motivo||'')+'</div>'+
+      (cli?flagsBadges(cli):'')+
+      '<div style="display:flex;gap:8px;margin-top:9px;flex-wrap:wrap">'+
+      (cli?'<button class="btn-sec" style="padding:8px 12px;font-size:12px" onclick="sugerirProduto('+cli.id+')">🤖 Sugerir abordagem</button>':'')+
+      '<button class="btn-sec" style="padding:8px 12px;font-size:12px" onclick="abrirCheckout(rotaVisitasAtual['+idx+'].id, rotaVisitasAtual['+idx+'].cliente)">✅ Check-out</button>'+
+      '</div></div></div>';
+  }).join('');
 }
 
 async function renderDashboard(){
@@ -833,6 +972,7 @@ function abrirNovoRep(){
   document.getElementById('rep-nome').value='';document.getElementById('rep-email').value='';
   document.getElementById('rep-senha').value='';document.getElementById('rep-senha-hint').textContent='(obrigatória)';
   document.getElementById('rep-papel').value='representante';document.getElementById('rep-ativo').value='true';
+  document.getElementById('rep-cidade').value='';document.getElementById('rep-estado').value='';
   document.getElementById('modal-rep').classList.remove('hidden');
 }
 function editarRep(id){
@@ -842,6 +982,7 @@ function editarRep(id){
   document.getElementById('rep-nome').value=u.nome;document.getElementById('rep-email').value=u.email;
   document.getElementById('rep-senha').value='';document.getElementById('rep-senha-hint').textContent='(deixe vazio p/ manter)';
   document.getElementById('rep-papel').value=u.papel;document.getElementById('rep-ativo').value=String(u.ativo);
+  document.getElementById('rep-cidade').value=u.regiao_cidade||'';document.getElementById('rep-estado').value=u.regiao_estado||'';
   document.getElementById('modal-rep').classList.remove('hidden');
 }
 async function salvarRep(){
@@ -851,17 +992,22 @@ async function salvarRep(){
   const senha=document.getElementById('rep-senha').value;
   const papel=document.getElementById('rep-papel').value;
   const ativo=document.getElementById('rep-ativo').value==='true';
+  const regiao_cidade=document.getElementById('rep-cidade').value.trim()||null;
+  const regiao_estado=document.getElementById('rep-estado').value.trim().toUpperCase()||null;
   if(!nome||!email){toast('Nome e email obrigatórios','err');return;}
   const btn=document.getElementById('btn-rep');btn.innerHTML='<span class="spinner-sm"></span>';btn.disabled=true;
   try{
+    let resp;
     if(id){
-      const body={nome,email,papel,ativo};if(senha)body.senha=senha;
-      await apiPatch('/api/usuarios/'+id,body);
+      const body={nome,email,papel,ativo,regiao_cidade,regiao_estado};if(senha)body.senha=senha;
+      resp=await apiPatch('/api/usuarios/'+id,body);
     }else{
       if(!senha){toast('Defina uma senha','err');btn.innerHTML='💾 Salvar';btn.disabled=false;return;}
-      await apiPost('/api/usuarios',{nome,email,senha,papel});
+      resp=await apiPost('/api/usuarios',{nome,email,senha,papel,regiao_cidade,regiao_estado});
     }
-    toast('Salvo com sucesso','ok');fecharModal('modal-rep');carregarReps();
+    let msg='Salvo com sucesso';
+    if(resp&&resp.clientes_associados>0)msg+=' · ✅ '+fmt(resp.clientes_associados)+' clientes associados automaticamente à carteira';
+    toast(msg,'ok');fecharModal('modal-rep');carregarReps();
   }catch(e){toast('Erro: '+esc(e.message),'err');}
   finally{btn.innerHTML='💾 Salvar';btn.disabled=false;}
 }
