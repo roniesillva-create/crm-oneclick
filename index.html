@@ -420,6 +420,7 @@ input,select,textarea{font-family:inherit}
     <div class="fld"><label>Estado (UF)</label><select id="f-uf-filtro"><option value="">Todos</option><option>SP</option><option>MG</option></select></div>
     <div class="fld"><label>Possui</label><select id="f-canal-filtro"><option value="">Indiferente</option><option value="whatsapp">Com WhatsApp</option><option value="email">Com Email</option></select></div>
     <div class="fld"><label>Bandeira (postos)</label><select id="f-band-filtro"><option value="">Todas</option><option>Ipiranga</option><option>Shell</option><option>BR Petrobras</option><option>ALE</option><option>Bandeira Branca</option><option>ESSO</option></select></div>
+    <div class="fld hidden" id="fld-rep-filtro"><label>Representante</label><select id="f-rep-filtro"><option value="">Todos</option></select></div>
     <button class="btn-primary" onclick="aplicarFiltros()">Aplicar filtros</button>
     <button class="btn-sec" style="width:100%;margin-top:10px" onclick="limparFiltros()">Limpar</button>
   </div>
@@ -470,6 +471,7 @@ input,select,textarea{font-family:inherit}
     <div class="fld"><label>Status</label><select id="rep-ativo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
     <div class="fld"><label>Cidade (região de atuação)</label><input id="rep-cidade" placeholder="ex: Ribeirão Preto"></div>
     <div class="fld"><label>Estado (UF)</label><input id="rep-estado" maxlength="2" placeholder="ex: SP" style="text-transform:uppercase"></div>
+    <div class="fld"><label>Bairros atendidos</label><textarea id="rep-bairros" rows="2" placeholder="ex: Santo Amaro, Moema, Vila Mariana"></textarea><div style="color:var(--txt3);font-size:11px;margin-top:5px;line-height:1.4">Separe por vírgula. Deixe em branco para cobrir a cidade inteira.</div></div>
     <button class="btn-primary" id="btn-rep" onclick="salvarRep()">💾 Salvar</button>
   </div>
 </div>
@@ -540,7 +542,7 @@ const ATIVIDADES_MOCK=[
   {g:'QUARTA',tipo:'Visita presencial',sub:'Posto Shell Select · 10:00',ic:'📍',cor:'#7B61FF',done:false}];
 
 let sessao=null,segmentosCache=[],clientesCache=[];
-let filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:''};
+let filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:'',responsavel_id:''};
 let pagina=0;const LIMIT=50;
 let mapa=null,mapaLayer=null,dashRendered=false;
 
@@ -707,6 +709,7 @@ async function buscarClientes(pg){
   if(filtros.estado)p.set('estado',filtros.estado);
   if(filtros.whatsapp)p.set('whatsapp','1');if(filtros.email)p.set('email','1');
   if(filtros.bandeira)p.set('bandeira',filtros.bandeira);
+  if(filtros.responsavel_id)p.set('responsavel_id',filtros.responsavel_id);
   p.set('limit',LIMIT);p.set('offset',pagina*LIMIT);
   try{
     const r=await apiGet('/api/clientes?'+p.toString());
@@ -724,11 +727,27 @@ async function buscarClientes(pg){
 }
 function renderPager(tp){document.getElementById('pager').innerHTML='<button onclick="buscarClientes('+(pagina-1)+')" '+(pagina<=0?'disabled':'')+'>‹ Anterior</button><span>'+(pagina+1)+' / '+tp+'</span><button onclick="buscarClientes('+(pagina+1)+')" '+(pagina+1>=tp?'disabled':'')+'>Próxima ›</button>';}
 
+let repsFiltroCache=null;
+async function popularFiltroReps(){
+  if(repsFiltroCache){document.getElementById('f-rep-filtro').value=filtros.responsavel_id;return;}
+  try{
+    const r=await apiGet('/api/usuarios');
+    repsFiltroCache=(r.usuarios||[]).filter(u=>u.papel==='representante');
+  }catch(e){repsFiltroCache=[];}
+  document.getElementById('f-rep-filtro').innerHTML='<option value="">Todos</option><option value="sem_responsavel">Sem responsável</option>'+repsFiltroCache.map(u=>'<option value="'+u.id+'">'+esc(u.nome)+'</option>').join('');
+  document.getElementById('f-rep-filtro').value=filtros.responsavel_id;
+}
 function abrirFiltros(){
   document.getElementById('f-seg-filtro').value=filtros.segmento_id;
   document.getElementById('f-uf-filtro').value=filtros.estado;
   document.getElementById('f-canal-filtro').value=filtros.whatsapp?'whatsapp':(filtros.email?'email':'');
   document.getElementById('f-band-filtro').value=filtros.bandeira;
+  if(sessao.papel==='admin'){
+    document.getElementById('fld-rep-filtro').classList.remove('hidden');
+    popularFiltroReps();
+  }else{
+    document.getElementById('fld-rep-filtro').classList.add('hidden');
+  }
   document.getElementById('modal-filtros').classList.remove('hidden');
 }
 function aplicarFiltros(){
@@ -737,9 +756,10 @@ function aplicarFiltros(){
   filtros.estado=document.getElementById('f-uf-filtro').value;
   filtros.whatsapp=canal==='whatsapp'?'1':'';filtros.email=canal==='email'?'1':'';
   filtros.bandeira=document.getElementById('f-band-filtro').value;
+  filtros.responsavel_id=(sessao.papel==='admin')?document.getElementById('f-rep-filtro').value:'';
   fecharModal('modal-filtros');buscarClientes(0);
 }
-function limparFiltros(){filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:''};fecharModal('modal-filtros');buscarClientes(0);}
+function limparFiltros(){filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:'',responsavel_id:''};fecharModal('modal-filtros');buscarClientes(0);}
 
 function verCliente(id){
   document.getElementById('modal-detalhe').classList.remove('hidden');
@@ -973,6 +993,7 @@ function abrirNovoRep(){
   document.getElementById('rep-senha').value='';document.getElementById('rep-senha-hint').textContent='(obrigatória)';
   document.getElementById('rep-papel').value='representante';document.getElementById('rep-ativo').value='true';
   document.getElementById('rep-cidade').value='';document.getElementById('rep-estado').value='';
+  document.getElementById('rep-bairros').value='';
   document.getElementById('modal-rep').classList.remove('hidden');
 }
 function editarRep(id){
@@ -983,6 +1004,7 @@ function editarRep(id){
   document.getElementById('rep-senha').value='';document.getElementById('rep-senha-hint').textContent='(deixe vazio p/ manter)';
   document.getElementById('rep-papel').value=u.papel;document.getElementById('rep-ativo').value=String(u.ativo);
   document.getElementById('rep-cidade').value=u.regiao_cidade||'';document.getElementById('rep-estado').value=u.regiao_estado||'';
+  document.getElementById('rep-bairros').value=(u.regiao_bairros&&u.regiao_bairros.length)?u.regiao_bairros.join(', '):'';
   document.getElementById('modal-rep').classList.remove('hidden');
 }
 async function salvarRep(){
@@ -994,20 +1016,22 @@ async function salvarRep(){
   const ativo=document.getElementById('rep-ativo').value==='true';
   const regiao_cidade=document.getElementById('rep-cidade').value.trim()||null;
   const regiao_estado=document.getElementById('rep-estado').value.trim().toUpperCase()||null;
+  const regiao_bairros_arr=document.getElementById('rep-bairros').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const regiao_bairros=regiao_bairros_arr.length?regiao_bairros_arr:null;
   if(!nome||!email){toast('Nome e email obrigatórios','err');return;}
   const btn=document.getElementById('btn-rep');btn.innerHTML='<span class="spinner-sm"></span>';btn.disabled=true;
   try{
     let resp;
     if(id){
-      const body={nome,email,papel,ativo,regiao_cidade,regiao_estado};if(senha)body.senha=senha;
+      const body={nome,email,papel,ativo,regiao_cidade,regiao_estado,regiao_bairros};if(senha)body.senha=senha;
       resp=await apiPatch('/api/usuarios/'+id,body);
     }else{
       if(!senha){toast('Defina uma senha','err');btn.innerHTML='💾 Salvar';btn.disabled=false;return;}
-      resp=await apiPost('/api/usuarios',{nome,email,senha,papel,regiao_cidade,regiao_estado});
+      resp=await apiPost('/api/usuarios',{nome,email,senha,papel,regiao_cidade,regiao_estado,regiao_bairros});
     }
     let msg='Salvo com sucesso';
     if(resp&&resp.clientes_associados>0)msg+=' · ✅ '+fmt(resp.clientes_associados)+' clientes associados automaticamente à carteira';
-    toast(msg,'ok');fecharModal('modal-rep');carregarReps();
+    toast(msg,'ok');fecharModal('modal-rep');repsFiltroCache=null;carregarReps();
   }catch(e){toast('Erro: '+esc(e.message),'err');}
   finally{btn.innerHTML='💾 Salvar';btn.disabled=false;}
 }
