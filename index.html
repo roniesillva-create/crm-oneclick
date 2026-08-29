@@ -250,6 +250,7 @@ input,select,textarea{font-family:inherit}
 .pflag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;line-height:1.4}
 .pflag.pf-cota{background:rgba(0,245,212,.16);color:var(--cyan-neon);border:1px solid rgba(0,245,212,.35)}
 .pflag.pf-manip{background:rgba(255,107,179,.16);color:#FF6BB3;border:1px solid rgba(255,107,179,.35)}
+.pflag.pf-unic{background:rgba(45,140,255,.16);color:#5FA8FF;border:1px solid rgba(45,140,255,.35)}
 .flag-opts{display:flex;gap:10px;margin-top:6px}
 .flag-chip{flex:1;display:flex;align-items:center;gap:8px;padding:11px 12px;border-radius:14px;border:1px solid var(--border-soft);background:rgba(9,26,54,.86);font-size:12px;font-weight:600;color:var(--txt2);cursor:pointer;transition:.15s}
 .flag-chip input{width:16px;height:16px;accent-color:var(--cyan);flex:0 0 auto}
@@ -365,6 +366,28 @@ input,select,textarea{font-family:inherit}
     </div>
   </div>
 
+  <div class="page" id="pg-unic">
+    <div class="ptitle">Farmácias Unicpharma</div>
+    <div class="subdate">Já enviam receita de manipulados pra Unic nos últimos 90 dias · oferecer CotaçãoNaMão</div>
+    <div class="searchbar">
+      <input id="unic-busca" placeholder="🔍 Buscar nome, CNPJ, cidade..." onkeydown="if(event.key==='Enter')buscarUnicAtivos(0)">
+    </div>
+    <div class="list-info" id="unic-total">—</div>
+    <div id="unic-lista"><div class="spinner"></div></div>
+    <div class="pager" id="unic-pager"></div>
+  </div>
+
+  <div class="page" id="pg-medicos">
+    <div class="ptitle">Médicos</div>
+    <div class="subdate">Prescreveram receita atendida pela Unicpharma nos últimos 90 dias</div>
+    <div class="searchbar">
+      <input id="med-busca" placeholder="🔍 Buscar nome ou CRM..." onkeydown="if(event.key==='Enter')buscarMedicos(0)">
+    </div>
+    <div class="list-info" id="med-total">—</div>
+    <div id="med-lista"><div class="spinner"></div></div>
+    <div class="pager" id="med-pager"></div>
+  </div>
+
   <div class="page" id="pg-reps">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
       <div><div class="ptitle">Representantes</div><div class="subdate" style="margin:3px 0 0">Gerencie usuários e acessos</div></div>
@@ -380,6 +403,9 @@ input,select,textarea{font-family:inherit}
     <div class="mais-row" onclick="irPara('dashboard')"><div class="mi">📊</div><div class="mt"><div class="n">Dashboard</div><div class="d">Conversão, funil e segmentos</div></div><span class="arr">›</span></div>
     <div class="mais-row" onclick="irPara('atividades')"><div class="mi">🗓️</div><div class="mt"><div class="n">Atividades</div><div class="d">Agenda e tarefas</div></div><span class="arr">›</span></div>
     <div class="mais-row" onclick="irPara('ai')"><div class="mi">🤖</div><div class="mt"><div class="n">OneClick AI</div><div class="d">Assistente comercial</div></div><span class="arr">›</span></div>
+    <div class="sec-title">Unicpharma</div>
+    <div class="mais-row" onclick="irPara('unic')"><div class="mi">🔵</div><div class="mt"><div class="n">Farmácias ativas (90d)</div><div class="d">Já enviam receita pra Unic · oferecer CotaçãoNaMão</div></div><span class="arr">›</span></div>
+    <div class="mais-row" onclick="irPara('medicos')"><div class="mi">🩺</div><div class="mt"><div class="n">Médicos</div><div class="d">CRM ativo na Unic (90d)</div></div><span class="arr">›</span></div>
     <div class="sec-title">Gestão</div>
     <div class="mais-row" id="mais-reps" onclick="irPara('reps')"><div class="mi">👥</div><div class="mt"><div class="n">Representantes</div><div class="d">Usuários e acessos</div></div><span class="arr">›</span></div>
     <div class="mais-row" onclick="emBreve()"><div class="mi">⚡</div><div class="mt"><div class="n">Automações</div><div class="d">n8n · OpenClaw · WhatsApp</div></div><span class="arr">›</span></div>
@@ -574,6 +600,7 @@ function flagsBadges(c){
   let h='';
   if(c.usa_cotacaonamao)h+='<span class="pflag pf-cota">💊 CotaçãoNaMão</span>';
   if(c.revende_manipulados)h+='<span class="pflag pf-manip">🧪 Manipulados</span>';
+  if(c.unicpharma_ativo_90d)h+='<span class="pflag pf-unic" title="Enviou receita pra Unicpharma nos últimos 90 dias">🔵 Ativo Unic (90d)</span>';
   return h?'<div class="pflags">'+h+'</div>':'';
 }
 function mdToHtml(md){
@@ -631,11 +658,14 @@ function irPara(pg){
   if(pg==='dashboard'&&!dashRendered)renderDashboard();
   if(pg==='atividades')renderAtividades('todas');
   if(pg==='reps')carregarReps();
+  if(pg==='unic'&&!unicCache.length)buscarUnicAtivos(0);
+  if(pg==='medicos'&&!medicosCache.length)buscarMedicos(0);
 }
 
 async function inicializar(){
   try{segmentosCache=await apiGet('/api/segmentos');}catch(e){segmentosCache=SEGMENTOS_MOCK.map((s,i)=>({id:i+1,nome:s.nome}));}
-  preencherSelects();renderKPIs();renderVisitas(VISITAS_MOCK);renderTabsLeads();
+  preencherSelects();renderKPIs();renderTabsLeads();
+  carregarVisitasHoje();
   try{const m=await apiGet('/api/clientes/metricas');renderKPIs(m);}catch(e){}
   carregarLeadsRecentes();
 }
@@ -656,11 +686,21 @@ function kpiCard(cls,ic,v,l,tr){return '<div class="kpi '+cls+'"><div class="ic 
 let visitasHomeCache=[];
 function renderVisitas(arr){
   visitasHomeCache=arr.slice(0,3);
+  if(!visitasHomeCache.length){
+    document.getElementById('home-visitas').innerHTML='<div style="text-align:center;color:var(--txt3);font-size:13px;padding:18px 0">Nenhuma visita agendada para hoje</div>';
+    return;
+  }
   document.getElementById('home-visitas').innerHTML=visitasHomeCache.map((v,i)=>
-    '<div class="visit-row"><div class="vi">'+segEmoji(v.segmento)+'</div><div class="vt"><div class="vn">'+esc(v.razao_social)+'</div><div class="vs">'+esc(v.segmento)+' · '+esc(v.cidade)+'</div></div><div class="vr"><div class="h">'+esc(v.horario)+'</div><div class="km">'+esc(v.km)+'</div></div>'+
+    '<div class="visit-row"><div class="vi">'+segEmoji(v.segmento)+'</div><div class="vt"><div class="vn">'+esc(v.razao_social)+'</div><div class="vs">'+esc(v.segmento)+' · '+esc(v.cidade)+'</div></div><div class="vr"><div class="h">'+esc(v.horario)+'</div></div>'+
     '<button class="qa" style="color:var(--ok);border-color:rgba(34,197,94,.4)" title="Check-out da visita" onclick="event.stopPropagation();abrirCheckoutHome('+i+')">✅</button></div>').join('');
 }
 function abrirCheckoutHome(i){const v=visitasHomeCache[i];if(!v)return;abrirCheckout(v.id,v.razao_social,v.mock);}
+async function carregarVisitasHoje(){
+  try{
+    const vh=await apiGet('/api/visitas/hoje');
+    renderVisitas(vh.map(v=>({id:v.id,razao_social:v.razao_social,segmento:v.segmento_nome||'',cidade:v.cidade||'',horario:(v.horario_previsto||'').toString().slice(0,5)})));
+  }catch(e){renderVisitas(VISITAS_MOCK);}
+}
 let checkoutCtx=null;
 function abrirCheckout(visitaId,nomeCliente,isMock){
   if(visitaId==null||isMock===true){toast('Check-out indisponível: esta visita ainda não tem registro no backend','err');return;}
@@ -764,7 +804,7 @@ function limparFiltros(){filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:
 function verCliente(id){
   document.getElementById('modal-detalhe').classList.remove('hidden');
   document.getElementById('d-content').innerHTML='<div class="spinner"></div>';
-  let c=clientesCache.find(x=>x.id===id)||LEADS_MOCK.find(x=>x.id===id);
+  let c=clientesCache.find(x=>x.id===id)||unicCache.find(x=>x.id===id)||LEADS_MOCK.find(x=>x.id===id);
   if(c){renderDetalhe(c);}else{apiGet('/api/clientes/'+id).then(renderDetalhe).catch(()=>{document.getElementById('d-content').innerHTML='<div class="empty">Erro ao carregar</div>';});}
 }
 function renderDetalhe(c){
@@ -937,8 +977,22 @@ async function renderDashboard(){
     legend:{position:'bottom',labels:{colors:'#A8B3CF'},fontSize:'11px'},dataLabels:{enabled:false},
     plotOptions:{pie:{donut:{size:'62%',labels:{show:true,total:{show:true,label:'Total',color:'#A8B3CF',formatter:()=>fmt(segs.reduce((a,b)=>a+b.total,0))}}}}}
   }).render();
-  document.getElementById('funil').innerHTML=FUNIL.map((f,i)=>'<div class="funnel-row"><div class="funnel-bar" style="width:'+Math.max(34,100-i*16)+'%;background:linear-gradient(90deg,'+f.c+','+f.c+'cc)"><span>'+f.f+'</span><span>'+fmt(f.v)+'</span></div></div>').join('');
-  const ufs=[{u:'SP',v:.82,c:'#00E5FF'},{u:'MG',v:.18,c:'#7B4DFF'}];
+  let funilDados=FUNIL;
+  try{
+    const r=await apiGet('/api/clientes/por-pipeline');
+    if(r&&r.length)funilDados=r.map(x=>({f:x.pipeline,v:Number(x.total),c:pipeCor(x.pipeline)}));
+  }catch(e){}
+  const funilMax=Math.max.apply(null,funilDados.map(f=>f.v).concat(1));
+  document.getElementById('funil').innerHTML=funilDados.map(f=>'<div class="funnel-row"><div class="funnel-bar" style="width:'+Math.max(8,f.v/funilMax*100)+'%;background:linear-gradient(90deg,'+f.c+','+f.c+'cc)"><span>'+esc(f.f)+'</span><span>'+fmt(f.v)+'</span></div></div>').join('');
+  let ufs=[{u:'SP',v:.82,c:'#00E5FF'},{u:'MG',v:.18,c:'#7B4DFF'}];
+  try{
+    const r=await apiGet('/api/clientes/por-estado');
+    if(r&&r.length){
+      const total=r.reduce((a,b)=>a+Number(b.total),0);
+      const cores=['#00E5FF','#7B4DFF','#FFB020','#22C55E','#FF6B35'];
+      if(total>0)ufs=r.slice(0,5).map((x,i)=>({u:x.estado||'—',v:Number(x.total)/total,c:cores[i%cores.length]}));
+    }
+  }catch(e){}
   document.getElementById('estados').innerHTML=ufs.map(x=>'<div class="seg-row"><div class="seg-dot" style="background:'+x.c+'"></div><div class="seg-name" style="flex:0 0 40px">'+x.u+'</div><div class="seg-track"><div class="seg-fill" style="width:'+(x.v*100)+'%;background:'+x.c+'"></div></div><div class="seg-val">'+Math.round(x.v*100)+'%</div></div>').join('');
 }
 
@@ -1038,6 +1092,63 @@ async function salvarRep(){
 async function toggleRep(id,novo){
   try{await apiPatch('/api/usuarios/'+id,{ativo:novo});toast(novo?'Ativado':'Desativado','ok');carregarReps();}
   catch(e){toast('Erro ao alterar','err');}
+}
+
+/* ===== FARMÁCIAS ATIVAS NA UNICPHARMA (90d) ===== */
+let unicCache=[],paginaUnic=0;
+function fmtData(d){if(!d)return'—';const p=String(d).slice(0,10).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:String(d);}
+function fmtMoeda(v){return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});}
+async function buscarUnicAtivos(pg){
+  paginaUnic=pg||0;document.getElementById('unic-lista').innerHTML='<div class="spinner"></div>';
+  const busca=document.getElementById('unic-busca').value.trim();
+  const p=new URLSearchParams();if(busca)p.set('busca',busca);p.set('limit',LIMIT);p.set('offset',paginaUnic*LIMIT);
+  try{
+    const r=await apiGet('/api/unicpharma/clientes-ativos?'+p.toString());
+    unicCache=r.clientes||[];
+    const total=r.total||unicCache.length;const tp=Math.ceil(total/LIMIT)||1;
+    document.getElementById('unic-total').textContent=fmt(total)+' farmácias ativas nos últimos 90 dias';
+    document.getElementById('unic-lista').innerHTML=unicCache.length?unicCache.map(unicCard).join(''):'<div class="empty">Nenhuma farmácia encontrada</div>';
+    document.getElementById('unic-pager').innerHTML='<button onclick="buscarUnicAtivos('+(paginaUnic-1)+')" '+(paginaUnic<=0?'disabled':'')+'>‹ Anterior</button><span>'+(paginaUnic+1)+' / '+tp+'</span><button onclick="buscarUnicAtivos('+(paginaUnic+1)+')" '+(paginaUnic+1>=tp?'disabled':'')+'>Próxima ›</button>';
+  }catch(e){document.getElementById('unic-lista').innerHTML='<div class="empty">Erro ao carregar ('+esc(e.message)+')</div>';}
+}
+function unicCard(c){
+  const seg=c.segmento_nome||'';const wpp=(c.whatsapp||c.telefone||'').replace(/\D/g,'');const tel=(c.telefone||'').replace(/\D/g,'');
+  return '<div class="lead-card" style="border-left-color:#2D8CFF">'+
+    '<div class="lc-top" onclick="verCliente('+c.id+')"><div class="lc-av">'+segEmoji(seg)+'</div>'+
+    '<div class="lc-info"><div class="lc-name">'+esc(c.razao_social||c.nome_fantasia||'Sem nome')+'</div>'+
+    '<div class="lc-meta">'+esc(seg||'—')+(c.cidade?' · '+esc(c.cidade):'')+(c.estado?'/'+esc(c.estado):'')+'</div>'+
+    '<div class="lc-meta">'+fmt(c.unicpharma_pedidos_90d)+' pedidos · '+fmtMoeda(c.unicpharma_faturamento_90d)+' · última venda '+fmtData(c.unicpharma_ultima_venda)+'</div>'+
+    flagsBadges(c)+'</div></div>'+
+    '<div class="lc-actions">'+
+    (wpp?'<button class="qa wpp" onclick="event.stopPropagation();window.open(\'https://wa.me/55'+wpp+'\')">💬</button>':'')+
+    (tel?'<button class="qa call" onclick="event.stopPropagation();window.open(\'tel:'+tel+'\')">📞</button>':'')+
+    (c.email?'<button class="qa mail" onclick="event.stopPropagation();window.open(\'mailto:'+esc(c.email)+'\')">✉️</button>':'')+
+    '<button class="qa" style="margin-left:auto;color:var(--ai-violet);border-color:rgba(139,92,246,.4)" title="Sugerir abordagem" onclick="event.stopPropagation();sugerirProduto('+c.id+')">🤖</button>'+
+    '</div></div>';
+}
+
+/* ===== MÉDICOS ATIVOS NA UNICPHARMA (90d) ===== */
+let medicosCache=[],paginaMed=0;
+async function buscarMedicos(pg){
+  paginaMed=pg||0;document.getElementById('med-lista').innerHTML='<div class="spinner"></div>';
+  const busca=document.getElementById('med-busca').value.trim();
+  const p=new URLSearchParams();if(busca)p.set('busca',busca);p.set('limit',LIMIT);p.set('offset',paginaMed*LIMIT);
+  try{
+    const r=await apiGet('/api/medicos?'+p.toString());
+    medicosCache=r.medicos||[];
+    const total=r.total||medicosCache.length;const tp=Math.ceil(total/LIMIT)||1;
+    document.getElementById('med-total').textContent=fmt(total)+' médicos ativos nos últimos 90 dias';
+    document.getElementById('med-lista').innerHTML=medicosCache.length?medicosCache.map(medCard).join(''):'<div class="empty">Nenhum médico encontrado</div>';
+    document.getElementById('med-pager').innerHTML='<button onclick="buscarMedicos('+(paginaMed-1)+')" '+(paginaMed<=0?'disabled':'')+'>‹ Anterior</button><span>'+(paginaMed+1)+' / '+tp+'</span><button onclick="buscarMedicos('+(paginaMed+1)+')" '+(paginaMed+1>=tp?'disabled':'')+'>Próxima ›</button>';
+  }catch(e){document.getElementById('med-lista').innerHTML='<div class="empty">Erro ao carregar ('+esc(e.message)+')</div>';}
+}
+function medCard(m){
+  return '<div class="lead-card" style="border-left-color:#8B5CF6">'+
+    '<div class="lc-top"><div class="lc-av">🩺</div>'+
+    '<div class="lc-info"><div class="lc-name">'+esc(m.nome||('CRM '+m.crm+'/'+m.uf))+'</div>'+
+    '<div class="lc-meta">CRM '+esc(m.crm)+'/'+esc(m.uf)+'</div>'+
+    '<div class="lc-meta">'+fmt(m.receitas_unicpharma_90d)+' receitas · '+fmtMoeda(m.valor_unicpharma_90d)+' · última '+fmtData(m.ultima_receita_unicpharma)+'</div>'+
+    '</div></div></div>';
 }
 
 verificarSessao();
