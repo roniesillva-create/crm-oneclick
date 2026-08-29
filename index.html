@@ -897,7 +897,7 @@ async function sugerirProduto(clienteId){
 function initMapa(){
   if(mapa)return;
   mapa=L.map('mapa',{zoomControl:false,attributionControl:false}).setView([-23.56,-46.64],11);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(mapa);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2i3l_1_6fc3ca6c861a0d35c441e7fa',{subdomains:'abcd',maxZoom:20}).addTo(mapa);
   setTimeout(()=>mapa.invalidateSize(),250);
 }
 let rotaVisitasAtual=[],proximaVisitaAtual=null;
