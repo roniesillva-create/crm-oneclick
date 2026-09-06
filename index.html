@@ -306,6 +306,7 @@ input,select,textarea{font-family:inherit}
     <div class="ptitle">Leads</div>
     <div class="subdate">Sua base comercial SP + MG</div>
     <div class="tabs" id="lead-tabs"></div>
+    <div class="tabs hidden" id="prio-chips" style="margin-top:8px"></div>
     <div class="searchbar">
       <input id="busca" placeholder="🔍 Buscar nome, CNPJ, cidade..." onkeydown="if(event.key==='Enter')buscarClientes(0)">
       <button class="btn-filt" onclick="abrirFiltros()">⚙</button>
@@ -568,7 +569,7 @@ const ATIVIDADES_MOCK=[
   {g:'QUARTA',tipo:'Visita presencial',sub:'Posto Shell Select · 10:00',ic:'📍',cor:'#7B61FF',done:false}];
 
 let sessao=null,segmentosCache=[],clientesCache=[];
-let filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:'',responsavel_id:''};
+let filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:'',responsavel_id:'',prioridade:''};
 let pagina=0;const LIMIT=50;
 let mapa=null,mapaLayer=null,dashRendered=false;
 
@@ -739,6 +740,20 @@ function renderTabsLeads(){
   document.getElementById('lead-tabs').innerHTML=tabs.map((t,i)=>'<button class="tab'+(i===0?' active':'')+'" onclick="tabLead(this,\''+t[0]+'\')">'+t[1]+'<small>'+fmt(t[2])+'</small></button>').join('');
 }
 function tabLead(el,pipe){document.querySelectorAll('#lead-tabs .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');filtros.pipeline=pipe;buscarClientes(0);}
+
+// Chips P1/P2/P3 da campanha Portal StockFarma — aparecem para admin e para quem tem
+// clientes da campanha na carteira (prefixo [PORTAL STOCKFARMA ...] em observacoes).
+const PRIO_CHIPS=[['','Todos'],['P1','P1 · Alvo quente'],['P2','P2 · Reativar'],['P3','P3 · Só cartão']];
+function renderPrioChips(){
+  document.getElementById('prio-chips').innerHTML=PRIO_CHIPS.map((t,i)=>'<button class="tab'+(i===0?' active':'')+'" onclick="tabPrio(this,\''+t[0]+'\')">'+t[1]+'</button>').join('');
+}
+function tabPrio(el,p){document.querySelectorAll('#prio-chips .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');filtros.prioridade=p;buscarClientes(0);}
+function mostrarPrioChips(){
+  const el=document.getElementById('prio-chips');
+  if(!el.classList.contains('hidden'))return;
+  const temCampanha=(sessao&&sessao.papel==='admin')||clientesCache.some(c=>(c.observacoes||'').indexOf('[PORTAL STOCKFARMA')===0);
+  if(temCampanha){renderPrioChips();el.classList.remove('hidden');}
+}
 async function buscarClientes(pg){
   pagina=pg||0;document.getElementById('lista-clientes').innerHTML='<div class="spinner"></div>';
   const busca=document.getElementById('busca').value.trim();
@@ -750,10 +765,12 @@ async function buscarClientes(pg){
   if(filtros.whatsapp)p.set('whatsapp','1');if(filtros.email)p.set('email','1');
   if(filtros.bandeira)p.set('bandeira',filtros.bandeira);
   if(filtros.responsavel_id)p.set('responsavel_id',filtros.responsavel_id);
+  if(filtros.prioridade)p.set('prioridade',filtros.prioridade);
   p.set('limit',LIMIT);p.set('offset',pagina*LIMIT);
   try{
     const r=await apiGet('/api/clientes?'+p.toString());
     clientesCache=r.clientes||[];
+    mostrarPrioChips();
     const total=r.total||clientesCache.length;const tp=r.total_paginas||Math.ceil(total/LIMIT)||1;
     document.getElementById('lista-total').textContent=fmt(total)+' clientes';
     document.getElementById('lista-clientes').innerHTML=clientesCache.length?clientesCache.map(leadCard).join(''):'<div class="empty">Nenhum cliente encontrado</div>';
@@ -799,7 +816,7 @@ function aplicarFiltros(){
   filtros.responsavel_id=(sessao.papel==='admin')?document.getElementById('f-rep-filtro').value:'';
   fecharModal('modal-filtros');buscarClientes(0);
 }
-function limparFiltros(){filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:'',responsavel_id:''};fecharModal('modal-filtros');buscarClientes(0);}
+function limparFiltros(){filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:'',responsavel_id:'',prioridade:''};document.querySelectorAll('#prio-chips .tab').forEach((t,i)=>t.classList.toggle('active',i===0));fecharModal('modal-filtros');buscarClientes(0);}
 
 function verCliente(id){
   document.getElementById('modal-detalhe').classList.remove('hidden');
