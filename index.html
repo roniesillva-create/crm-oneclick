@@ -844,22 +844,49 @@ function renderDetalhe(c){
       (c.bandeira?'<div class="info-row"><span class="k">Bandeira</span><span class="v">'+esc(c.bandeira)+'</span></div>':'')+
       '<div class="info-row"><span class="k">Segmento</span><span class="v">'+esc(seg||'—')+'</span></div>'+
       '<div class="info-row"><span class="k">Origem</span><span class="v">'+esc(c.fonte_lead||'Indicação')+'</span></div>'+
-      '<div class="info-row"><span class="k">Responsável</span><span class="v">'+esc(c.responsavel||sessao.nome)+'</span></div></div>'+
+      '<div class="info-row"><span class="k">Responsável</span><span class="v">'+esc(c.responsavel||sessao.nome)+'</span></div>'+
+      (c.observacoes?'<div class="info-row" style="flex-direction:column;align-items:flex-start;gap:4px"><span class="k">📋 Observações</span><span class="v" style="text-align:left;white-space:pre-wrap;word-break:break-word;font-weight:500;line-height:1.5">'+esc(c.observacoes)+'</span></div>':'')+'</div>'+
       '<div class="edit-seg-box"><label>Alterar segmento</label><div class="row"><select id="d-seg">'+opc+'</select><button class="btn-sec" onclick="salvarSegmento('+c.id+')">Salvar</button></div></div>'+
       '<div class="edit-seg-box"><label>Flags de produto</label><div class="flag-opts">'+
         '<label class="flag-chip'+(c.usa_cotacaonamao?' on':'')+'"><input type="checkbox" id="d-cota" '+(c.usa_cotacaonamao?'checked':'')+' onchange="this.parentElement.classList.toggle(\'on\',this.checked);salvarFlags('+c.id+')">💊 CotaçãoNaMão</label>'+
         '<label class="flag-chip'+(c.revende_manipulados?' on':'')+'"><input type="checkbox" id="d-manip" '+(c.revende_manipulados?'checked':'')+' onchange="this.parentElement.classList.toggle(\'on\',this.checked);salvarFlags('+c.id+')">🧪 Manipulados</label>'+
-      '</div></div></div>'+
+      '</div></div>'+
+      '<div class="edit-seg-box"><label>📞 Registrar ligação</label>'+
+        '<div class="fld" style="margin-bottom:8px"><select id="d-lig-res"><option value="">Resultado da ligação...</option><option>Falou — vai usar o portal</option><option>Falou — ficou de pensar</option><option>Falou — sem interesse</option><option>Não atendeu</option><option>Caixa postal</option><option>Telefone errado</option></select></div>'+
+        '<div class="fld" style="margin-bottom:8px"><textarea id="d-lig-obs" rows="2" placeholder="Anotação (opcional): com quem falou, quando retornar..."></textarea></div>'+
+        '<button class="btn-primary" style="width:100%" onclick="salvarLigacao('+c.id+')">💾 Salvar ligação</button></div></div>'+
     '<div id="dt-tl" class="hidden">'+
       '<div class="tl-item"><div class="tl-dot"></div><div><div class="tl-txt">Lead criado</div><div class="tl-time">Hoje 11:30 · por '+esc(sessao.nome)+'</div></div></div>'+
       '<div class="tl-item"><div class="tl-dot" style="background:#22C55E"></div><div><div class="tl-txt">Mensagem enviada no WhatsApp</div><div class="tl-time">Hoje 11:45</div></div></div>'+
       '<div class="tl-item"><div class="tl-dot" style="background:#7B61FF"></div><div><div class="tl-txt">E-mail aberto</div><div class="tl-time">Ontem 10:45</div></div></div>'+
       '<div class="tl-item"><div class="tl-dot" style="background:#FF6B35"></div><div><div class="tl-txt">Proposta enviada</div><div class="tl-time">Ontem 16:20</div></div></div></div>'+
-    '<div id="dt-ativ" class="hidden"><div class="empty">Sem atividades registradas para este lead.</div></div>'+
+    '<div id="dt-ativ" class="hidden"><div class="spinner"></div></div>'+
     '<button class="btn-analyze" onclick="analisarIA('+c.id+')">✨ Analisar com IA</button>'+
     '<button class="btn-analyze" style="background:var(--grad-primary);color:#02111F;box-shadow:var(--glow-cyan);margin-top:9px" onclick="sugerirProduto('+c.id+')">🤖 Sugerir abordagem de produto</button>'+
     '<div id="ia-result" style="margin-top:12px"></div>';
+  carregarInteracoes(c.id);
 }
+// ---- Registro de ligação (campanha Portal StockFarma) + atividades reais ----
+async function salvarLigacao(id){
+  const res=document.getElementById('d-lig-res').value;
+  if(!res){toast('Escolha o resultado da ligação','err');return;}
+  const desc=document.getElementById('d-lig-obs').value.trim();
+  try{
+    await apiPost('/api/clientes/'+id+'/interacoes',{tipo:'Ligação',resultado:res,descricao:desc||res,responsavel:sessao.nome,proximo_passo:null});
+    toast('Ligação registrada ✓','ok');
+    document.getElementById('d-lig-res').value='';document.getElementById('d-lig-obs').value='';
+    await carregarInteracoes(id);
+    const tabAtiv=document.querySelectorAll('.dt-tab')[2];if(tabAtiv)dtTab(tabAtiv,'ativ');
+  }catch(e){toast('Erro ao salvar a ligação','err');}
+}
+async function carregarInteracoes(id){
+  const box=document.getElementById('dt-ativ');if(!box)return;
+  try{
+    const arr=await apiGet('/api/clientes/'+id+'/interacoes');
+    box.innerHTML=(arr&&arr.length)?arr.map(i=>'<div class="tl-item"><div class="tl-dot" style="background:#00E5FF"></div><div><div class="tl-txt">'+esc(i.tipo||'Interação')+(i.resultado?' — '+esc(i.resultado):'')+'</div>'+(i.descricao&&i.descricao!==i.resultado?'<div class="tl-txt" style="opacity:.85;font-weight:400">'+esc(i.descricao)+'</div>':'')+'<div class="tl-time">'+fmtDataHora(i.data_interacao)+(i.responsavel?' · '+esc(i.responsavel):'')+'</div></div></div>').join(''):'<div class="empty">Nenhuma ligação registrada ainda. Use o 📞 Registrar ligação na aba Informações.</div>';
+  }catch(e){box.innerHTML='<div class="empty">Não foi possível carregar as atividades.</div>';}
+}
+function fmtDataHora(d){try{return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
 function dtTab(el,t){
   document.querySelectorAll('.dt-tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');
   ['info','tl','ativ'].forEach(x=>document.getElementById('dt-'+x).classList.toggle('hidden',x!==t));
