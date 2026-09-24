@@ -743,7 +743,7 @@ function tabLead(el,pipe){document.querySelectorAll('#lead-tabs .tab').forEach(t
 
 // Chips P1/P2/P3 da campanha Portal StockFarma — aparecem para admin e para quem tem
 // clientes da campanha na carteira (prefixo [PORTAL STOCKFARMA ...] em observacoes).
-const PRIO_CHIPS=[['','Todos'],['P1','P1 · Alvo quente'],['P2','P2 · Reativar'],['P3','P3 · Só cartão']];
+const PRIO_CHIPS=[['','Todos'],['P0','🔥 P0 · Migrar urgente'],['P1','P1 · Alvo quente'],['P2','P2 · Reativar'],['P3','P3 · Só cartão'],['CARTAO','💳 Novo · Cartão']];
 function renderPrioChips(){
   document.getElementById('prio-chips').innerHTML=PRIO_CHIPS.map((t,i)=>'<button class="tab'+(i===0?' active':'')+'" onclick="tabPrio(this,\''+t[0]+'\')">'+t[1]+'</button>').join('');
 }
