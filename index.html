@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0A1424">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
@@ -140,7 +140,7 @@ input::placeholder,textarea::placeholder{color:var(--txt-3);opacity:1}
 .page{display:none;padding:var(--s-4)}
 .page.active{display:block}
 .greeting,.ptitle{font-size:24px;line-height:28px;font-weight:600;letter-spacing:-.015em}
-.subdate{color:var(--txt-2);font-size:13px;line-height:18px;margin:2px 0 var(--s-4);text-transform:capitalize}
+.subdate{color:var(--txt-2);font-size:13px;line-height:18px;margin:2px 0 var(--s-4)}
 .sec-title{color:var(--txt-2);margin:var(--s-5) 0 var(--s-3);display:flex;justify-content:space-between;align-items:center}
 .sec-title a{color:var(--link);font-size:13px;line-height:18px;font-weight:500;text-transform:none;letter-spacing:0;cursor:pointer}
 .sec-title a:hover{color:var(--txt-1)}
@@ -355,6 +355,25 @@ input::placeholder,textarea::placeholder{color:var(--txt-3);opacity:1}
   .btn-primary,.btn-nav,.btn-ai,.btn-sec,.btn-analyze,.btn-mini,.sug,.btn-filt,.pager button,.co-opt,.qa,.tab,.nav-btn,.bell,.x,.chk,.flag-chip,.mais-row,.lead-card,.qa-item,.dt-act,.dt-tab,.fab,.ai-send,.sec-title a{transition:background-color var(--dur-1) var(--ease),color var(--dur-1) var(--ease),border-color var(--dur-1) var(--ease)}
   @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+  /* motion: PR1.1 — micro-animações nos SVGs Lucide (o alvo é o svg, não o botão); classes is-* são postas pelos hooks no JS, nunca em loop (exceção: pulso da IA) */
+  .qa svg,.nav-btn svg,.fab svg,.bell svg{transition:transform var(--dur-1) var(--ease),color var(--dur-1) var(--ease)} /* motion: base */
+  .qa.is-tap svg{animation:ico-pop var(--dur-2) var(--ease)} /* motion: WhatsApp/e-mail "pop" 1× ao tocar */
+  .qa.call.is-tap svg{animation:ico-ring 360ms var(--ease)} /* motion: telefone "toca" 1× ao tocar */
+  .bell.is-ring svg{animation:bell-ring 600ms var(--ease)} /* motion: sino balança 1× (carga com badge>0 / contagem aumentou) */
+  .ai-card .ai-h svg.ico,.ai-hero svg.hero-ic{animation:ai-pulse 2.4s ease-in-out infinite} /* motion: pulso da IA — ÚNICA animação infinita além do skeleton */
+  .nav-btn.active svg{transform:translateY(-1px)} /* motion: item ativo da bottom-nav sobe 1px (cor já transiciona em --dur-1) */
+  .fab svg{transition:transform var(--dur-2) var(--ease),color var(--dur-1) var(--ease)} /* motion: base do FAB */
+  .fab.is-open svg{transform:rotate(90deg)} /* motion: "+" gira 90° enquanto o sheet de ações está aberto */
+  #btn-tema.is-flip svg{animation:ico-flip var(--dur-2) var(--ease)} /* motion: sol/lua gira 180° na troca de tema */
+  @keyframes ico-pop{50%{transform:translateY(-2px)}to{transform:none}}
+  @keyframes ico-ring{25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}to{transform:none}}
+  @keyframes bell-ring{20%{transform:rotate(12deg)}40%{transform:rotate(-12deg)}60%{transform:rotate(8deg)}80%{transform:rotate(-8deg)}to{transform:none}}
+  @keyframes ai-pulse{0%,100%{opacity:1}50%{opacity:.65}}
+  @keyframes ico-flip{from{transform:rotate(0)}to{transform:rotate(180deg)}}
+}
+/* motion: reduced-motion — nenhuma regra acima existe fora do no-preference; aqui só garante o estado final estático */
+@media (prefers-reduced-motion:reduce){
+  .qa svg,.nav-btn svg,.fab svg,.bell svg,#btn-tema svg,.ai-card .ai-h svg.ico,.ai-hero svg.hero-ic{animation:none;transition:none;transform:none;opacity:1}
 }
 /* ===== 17. ALVOS DE TOQUE ≤1023px — DESIGN §5 (36 desktop / 44 mobile); ícone continua 18-20px, cresce só a área clicável (fix pack 1) ===== */
 @media (max-width:1023px){
@@ -683,9 +702,15 @@ let sessao=null,segmentosCache=[],clientesCache=[];
 let filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:'',responsavel_id:'',prioridade:''};
 let pagina=0;const LIMIT=50;
 let mapa=null,mapaLayer=null,mapaTiles=null,dashRendered=false;
+let dashCharts={conv:null,seg:null,segCores:[]}; // instâncias ApexCharts (não leem var()) — reaplicadas no toggle de tema
 /* ===== tema + tokens em runtime ===== */
 function temaAtual(){return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';}
-function alternarTema(){window.aplicarTema(temaAtual()==='dark'?'light':'dark',true);if(mapaTiles)mapaTiles.setUrl(tileUrl());}
+function alternarTema(){window.aplicarTema(temaAtual()==='dark'?'light':'dark',true);if(mapaTiles)mapaTiles.setUrl(tileUrl());motionTap(document.getElementById('btn-tema'),'is-flip',400);retematizarDashboard();} // kiss: hook aqui e não no aplicarTema do <head> (que roda antes do JS do app existir)
+function retematizarDashboard(){ // Item 3: Apex guardou cores 1×; reaplica tokens do tema ativo via updateOptions — dados/queries intactos
+  if(!dashCharts.conv)return;const t=temaAtual();
+  dashCharts.conv.updateOptions({theme:{mode:t},colors:[tok('accent')],xaxis:{categories:['Jan','Fev','Mar','Abr','Mai','Jun'],labels:{style:{colors:tok('txt-3')}}},grid:{borderColor:tok('line')}},false,false); // categories repetidas: o merge de xaxis do Apex as descarta se omitidas
+  if(dashCharts.seg)dashCharts.seg.updateOptions({theme:{mode:t},stroke:{colors:[tok('bg-1')]},colors:dashCharts.segCores.map(tok),legend:{labels:{colors:tok('txt-2')}},plotOptions:{pie:{donut:{labels:{total:{color:tok('txt-2')}}}}}},false,false);
+}
 function tok(n){return getComputedStyle(document.documentElement).getPropertyValue('--'+n).trim();} // valor real do token (ApexCharts/Leaflet não leem var())
 
 function authHeaders(extra){const h=extra||{};if(TOKEN)h['Authorization']='Bearer '+TOKEN;return h;}
@@ -761,7 +786,8 @@ function entrarApp(){
   document.getElementById('mais-nome').textContent=sessao.nome;
   document.getElementById('mais-mail').textContent=sessao.mail||'';
   document.getElementById('mais-reps').style.display=(sessao.papel==='admin')?'flex':'none';
-  document.getElementById('home-data').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const dataHoje=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('home-data').textContent=dataHoje.charAt(0).toUpperCase()+dataHoje.slice(1); // só a 1ª letra maiúscula (saiu o text-transform:capitalize)
   inicializar();
 }
 
@@ -1122,22 +1148,22 @@ function renderRoteiro(visitas,resumo,carteira){
 
 async function renderDashboard(){
   dashRendered=true;
-  new ApexCharts(document.getElementById('chart-conv'),{
+  dashCharts.conv=new ApexCharts(document.getElementById('chart-conv'),{
     chart:{type:'area',height:150,background:'transparent',toolbar:{show:false}},theme:{mode:temaAtual()},
     series:[{name:'Conversão',data:[2.1,2.4,2.3,2.7,2.9,3.12]}],colors:[tok('accent')],stroke:{curve:'smooth',width:2},
     fill:{type:'solid',opacity:.12},
     xaxis:{categories:['Jan','Fev','Mar','Abr','Mai','Jun'],labels:{style:{colors:tok('txt-3')}},axisBorder:{show:false},axisTicks:{show:false}},
     yaxis:{show:false},dataLabels:{enabled:false},grid:{borderColor:tok('line')}
-  }).render();
+  });dashCharts.conv.render();
   let segs=SEGMENTOS_MOCK;
   try{const r=await apiGet('/api/clientes/por-segmento');const a=(r.segmentos||r||[]).filter(s=>s.total>0);if(a.length)segs=a.map(s=>({nome:s.nome,total:s.total,cor:(SEGMENTOS_MOCK.find(m=>m.nome===s.nome)||{}).cor||'txt-3'}));}catch(e){}
-  segs=segs.sort((a,b)=>b.total-a.total).slice(0,8);
-  new ApexCharts(document.getElementById('chart-seg'),{
+  segs=segs.sort((a,b)=>b.total-a.total).slice(0,8);dashCharts.segCores=segs.map(s=>s.cor);
+  dashCharts.seg=new ApexCharts(document.getElementById('chart-seg'),{
     chart:{type:'donut',height:230,background:'transparent'},theme:{mode:temaAtual()},stroke:{colors:[tok('bg-1')]},
     series:segs.map(s=>s.total),labels:segs.map(s=>s.nome),colors:segs.map(s=>tok(s.cor)),
     legend:{position:'bottom',labels:{colors:tok('txt-2')},fontSize:'13px'},dataLabels:{enabled:false},
     plotOptions:{pie:{donut:{size:'62%',labels:{show:true,total:{show:true,label:'Total',color:tok('txt-2'),formatter:()=>fmt(segs.reduce((a,b)=>a+b.total,0))}}}}}
-  }).render();
+  });dashCharts.seg.render();
   let funilDados=FUNIL;
   try{
     const r=await apiGet('/api/clientes/por-pipeline');
@@ -1318,6 +1344,22 @@ let iconsAgendado=false;
 new MutationObserver(()=>{if(iconsAgendado)return;iconsAgendado=true;setTimeout(()=>{iconsAgendado=false;drawIcons();},0);}).observe(document.body,{childList:true,subtree:true});
 window.aplicarTema(temaAtual(),false); // sincroniza rótulo "Tema" (#tema-atual) — o <head> rodou antes do body existir
 drawIcons();
+/* ===== PR1.1 motion hooks — só adicionam/removem classes is-*; as ações (window.open, irPara, modais) continuam nos handlers originais. Regras CSS marcadas "motion:" ===== */
+function motionTap(el,cls,ms){if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),ms||400);}
+document.addEventListener('pointerdown',e=>{const b=e.target&&e.target.closest&&e.target.closest('.qa');if(b)motionTap(b,'is-tap',400);},true); // motion: ação rápida — captura, não interfere no stopPropagation do onclick
+(function vigiarSino(){ // motion: sino balança 1× quando o app aparece com badge>0 e sempre que a contagem AUMENTAR (só leitura do valor)
+  const dot=document.querySelector('.bell .dot'),app=document.getElementById('app');if(!dot||!app)return;const bell=dot.closest('.bell');
+  const ler=()=>parseInt(dot.textContent,10)||0;let ultimo=ler();
+  const visivel=()=>!app.classList.contains('hidden');
+  if(visivel()&&ultimo>0)motionTap(bell,'is-ring',700);
+  new MutationObserver(()=>{if(visivel()&&ultimo>0)motionTap(bell,'is-ring',700);}).observe(app,{attributes:true,attributeFilter:['class']});
+  new MutationObserver(()=>{const n=ler();if(n>ultimo&&visivel())motionTap(bell,'is-ring',700);ultimo=n;}).observe(dot,{childList:true,characterData:true,subtree:true});
+})();
+(function vigiarFab(){ // motion: FAB "+" gira 90° enquanto #modal-qa está aberto — cobre abrirQuickActions, fecharModal e o clique no scrim
+  const m=document.getElementById('modal-qa'),fab=document.querySelector('.fab');if(!m||!fab)return;
+  const sync=()=>fab.classList.toggle('is-open',!m.classList.contains('hidden'));
+  new MutationObserver(sync).observe(m,{attributes:true,attributeFilter:['class']});sync();
+})();
 verificarSessao();
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
 </script>
