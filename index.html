@@ -1,268 +1,373 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#050D1F">
+<meta name="theme-color" content="#0A1424">
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OneClick CRM">
 <title>OneClick CRM · Enterprise v4</title>
+<script>
+/* Tema (mesmo mecanismo do mockup redesign/proposta-final.html, sem data-accent):
+   ?theme=dark|light (vence e grava) > localStorage('theme') > dark — DESIGN.md "Atributos e resolução": SEM prefers-color-scheme (1º acesso é escuro; claro via toggle).
+   Roda antes do CSS pra não piscar. kiss: os 2 hex abaixo = --bg-0 de cada tema, só pro <meta theme-color>. */
+(function(){
+  var h=document.documentElement,ls=null,BG={dark:'#0A1424',light:'#F9F9FB'};
+  try{ls=window.localStorage}catch(e){}
+  function aplicarTema(t,persistir){
+    t=t==='light'?'light':'dark';
+    h.setAttribute('data-theme',t);
+    var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',BG[t]);
+    if(persistir){try{ls&&ls.setItem('theme',t)}catch(e){}}
+    var el=document.getElementById('tema-atual');if(el)el.textContent=t==='light'?'Claro':'Escuro';
+    return t;
+  }
+  var q=new URLSearchParams(location.search).get('theme'),saved=null;
+  try{saved=ls&&ls.getItem('theme')}catch(e){}
+  if(q==='dark'||q==='light')aplicarTema(q,true);
+  else if(saved==='dark'||saved==='light')aplicarTema(saved,false);
+  else aplicarTema('dark',false);
+  window.aplicarTema=aplicarTema;
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.1/dist/apexcharts.min.js"></script>
 <style>
+/* ===== 1. TOKENS (redesign/DESIGN.md "Tokens finais 2026-11-12") — cor (hex/rgba) vive SÓ nos 2 blocos de tema; :root tem escala/raio/motion/fonte ===== */
 :root{
-  --bg-main:#050D1F;--bg-secondary:#091A36;--bg-card:#122544;--bg-card-hover:#18335D;
-  --bg-glass:rgba(18,37,68,.72);--border-soft:#254A7D;
-  --cyan:#00E5FF;--cyan-neon:#00F5D4;--blue:#2D8CFF;--sky:#00BFFF;
-  --ai-purple:#7B4DFF;--ai-violet:#8B5CF6;
-  --st-prospect:#7B61FF;--st-contact:#00B8FF;--st-negoc:#FFB020;--st-prop:#FF6B35;--st-won:#22C55E;--st-lost:#EF4444;
-  --txt:#F8FAFC;--txt2:#A8B3CF;--txt3:#6F7FA3;
-  --ok:#22C55E;--warn:#FFB020;--err:#EF4444;
-  --grad-primary:linear-gradient(135deg,#00F5D4 0%,#00E5FF 45%,#2D8CFF 100%);
-  --grad-ai:linear-gradient(135deg,#7B4DFF 0%,#8B5CF6 45%,#2D8CFF 100%);
-  --glow-cyan:0 0 18px rgba(0,229,255,.35),0 0 38px rgba(0,245,212,.18);
-  --glow-ai:0 0 18px rgba(123,77,255,.35),0 0 38px rgba(45,140,255,.18);
+  --s-1:4px;--s-2:8px;--s-3:12px;--s-4:16px;--s-5:24px;--s-6:32px;--s-7:48px;--s-8:64px;
+  --r:4px;--r-pill:999px;
+  --dur-1:120ms;--dur-2:200ms;--dur-3:320ms;--ease:cubic-bezier(0.2,0,0,1);
+  --font:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
 }
+/* ESCURO · verde (padrão) — Bloco 1 */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg-0:#0A1424;--bg-1:#101C30;--bg-2:#172540;--bg-3:#1E2F4D;
+  --line:#22324F;--line-2:#2E4166;--input-border:#6B7A96;--input-bg:var(--bg-2);
+  --txt-1:#EEF2F8;--txt-2:#A9B5CB;--txt-3:#7F8DA8;
+  --accent:#34C77A;--accent-hover:#4AD48C;--accent-pressed:#2EB870;--accent-ink:#06200F;--accent-txt:#34C77A;--accent-soft:rgba(52,199,122,.12);
+  --link:var(--accent-txt);--focus:#34C77A;--info:var(--accent-txt);--ok:#34C77A;--warn:#E9B44C;--err:#EF5A5A;
+  --pipe-1:#7F8DA8;--pipe-2:#8BA6D2;--pipe-3:#A9C0E6;--pipe-4:#CFDCF2;--pipe-won:#34C77A;--pipe-lost:#EF5A5A;
+  --abr:#9DB3D8;--rail-bg:var(--bg-1);--rail-txt:var(--txt-2);--rail-txt-on:var(--accent-txt);--brand-b:var(--accent-txt);
+  --shadow:0 8px 24px rgba(0,0,0,.40);--shadow-up:0 -8px 24px rgba(0,0,0,.40);--scrim:rgba(10,20,36,.6);--shimmer:rgba(238,242,248,.06);
+}
+/* CLARO · A · Slate + Índigo — Bloco 3 */
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg-0:#F9F9FB;--bg-1:#FFFFFF;--bg-2:#F0F0F3;--bg-3:#E8E8EC;
+  --line:#D9D9E0;--line-2:#CDCED6;--input-border:#8B8D98;--input-bg:var(--bg-1);
+  --txt-1:#1C2024;--txt-2:#60646C;--txt-3:#6A6D75;
+  --accent:#3E63DD;--accent-hover:#3358D4;--accent-pressed:#3A5BC7;--accent-ink:#FFFFFF;--accent-txt:var(--accent);--accent-soft:rgba(62,99,221,.10);
+  --link:#3358D4;--focus:#3E63DD;--info:#3A5BC7;--ok:#1E7750;--warn:#9A5A00;--err:#C62A2F;
+  --pipe-1:#60646C;--pipe-2:#475569;--pipe-3:#334155;--pipe-4:#1C2024;--pipe-won:#1E7750;--pipe-lost:#C62A2F;
+  --abr:#3A5BC7;--rail-bg:#0A1424;--rail-txt:#A9B5CB;--rail-txt-on:#FFFFFF;--brand-b:var(--accent);
+  --shadow:0 4px 16px rgba(28,32,36,.08);--shadow-up:0 -4px 16px rgba(28,32,36,.08);--scrim:rgba(28,32,36,.40);--shimmer:rgba(28,32,36,.05);
+}
+
+/* ===== 2. BASE ===== */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg-main);color:var(--txt);
-  background-image:radial-gradient(circle at 15% -5%,rgba(45,140,255,.10),transparent 40%),radial-gradient(circle at 95% 105%,rgba(123,77,255,.10),transparent 42%);
-  background-attachment:fixed;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+body{font:400 14px/20px var(--font);font-variant-numeric:tabular-nums;font-feature-settings:"tnum";background:var(--bg-0);color:var(--txt-1);-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
 .hidden{display:none!important}
 ::-webkit-scrollbar{width:0;height:0}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-input,select,textarea{font-family:inherit}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.tab:focus-visible,.nav-btn:focus-visible,.dt-tab:focus-visible,.dt-act:focus-visible,.mais-row:focus-visible,.kpi:focus-visible{outline-offset:-2px}
+[disabled]{opacity:.4;pointer-events:none}
+/* ícones: Lucide substitui <i class="ico" data-lucide="…">; sem CDN o <i> fica como espaço reservado */
+.ico{display:inline-block;width:18px;height:18px;flex:0 0 18px;vertical-align:middle;stroke-width:1.75}
+svg.ico{stroke:currentColor}
+.ico.i14{width:14px;height:14px;flex-basis:14px}
+.ico.i16{width:16px;height:16px;flex-basis:16px}
+.ico.i20{width:20px;height:20px;flex-basis:20px}
+.ico.i32{width:32px;height:32px;flex-basis:32px}
+.mono{font-family:var(--mono);font-size:13px;line-height:18px;font-weight:500}
+.t-label,.sec-title,.day-h,.kpi .l,.rt-cell .l,.nv-h,.edit-seg-box label,.login-sub,.tb-brand .tt small,.pflag{font-size:12px;line-height:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
 .app-wrap{max-width:480px;margin:0 auto;position:relative}
-#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:90}
-.login-card{width:100%;max-width:380px;background:var(--bg-glass);backdrop-filter:blur(18px);border:1px solid var(--border-soft);border-radius:24px;padding:36px 26px;box-shadow:0 24px 60px rgba(0,0,0,.5),var(--glow-cyan)}
-.brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
+
+/* ===== 3. LOGIN ===== */
+#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:var(--s-5);z-index:90;background:var(--bg-0)}
+.login-card{width:100%;max-width:380px;background:var(--bg-1);border:1px solid var(--line-2);border-radius:var(--r);padding:var(--s-6) var(--s-5)}
+.brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:var(--s-1)}
 .brand .logo-mark{width:40px;height:40px}
-.brand b{font-size:18px;font-weight:800;letter-spacing:.5px}
-.brand b span{color:var(--cyan)}
-.login-sub{text-align:center;color:var(--txt3);font-size:12px;margin-bottom:26px;letter-spacing:.3px}
-.fld{margin-bottom:14px}
-.fld label{display:block;font-size:12px;color:var(--txt2);margin-bottom:6px;font-weight:600}
-.fld input,.fld select,.fld textarea{width:100%;background:rgba(9,26,54,.86);border:1px solid rgba(37,74,125,.55);border-radius:14px;padding:13px 14px;color:var(--txt);font-size:14px;transition:.15s}
-.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.15)}
-.btn-primary{width:100%;background:var(--grad-primary);color:#02111F;font-weight:800;font-size:15px;border-radius:16px;padding:14px;box-shadow:var(--glow-cyan);transition:.15s}
-.btn-primary:active{transform:scale(.98)}
-.btn-ai{background:var(--grad-ai);color:#fff;font-weight:800;border-radius:16px;padding:13px;box-shadow:var(--glow-ai);transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-ai:active{transform:scale(.98)}
-.btn-ai:disabled{opacity:.6}
-.login-err{color:var(--err);font-size:13px;text-align:center;margin-top:12px;min-height:18px}
-#app{padding-bottom:104px;min-height:100%}
-.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(5,13,31,.85);backdrop-filter:blur(14px);border-bottom:1px solid rgba(37,74,125,.4)}
-.tb-brand{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
-.tb-brand .logo-mark{width:30px;height:30px;flex:0 0 auto}
-.tb-brand .tt b{font-size:15px;font-weight:800;letter-spacing:.4px;line-height:1}
-.tb-brand .tt b span{color:var(--cyan)}
-.tb-brand .tt small{display:block;font-size:9px;color:var(--txt3);letter-spacing:2px;font-weight:700;margin-top:2px}
-.bell{position:relative;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--bg-card);border:1px solid var(--border-soft)}
-.bell .dot{position:absolute;top:-4px;right:-4px;background:var(--err);color:#fff;font-size:10px;font-weight:800;width:18px;height:18px;border-radius:99px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg-main)}
-.avatar{width:40px;height:40px;border-radius:12px;background:var(--grad-ai);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;box-shadow:var(--glow-ai)}
-.page{display:none;padding:18px;animation:fade .25s ease}
+.logo-mark{color:var(--accent-txt);display:block}
+.brand b{font-size:20px;line-height:24px;font-weight:400;letter-spacing:-.01em}
+.brand b span,.tb-brand .tt b span{color:var(--brand-b);font-weight:600}
+.login-sub{text-align:center;color:var(--txt-3);margin-bottom:var(--s-5)}
+.fld{margin-bottom:var(--s-3)}
+.fld label{display:block;font-size:13px;line-height:18px;color:var(--txt-2);margin-bottom:var(--s-1)}
+.fld input,.fld select,.fld textarea,.searchbar input,.ai-input input,.edit-seg-box select{width:100%;height:44px;padding:0 var(--s-3);background:var(--input-bg);border:1px solid var(--input-border);border-radius:var(--r);color:var(--txt-1)}
+.fld textarea{height:auto;min-height:72px;padding:var(--s-2) var(--s-3);resize:vertical;line-height:20px}
+input::placeholder,textarea::placeholder{color:var(--txt-3);opacity:1}
+.fld input:hover,.fld select:hover,.fld textarea:hover,.searchbar input:hover,.ai-input input:hover,.edit-seg-box select:hover{border-color:var(--txt-2)}
+.fld input:focus,.fld select:focus,.fld textarea:focus,.searchbar input:focus,.ai-input input:focus,.edit-seg-box select:focus{border-color:var(--focus);outline:2px solid var(--focus);outline-offset:1px}
+.login-err{color:var(--err);font-size:13px;line-height:18px;text-align:center;margin-top:var(--s-3);min-height:18px}
+
+/* ===== 4. BOTÕES (DESIGN §6) ===== */
+.btn-primary,.btn-nav,.ai-send,.fab{background:var(--accent);color:var(--accent-ink);font-weight:500}
+.btn-primary:hover,.btn-nav:hover,.ai-send:hover,.fab:hover{background:var(--accent-hover)}
+.btn-primary:active,.btn-nav:active,.ai-send:active,.fab:active{background:var(--accent-pressed)}
+.btn-primary,.btn-nav{width:100%;height:48px;display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);padding:0 var(--s-4);border-radius:var(--r);white-space:nowrap}
+.btn-primary:active,.btn-nav:active{transform:translateY(1px)}
+.btn-ai,.btn-sec,.btn-analyze,.btn-mini,.sug,.btn-filt,.pager button,.co-opt{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);height:44px;padding:0 var(--s-4);background:transparent;border:1px solid var(--input-border);border-radius:var(--r);color:var(--txt-1);font-weight:500;white-space:nowrap}
+.btn-ai:hover,.btn-sec:hover,.btn-analyze:hover,.btn-mini:hover,.sug:hover,.btn-filt:hover,.pager button:hover,.co-opt:hover{background:var(--bg-2);border-color:var(--txt-2)}
+.btn-ai:active,.btn-sec:active,.btn-analyze:active,.btn-mini:active,.sug:active,.btn-filt:active,.pager button:active,.co-opt:active{background:var(--bg-3)}
+.btn-sm{height:36px;padding:0 var(--s-3);font-size:13px}
+.btn-analyze{width:100%;margin-top:var(--s-2)}
+
+/* ===== 5. SHELL ===== */
+#app{padding-bottom:96px;min-height:100%}
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:var(--s-1);height:56px;padding:0 var(--s-3) 0 var(--s-4);background:var(--bg-1);border-bottom:1px solid var(--line)}
+.tb-brand{display:flex;align-items:center;gap:var(--s-2);flex:1;min-width:0}
+.tb-brand .logo-mark{width:28px;height:28px;flex:0 0 auto}
+.tb-brand .tt b{display:block;font-size:14px;line-height:20px;font-weight:400;letter-spacing:-.01em}
+.tb-brand .tt small{display:block;color:var(--txt-3)}
+.bell,.x{position:relative;width:36px;height:36px;border-radius:var(--r);display:inline-flex;align-items:center;justify-content:center;color:var(--txt-2);flex:0 0 auto}
+.bell:hover,.x:hover{color:var(--accent-txt);background:var(--accent-soft)}
+.bell .dot{position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:var(--r-pill);background:var(--accent);color:var(--accent-ink);font-size:12px;line-height:16px;font-weight:600;text-align:center}
+.avatar{width:36px;height:36px;border-radius:var(--r-pill);background:var(--accent-soft);color:var(--accent-txt);display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex:0 0 auto;margin-left:var(--s-1)}
+.page{display:none;padding:var(--s-4)}
 .page.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-.greeting{font-size:24px;font-weight:800;line-height:1.1}
-.greeting span{background:var(--grad-primary);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.subdate{color:var(--txt3);font-size:13px;margin:3px 0 18px;text-transform:capitalize}
-.ptitle{font-size:21px;font-weight:800;margin-bottom:2px}
-.sec-title{font-size:12px;font-weight:700;color:var(--txt2);letter-spacing:.6px;text-transform:uppercase;margin:20px 0 12px;display:flex;justify-content:space-between;align-items:center}
-.sec-title a{color:var(--cyan);font-size:12px;font-weight:700;text-transform:none;letter-spacing:0;cursor:pointer}
-.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.kpi{background:var(--bg-glass);backdrop-filter:blur(12px);border:1px solid rgba(37,74,125,.45);border-radius:20px;padding:15px}
-.kpi .ic{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:11px}
-.kpi .v{font-size:26px;font-weight:800;line-height:1}
-.kpi .l{color:var(--txt2);font-size:11px;font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
-.kpi .tr{font-size:11px;font-weight:700;margin-top:7px}
-.tr.up{color:var(--ok)}
-.ic.c-cyan{background:rgba(0,229,255,.14);color:var(--cyan)}
-.ic.c-green{background:rgba(34,197,94,.14);color:var(--ok)}
-.ic.c-purple{background:rgba(123,97,255,.14);color:var(--st-prospect)}
-.ic.c-amber{background:rgba(255,176,32,.14);color:var(--warn)}
-.kpi.c-cyan .v{color:var(--cyan)}.kpi.c-green .v{color:var(--ok)}.kpi.c-purple .v{color:var(--st-prospect)}.kpi.c-amber .v{color:var(--warn)}
-.ai-card{position:relative;overflow:hidden;border-radius:22px;padding:18px;margin-top:18px;background:radial-gradient(circle at top right,rgba(123,77,255,.4),transparent 40%),linear-gradient(135deg,rgba(18,37,68,.94),rgba(9,26,54,.96));border:1px solid rgba(123,77,255,.32)}
-.ai-card .ai-h{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;margin-bottom:8px}
-.beta{font-size:9px;font-weight:800;background:rgba(123,97,255,.25);color:#c9b8ff;border:1px solid rgba(123,97,255,.5);padding:2px 7px;border-radius:99px;letter-spacing:.5px}
-.ai-card .ai-txt{font-size:14px;line-height:1.5;max-width:72%;color:var(--txt)}
-.ai-card .ai-txt b{color:var(--cyan)}
-.ai-card .robot{position:absolute;right:8px;bottom:0;width:104px;height:104px;opacity:.95;filter:drop-shadow(0 0 14px rgba(123,97,255,.5))}
-.ai-card .btn-mini{margin-top:13px;background:var(--grad-ai);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border-radius:12px;box-shadow:var(--glow-ai)}
-.visit-row,.lead-card,.act-row{background:var(--bg-card);border:1px solid rgba(37,74,125,.45);border-radius:16px;transition:.15s}
-.visit-row{display:flex;align-items:center;gap:12px;padding:13px;margin-bottom:10px}
-.visit-row .vi{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--bg-secondary);flex:0 0 auto}
+.greeting,.ptitle{font-size:24px;line-height:28px;font-weight:600;letter-spacing:-.015em}
+.subdate{color:var(--txt-2);font-size:13px;line-height:18px;margin:2px 0 var(--s-4);text-transform:capitalize}
+.sec-title{color:var(--txt-2);margin:var(--s-5) 0 var(--s-3);display:flex;justify-content:space-between;align-items:center}
+.sec-title a{color:var(--link);font-size:13px;line-height:18px;font-weight:500;text-transform:none;letter-spacing:0;cursor:pointer}
+.sec-title a:hover{color:var(--txt-1)}
+
+/* ===== 6. INÍCIO ===== */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3)}
+.kpi{display:flex;flex-direction:column;justify-content:space-between;height:80px;padding:var(--s-3) var(--s-4);background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r)}
+.kpi .v{font-size:24px;line-height:28px;font-weight:600;letter-spacing:-.02em}
+.kpi .l{color:var(--txt-3)}
+.ai-card{border-radius:var(--r);padding:var(--s-4);margin-top:var(--s-4);background:var(--bg-1);border:1px solid var(--line)}
+.ai-card .ai-h{display:flex;align-items:center;gap:var(--s-2);font-weight:600;margin-bottom:var(--s-2)}
+.ai-card .ai-h .ico{color:var(--txt-2)}
+.beta{font-size:12px;line-height:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:1px var(--s-2);border:1px solid var(--line-2);border-radius:var(--r-pill);color:var(--txt-2)}
+.ai-card .ai-txt{color:var(--txt-1)}
+.ai-card .ai-txt b{font-weight:600}
+.ai-card .btn-mini{margin-top:var(--s-3);height:36px;font-size:13px;padding:0 var(--s-3)}
+.visit-row,.lead-card,.act-row,.mais-row,.rota-item,.qa-item,.mais-prof,.chart-card,.dt-card,.next-visit,.rt-cell{background:var(--bg-1);border:1px solid var(--line-2);border-radius:var(--r)}
+.visit-row{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3);margin-bottom:var(--s-2)}
+.visit-row .vi,.lc-av,.nv-av,.dt-av{width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--txt-2);flex:0 0 auto}
 .visit-row .vt{flex:1;min-width:0}
-.visit-row .vn{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.visit-row .vs{color:var(--txt3);font-size:12px;margin-top:2px}
+.visit-row .vn{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.visit-row .vs{color:var(--txt-2);font-size:13px;line-height:18px}
 .visit-row .vr{text-align:right;flex:0 0 auto}
-.visit-row .vr .h{font-weight:700;font-size:13px}
-.visit-row .vr .km{color:var(--cyan);font-size:12px;font-weight:600;margin-top:2px}
-.lead-card{padding:14px;margin-bottom:11px;border-left:3px solid var(--border-soft)}
-.lead-card:active{background:var(--bg-card-hover)}
-.lc-top{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
-.lc-av{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--bg-secondary);border:1px solid var(--border-soft);flex:0 0 auto}
+.visit-row .vr .h{font-family:var(--mono);font-size:13px;line-height:18px;font-weight:500}
+
+/* ===== 7. LEADS (cartão — lista compacta é PR3) ===== */
+.lead-card{padding:var(--s-3);margin-bottom:var(--s-3)}
+.lead-card:hover{border-color:var(--txt-3)}
+.lead-card:active{background:var(--bg-2)}
+.lc-top{display:flex;gap:var(--s-3);align-items:flex-start;cursor:pointer}
 .lc-info{flex:1;min-width:0}
-.lc-name{font-weight:700;font-size:14px;line-height:1.25}
-.lc-meta{color:var(--txt3);font-size:12px;margin-top:3px}
-.pill{font-size:10px;font-weight:700;padding:4px 9px;border-radius:99px;white-space:nowrap;flex:0 0 auto}
-.lc-actions{display:flex;align-items:center;gap:8px;margin-top:11px}
-.lc-actions .qa{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;border:1px solid var(--border-soft);background:var(--bg-secondary)}
-.qa.wpp{color:var(--ok);border-color:rgba(34,197,94,.4)}
-.qa.call{color:var(--sky);border-color:rgba(45,140,255,.4)}
-.qa.mail{color:var(--st-prospect);border-color:rgba(123,97,255,.4)}
-.lc-actions .when{margin-left:auto;color:var(--txt3);font-size:11px}
-.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
-.tab{flex:0 0 auto;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:13px;padding:9px 14px;font-size:12px;font-weight:700;color:var(--txt2);text-align:center;line-height:1.2}
-.tab small{display:block;color:var(--txt3);font-size:10px;font-weight:600;margin-top:2px}
-.tab.active{background:var(--grad-primary);color:#02111F;border-color:transparent;box-shadow:var(--glow-cyan)}
-.tab.active small{color:rgba(2,17,31,.7)}
-.dtab{flex:0 0 auto;background:transparent;border-bottom:2px solid transparent;border-radius:0;padding:8px 4px;font-size:13px;font-weight:700;color:var(--txt3)}
-.dtab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
-.searchbar{display:flex;gap:10px;margin-bottom:14px}
-.searchbar input{flex:1;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:13px 15px;color:var(--txt);font-size:14px}
-.searchbar input:focus{outline:none;border-color:var(--cyan)}
-.btn-filt{width:48px;border-radius:14px;border:1px solid var(--border-soft);background:var(--bg-card);font-size:17px;display:flex;align-items:center;justify-content:center}
-.list-info{color:var(--txt3);font-size:12px;margin-bottom:12px}
-.pager{display:flex;gap:10px;justify-content:center;align-items:center;margin:16px 0 4px}
-.pager button{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:12px;padding:10px 16px;font-weight:700;font-size:13px}
-.pager button:disabled{opacity:.35}
-.pager span{color:var(--txt2);font-size:13px;font-weight:600}
-.rt-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
-.rt-cell{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:15px;padding:13px 6px;text-align:center}
-.rt-cell .n{font-size:20px;font-weight:800;color:var(--cyan)}
-.rt-cell .n.pink{color:#FF6BB3}
-.rt-cell .l{font-size:10px;color:var(--txt3);font-weight:600;margin-top:3px}
-#mapa{height:300px;border-radius:20px;border:1px solid var(--border-soft);margin-bottom:14px;background:var(--bg-secondary)}
-.leaflet-container{background:var(--bg-secondary)}
-.next-visit{background:radial-gradient(circle at top left,rgba(34,197,94,.18),transparent 45%),var(--bg-card);border:1px solid rgba(34,197,94,.3);border-radius:18px;padding:15px;margin-bottom:6px}
-.nv-h{display:flex;align-items:center;gap:7px;color:var(--ok);font-weight:700;font-size:13px;margin-bottom:11px}
-.nv-body{display:flex;align-items:center;gap:12px}
-.nv-av{width:42px;height:42px;border-radius:12px;background:var(--bg-secondary);border:1px solid var(--border-soft);display:flex;align-items:center;justify-content:center;font-size:19px}
-.nv-name{font-weight:700;font-size:15px}
-.nv-sub{color:var(--txt3);font-size:12px;margin-top:2px}
-.btn-nav{width:100%;margin-top:14px;background:var(--grad-primary);color:#02111F;font-weight:800;border-radius:14px;padding:13px;box-shadow:var(--glow-cyan);display:flex;align-items:center;justify-content:center;gap:8px}
-.rota-item{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:12px 13px;margin-bottom:9px;display:flex;gap:12px;align-items:flex-start}
-.rota-ord{width:28px;height:28px;border-radius:9px;background:var(--grad-ai);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex:0 0 auto;box-shadow:var(--glow-ai)}
-.chart-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:18px;padding:16px;margin-bottom:14px}
-.chart-card h3{font-size:14px;font-weight:700;margin-bottom:6px}
-.conv{font-size:30px;font-weight:800;color:var(--cyan)}
-.conv small{font-size:13px;color:var(--ok);font-weight:700;margin-left:8px}
-.funnel-row{margin-bottom:10px}
-.funnel-bar{height:34px;border-radius:9px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;font-size:13px;font-weight:700;color:#fff}
-.seg-row{display:flex;align-items:center;gap:11px;padding:9px 0}
-.seg-dot{width:10px;height:10px;border-radius:99px;flex:0 0 auto}
-.seg-name{font-size:13px;flex:0 0 130px;color:var(--txt2)}
-.seg-track{flex:1;height:8px;border-radius:99px;background:var(--bg-secondary);overflow:hidden}
-.seg-fill{height:100%;border-radius:99px}
-.seg-val{font-size:12px;font-weight:700;color:var(--txt2);flex:0 0 auto;min-width:54px;text-align:right}
-.day-h{font-size:11px;font-weight:800;color:var(--txt3);letter-spacing:.6px;margin:18px 0 10px}
-.act-row{display:flex;align-items:center;gap:12px;padding:13px;margin-bottom:10px}
-.act-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 auto}
+.lc-name{font-weight:500}
+.lc-meta{color:var(--txt-2);font-size:13px;line-height:18px;margin-top:2px}
+.pill{display:inline-flex;align-items:center;height:20px;padding:0 var(--s-2);border:1px solid color-mix(in srgb,var(--pc,var(--txt-3)) 40%,transparent);border-radius:var(--r-pill);color:var(--pc,var(--txt-3));font-size:12px;line-height:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;flex:0 0 auto;background:transparent}
+.lc-actions{display:flex;align-items:center;gap:var(--s-1);margin-top:var(--s-2)}
+.qa{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--r);color:var(--txt-2)}
+.qa:hover,.qa:focus-visible{color:var(--accent-txt);background:var(--accent-soft)}
+.lc-actions .when{margin-left:auto;color:var(--txt-3);font-size:13px;line-height:18px}
+.tabs{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:var(--s-3);scrollbar-width:none}
+.tab{flex:0 0 auto;display:inline-flex;align-items:center;gap:var(--s-2);height:40px;padding:0 var(--s-3);color:var(--txt-2);font-weight:500;border-bottom:2px solid transparent;border-radius:0;margin-bottom:-1px;white-space:nowrap;line-height:20px}
+.tab small{font-size:13px;color:var(--txt-3);font-weight:400}
+.tab:hover{color:var(--txt-1)}
+.tab.active{color:var(--txt-1);border-bottom-color:var(--accent-txt)}
+.tab.active small{color:var(--txt-2)}
+.tab .ico{color:var(--txt-3)}
+/* chips P0-P3 (#prio-chips) = chip toggle do DESIGN §6 */
+#prio-chips{border-bottom:0;gap:var(--s-2);padding-bottom:2px}
+#prio-chips .tab{height:32px;padding:0 10px;border:1px solid var(--line-2);border-radius:var(--r);font-size:13px;margin-bottom:0}
+#prio-chips .tab:hover{border-color:var(--txt-2)}
+#prio-chips .tab.active{background:var(--accent-soft);border-color:var(--accent-txt);color:var(--accent-txt)}
+#prio-chips .tab.active .ico{color:var(--accent-txt)}
+.searchbar{display:flex;gap:var(--s-2);margin-bottom:var(--s-3);position:relative}
+.searchbar .sb-ico{position:absolute;left:var(--s-3);top:50%;margin-top:-8px;color:var(--txt-3);pointer-events:none}
+.searchbar input{flex:1;padding-left:40px}
+.btn-filt{width:44px;padding:0;flex:0 0 auto;color:var(--txt-2)}
+.list-info{color:var(--txt-2);font-size:13px;line-height:18px;margin-bottom:var(--s-3)}
+.pager{display:flex;gap:var(--s-3);justify-content:center;align-items:center;margin:var(--s-4) 0 var(--s-1)}
+.pager button{height:36px;padding:0 var(--s-3);font-size:13px}
+.pager span{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--txt-1)}
+
+/* ===== 8. ROTEIRO ===== */
+.rt-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-2);margin:var(--s-4) 0}
+.rt-cell{padding:var(--s-3) var(--s-1);text-align:center;border-color:var(--line)}
+.rt-cell .n{font-size:20px;line-height:24px;font-weight:600;letter-spacing:-.01em}
+.rt-cell .l{color:var(--txt-3);margin-top:2px}
+#mapa{height:300px;border-radius:var(--r);border:1px solid var(--line-2);margin-bottom:var(--s-3);background:var(--bg-1);overflow:hidden}
+.leaflet-container{background:var(--bg-1)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--bg-1);color:var(--txt-1);border-radius:var(--r);box-shadow:var(--shadow)}
+.next-visit{padding:var(--s-4);margin-bottom:var(--s-2)}
+.nv-h{display:flex;align-items:center;gap:var(--s-2);color:var(--txt-2);margin-bottom:var(--s-3)}
+.nv-body{display:flex;align-items:center;gap:var(--s-3)}
+.nv-name{font-weight:500}
+.nv-sub{color:var(--txt-2);font-size:13px;line-height:18px}
+.nv-actions{display:flex;gap:var(--s-2);margin-top:var(--s-3)}
+.nv-actions .btn-nav{flex:1;margin-top:0;height:44px}
+.nv-actions .btn-ic{flex:0 0 44px;width:44px;padding:0}
+.rota-item{padding:var(--s-3);margin-bottom:var(--s-2);display:flex;gap:var(--s-3);align-items:flex-start}
+.rota-ord{width:28px;height:28px;border-radius:var(--r);background:var(--bg-2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:500;font-size:13px;flex:0 0 auto}
+.rota-nm{font-weight:500}
+.rota-meta{color:var(--txt-2);font-size:13px;line-height:18px;margin:2px 0 var(--s-1)}
+.rota-meta .h{font-family:var(--mono);font-weight:500;color:var(--txt-1)}
+.rota-mot{font-size:13px;line-height:18px;color:var(--txt-2)}
+.rota-acts{display:flex;gap:var(--s-2);margin-top:var(--s-2);flex-wrap:wrap}
+
+/* ===== 9. DASHBOARD ===== */
+.chart-card{padding:var(--s-4);margin-bottom:var(--s-3);border-color:var(--line)}
+.chart-card h3{font-size:17px;line-height:22px;font-weight:600;margin-bottom:var(--s-2)}
+.conv{font-size:29px;line-height:32px;font-weight:600;letter-spacing:-.02em}
+.funnel-row{margin-bottom:var(--s-2)}
+.funnel-bar{height:32px;border-radius:var(--r);display:flex;align-items:center;justify-content:space-between;padding:0 var(--s-3);font-size:13px;font-weight:500;color:var(--bg-0)}
+.seg-row{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-2) 0}
+.seg-dot{width:8px;height:8px;border-radius:var(--r-pill);flex:0 0 auto}
+.seg-name{font-size:13px;flex:0 0 130px;color:var(--txt-2)}
+.seg-track{flex:1;height:8px;border-radius:var(--r-pill);background:var(--bg-2);overflow:hidden}
+.seg-fill{height:100%;border-radius:var(--r-pill)}
+.seg-val{font-size:13px;color:var(--txt-1);flex:0 0 auto;min-width:54px;text-align:right}
+
+/* ===== 10. ATIVIDADES ===== */
+.day-h{color:var(--txt-3);margin:var(--s-4) 0 var(--s-2)}
+.act-row{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3);margin-bottom:var(--s-2)}
+.act-ic{width:36px;height:36px;border-radius:var(--r);background:var(--bg-2);color:var(--txt-2);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
 .act-t{flex:1;min-width:0}
-.act-n{font-weight:700;font-size:14px}
-.act-s{color:var(--txt3);font-size:12px;margin-top:2px}
-.chk{width:24px;height:24px;border-radius:8px;border:2px solid var(--border-soft);flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:13px;color:transparent;transition:.15s;cursor:pointer}
-.chk.on{background:var(--ok);border-color:var(--ok);color:#02111F}
-.ai-hero{text-align:center;padding:8px 0 4px}
-.ai-hero .robot{width:120px;height:120px;margin:0 auto;filter:drop-shadow(0 0 22px rgba(123,97,255,.55))}
-.ai-hero h2{font-size:22px;font-weight:800;margin-top:6px}
-.ai-hero p{color:var(--txt2);font-size:14px;margin-top:3px}
-.sug-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
-.sug{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;text-align:left;line-height:1.2}
-.sug:active{background:var(--bg-card-hover)}
-.sug .si{font-size:16px}
-.ai-feed{background:var(--bg-secondary);border:1px solid var(--border-soft);border-radius:16px;padding:14px;min-height:80px;font-size:14px;line-height:1.55;margin-bottom:12px;white-space:pre-wrap}
-.ai-input{display:flex;gap:9px;align-items:center}
-.ai-input input{flex:1;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:13px 15px;color:var(--txt);font-size:14px}
-.ai-input input:focus{outline:none;border-color:var(--ai-purple)}
-.ai-send{width:46px;height:46px;border-radius:14px;background:var(--grad-ai);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--glow-ai);flex:0 0 auto}
-.mais-prof{display:flex;align-items:center;gap:13px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:18px;padding:16px;margin-bottom:8px}
-.mais-prof .av{width:50px;height:50px;border-radius:14px;background:var(--grad-ai);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;box-shadow:var(--glow-ai)}
-.mais-prof .nm{font-weight:800;font-size:16px}
-.mais-prof .rl{color:var(--txt3);font-size:12px;margin-top:2px}
-.mais-row{display:flex;align-items:center;gap:13px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:15px;margin-bottom:10px;cursor:pointer}
-.mais-row:active{background:var(--bg-card-hover)}
-.mais-row .mi{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--bg-secondary);flex:0 0 auto}
-.mais-row .mt{flex:1}
-.mais-row .mt .n{font-weight:700;font-size:14px}
-.mais-row .mt .d{color:var(--txt3);font-size:12px;margin-top:2px}
-.mais-row .arr{color:var(--txt3);font-size:18px}
-.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:50;max-width:480px;margin:0 auto;display:flex;align-items:flex-end;background:rgba(9,26,54,.94);backdrop-filter:blur(18px);border-top:1px solid rgba(37,74,125,.5);padding:9px 4px calc(9px + env(safe-area-inset-bottom))}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;color:var(--txt3);font-size:10px;font-weight:700}
-.nav-btn .ni{font-size:20px;line-height:1}
-.nav-btn.active{color:var(--cyan)}
-.nav-btn.active .ni{filter:drop-shadow(0 0 8px rgba(0,229,255,.7))}
-.nav-fab{flex:0 0 auto;width:58px;margin:0 4px}
-.fab{width:58px;height:58px;border-radius:50%;background:var(--grad-primary);font-size:28px;color:#02111F;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:var(--glow-cyan);transform:translateY(-14px);border:4px solid var(--bg-main)}
-.fab:active{transform:translateY(-14px) scale(.92)}
-.modal{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;background:rgba(2,6,15,.72);backdrop-filter:blur(4px);animation:fade .2s}
-.sheet{width:100%;max-width:480px;max-height:94vh;overflow-y:auto;background:var(--bg-secondary);border:1px solid var(--border-soft);border-radius:26px 26px 0 0;padding:20px;animation:up .3s cubic-bezier(.2,.9,.3,1)}
-@keyframes up{from{transform:translateY(100%)}to{transform:none}}
-.grip{width:42px;height:5px;border-radius:99px;background:var(--border-soft);margin:0 auto 14px}
-.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.sheet-head h2{font-size:17px;font-weight:800}
-.x{width:34px;height:34px;border-radius:10px;background:var(--bg-card);border:1px solid var(--border-soft);font-size:15px}
-.qa-item{display:flex;align-items:center;gap:13px;padding:14px;border-radius:14px;background:var(--bg-card);border:1px solid var(--border-soft);margin-bottom:10px;cursor:pointer}
-.qa-item:active{background:var(--bg-card-hover)}
-.qa-item .qai{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 auto}
-.qa-item .qan{font-weight:700;font-size:14px}
-.dt-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:18px;padding:16px;margin-bottom:14px}
-.dt-head{display:flex;gap:13px;align-items:flex-start}
-.dt-av{width:54px;height:54px;border-radius:15px;background:var(--bg-secondary);border:1px solid var(--border-soft);display:flex;align-items:center;justify-content:center;font-size:25px;flex:0 0 auto}
-.dt-name{font-size:17px;font-weight:800;line-height:1.2}
-.dt-seg{color:var(--txt2);font-size:13px;margin-top:4px}
-.dt-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:15px 0 0}
-.dt-act{border-radius:14px;padding:12px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;border:1px solid var(--border-soft);background:var(--bg-secondary);font-size:11px;font-weight:700}
-.dt-act .ai{font-size:18px}
-.dt-act.wpp{color:var(--ok)}.dt-act.call{color:var(--sky)}.dt-act.mail{color:var(--st-prospect)}
-.dt-tabs{display:flex;gap:14px;border-bottom:1px solid var(--border-soft);margin-bottom:14px}
-.dt-tab{padding:9px 2px;font-size:13px;font-weight:700;color:var(--txt3);border-bottom:2px solid transparent}
-.dt-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
-.info-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid rgba(37,74,125,.35);font-size:13px}
+.act-n{font-weight:500}
+.act-s{color:var(--txt-2);font-size:13px;line-height:18px}
+.chk{width:20px;height:20px;border-radius:var(--r);border:1px solid var(--input-border);flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:transparent;cursor:pointer}
+.chk.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+/* ===== 11. IA ===== */
+.ai-hero{text-align:center;padding:var(--s-2) 0 var(--s-1)}
+.ai-hero .hero-ic{color:var(--txt-3)}
+.ai-hero h2{font-size:24px;line-height:28px;font-weight:600;letter-spacing:-.015em;margin-top:var(--s-2)}
+.ai-hero p{color:var(--txt-2);margin-top:2px}
+.sug-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-2);margin:var(--s-4) 0}
+.sug{height:auto;min-height:44px;padding:var(--s-2) var(--s-3);font-size:13px;line-height:18px;justify-content:flex-start;text-align:left;white-space:normal}
+.sug .si{color:var(--txt-2);display:inline-flex}
+.ai-feed{background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-3);min-height:80px;line-height:1.55;margin-bottom:var(--s-3);white-space:pre-wrap}
+.ai-input{display:flex;gap:var(--s-2);align-items:center}
+.ai-input input{flex:1}
+.ai-send{width:44px;height:44px;border-radius:var(--r);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+
+/* ===== 12. MAIS ===== */
+.mais-prof{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-4);margin-bottom:var(--s-2)}
+.mais-prof .av{width:44px;height:44px;border-radius:var(--r-pill);background:var(--accent-soft);color:var(--accent-txt);display:flex;align-items:center;justify-content:center;font-weight:600;flex:0 0 auto}
+.mais-prof .nm{font-size:17px;line-height:22px;font-weight:600}
+.mais-prof .rl{color:var(--txt-2);font-size:13px;line-height:18px}
+.mais-row{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3);margin-bottom:var(--s-2);cursor:pointer}
+.mais-row:hover{border-color:var(--txt-3)}
+.mais-row:active{background:var(--bg-2)}
+.mais-row .mi{width:36px;height:36px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;background:var(--bg-2);color:var(--txt-2);flex:0 0 auto}
+.mais-row .mt{flex:1;min-width:0}
+.mais-row .mt .n{font-weight:500}
+.mais-row .mt .d{color:var(--txt-2);font-size:13px;line-height:18px}
+.mais-row .arr{color:var(--txt-3);display:inline-flex}
+.rodape{text-align:center;color:var(--txt-3);font-size:12px;line-height:16px;margin-top:var(--s-4)}
+
+/* ===== 13. BOTTOM-NAV (DESIGN §6) ===== */
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:50;max-width:480px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 64px 1fr 1fr;height:calc(64px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--bg-1);border-top:1px solid var(--line)}
+.nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--txt-3);font-size:12px;line-height:16px;letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.nav-btn .ni{display:inline-flex;line-height:1}
+.nav-btn.active{color:var(--accent-txt)}
+.nav-fab{display:flex;align-items:center;justify-content:center}
+.fab{width:48px;height:48px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center}
+
+/* ===== 14. SHEETS / MODAIS ===== */
+.modal{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;background:var(--scrim)}
+/* kiss: 12px no topo do sheet = única exceção de raio documentada (DESIGN §5) */
+.sheet{width:100%;max-width:480px;max-height:94vh;overflow-y:auto;background:var(--bg-1);border:1px solid var(--line-2);border-bottom:0;border-radius:12px 12px 0 0;padding:var(--s-2) var(--s-4) var(--s-5);box-shadow:var(--shadow-up)}
+.grip{width:36px;height:4px;border-radius:var(--r-pill);background:var(--line-2);margin:0 auto var(--s-3)}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:var(--s-3);margin-bottom:var(--s-4)}
+.sheet-head h2{font-size:20px;line-height:24px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:var(--s-2)}
+.qa-item{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3);margin-bottom:var(--s-2);cursor:pointer}
+.qa-item:hover{border-color:var(--txt-3)}
+.qa-item:active{background:var(--bg-2)}
+.qa-item .qai{width:36px;height:36px;border-radius:var(--r);background:var(--bg-2);color:var(--txt-2);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.qa-item .qan{font-weight:500}
+
+/* ===== 15. FICHA ===== */
+.dt-card{padding:var(--s-4);margin-bottom:var(--s-3);border-color:var(--line)}
+.dt-head{display:flex;gap:var(--s-3);align-items:flex-start}
+.dt-av{width:36px;height:36px}
+.dt-av .ico{width:20px;height:20px}
+.dt-name{font-size:20px;line-height:24px;font-weight:600;letter-spacing:-.01em}
+.dt-seg{color:var(--txt-2);font-size:13px;line-height:18px;margin-top:var(--s-1)}
+.dt-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s-2);margin:0 0 var(--s-3)}
+.dt-act{height:56px;border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid var(--line-2);background:var(--bg-1);color:var(--txt-2);font-size:12px;line-height:16px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.dt-act:hover{color:var(--accent-txt);background:var(--accent-soft);border-color:var(--accent-txt)}
+.dt-act .ai{display:inline-flex}
+.dt-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:var(--s-3);overflow-x:auto;scrollbar-width:none}
+.dt-tab{height:40px;padding:0 var(--s-3);color:var(--txt-2);font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.dt-tab:hover{color:var(--txt-1)}
+.dt-tab.active{color:var(--txt-1);border-bottom-color:var(--accent-txt)}
+.info-row{display:flex;justify-content:space-between;gap:var(--s-3);padding:10px 0;border-bottom:1px solid var(--line)}
 .info-row:last-child{border-bottom:none}
-.info-row .k{color:var(--txt3);font-weight:600}
-.info-row .v{text-align:right;font-weight:600}
-.tl-item{display:flex;gap:12px;padding:9px 0}
-.tl-dot{width:11px;height:11px;border-radius:99px;background:var(--cyan);margin-top:4px;box-shadow:var(--glow-cyan);flex:0 0 auto}
-.tl-txt{font-size:13px;font-weight:600}
-.tl-time{color:var(--txt3);font-size:11px;margin-top:1px}
-.btn-analyze{width:100%;background:var(--grad-ai);color:#fff;font-weight:800;border-radius:16px;padding:14px;box-shadow:var(--glow-ai);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
-.btn-analyze:disabled{opacity:.6}
-.edit-seg-box{background:var(--bg-secondary);border:1px solid var(--border-soft);border-radius:14px;padding:13px;margin:14px 0}
-.edit-seg-box label{font-size:12px;color:var(--txt2);font-weight:600;display:block;margin-bottom:8px}
-.edit-seg-box .row{display:flex;gap:9px}
-.edit-seg-box select{flex:1;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:11px;padding:11px;color:var(--txt);font-size:13px}
-.btn-sec{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:12px;padding:12px;font-weight:700;font-size:14px}
-.spinner{width:34px;height:34px;border:3px solid rgba(0,229,255,.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;margin:30px auto}
-.spinner-sm{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle}
+.info-row .k{color:var(--txt-2);font-size:13px;line-height:18px;flex:0 0 auto;min-width:112px}
+.info-row .v{text-align:right;color:var(--txt-1);word-break:break-word;min-width:0}
+.tl-item{display:flex;gap:var(--s-3);padding:var(--s-3) 0;border-bottom:1px solid var(--line)}
+.tl-dot{width:8px;height:8px;border-radius:var(--r-pill);background:var(--txt-3);margin:6px 4px;flex:0 0 auto}
+.tl-dot.on{background:var(--accent-txt)}
+.tl-txt{color:var(--txt-1)}
+.tl-time{color:var(--txt-2);font-size:13px;line-height:18px}
+.edit-seg-box{background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r);padding:var(--s-3);margin:var(--s-3) 0}
+.edit-seg-box label{color:var(--txt-2);display:block;margin-bottom:var(--s-2)}
+.edit-seg-box .row{display:flex;gap:var(--s-2)}
+.edit-seg-box select{flex:1;width:auto;min-width:0}
+.spinner{width:32px;height:32px;border:2px solid var(--line-2);border-top-color:var(--accent-txt);border-radius:50%;animation:spin .7s linear infinite;margin:var(--s-6) auto}
+.spinner-sm{width:16px;height:16px;border:2px solid var(--line-2);border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
-.empty{text-align:center;color:var(--txt3);padding:40px 18px;font-size:14px;line-height:1.5}
-.toast{position:fixed;left:50%;bottom:130px;transform:translateX(-50%);z-index:99;padding:12px 20px;border-radius:13px;font-size:13px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:fade .2s;max-width:90%;text-align:center}
-.toast-ok{background:var(--ok);color:#02111F}.toast-err{background:var(--err);color:#fff}
-.pflags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.pflag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;line-height:1.4}
-.pflag.pf-cota{background:rgba(0,245,212,.16);color:var(--cyan-neon);border:1px solid rgba(0,245,212,.35)}
-.pflag.pf-manip{background:rgba(255,107,179,.16);color:#FF6BB3;border:1px solid rgba(255,107,179,.35)}
-.pflag.pf-unic{background:rgba(45,140,255,.16);color:#5FA8FF;border:1px solid rgba(45,140,255,.35)}
-.flag-opts{display:flex;gap:10px;margin-top:6px}
-.flag-chip{flex:1;display:flex;align-items:center;gap:8px;padding:11px 12px;border-radius:14px;border:1px solid var(--border-soft);background:rgba(9,26,54,.86);font-size:12px;font-weight:600;color:var(--txt2);cursor:pointer;transition:.15s}
-.flag-chip input{width:16px;height:16px;accent-color:var(--cyan);flex:0 0 auto}
-.flag-chip.on{border-color:var(--cyan);background:rgba(0,229,255,.1);color:var(--txt)}
-.checkout-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
-.co-opt{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:14px;padding:14px 8px;font-size:12px;font-weight:700;color:var(--txt2);text-align:center}
-.co-opt:active{background:var(--bg-card-hover);border-color:var(--cyan)}
-.co-opt .ci{font-size:20px}
-.md-txt h2,.md-txt h3,.md-txt h4{color:var(--cyan);font-weight:800;margin:12px 0 5px}
-.md-txt h2{font-size:16px}.md-txt h3{font-size:14px}.md-txt h4{font-size:13px}
+.empty{text-align:center;color:var(--txt-2);padding:var(--s-7) var(--s-4);line-height:1.5}
+.toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:99;min-height:44px;display:flex;align-items:center;padding:var(--s-2) var(--s-4);border-radius:var(--r);background:var(--bg-3);border:1px solid var(--line-2);color:var(--txt-1);box-shadow:var(--shadow);max-width:90%;text-align:center}
+.toast-ok{border-color:var(--ok)}
+.toast-err{border-color:var(--err)}
+.pflags{display:flex;gap:var(--s-2);flex-wrap:wrap;margin-top:var(--s-1)}
+.pflag{display:inline-flex;align-items:center;gap:var(--s-1);color:var(--txt-2);white-space:nowrap}
+.pflag .ico{color:var(--txt-3)}
+.flag-opts{display:flex;gap:var(--s-2);margin-top:var(--s-1);flex-wrap:wrap}
+.flag-chip{flex:1;display:flex;align-items:center;gap:var(--s-2);height:32px;padding:0 10px;border-radius:var(--r);border:1px solid var(--line-2);background:transparent;font-size:13px;font-weight:500;color:var(--txt-2);cursor:pointer;white-space:nowrap}
+.flag-chip input{width:16px;height:16px;accent-color:var(--accent);flex:0 0 auto;margin:0}
+.flag-chip:hover{border-color:var(--txt-2);color:var(--txt-1)}
+.flag-chip.on{border-color:var(--accent-txt);background:var(--accent-soft);color:var(--accent-txt)}
+.checkout-opts{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-2);margin-top:var(--s-1)}
+.co-opt{height:auto;flex-direction:column;gap:var(--s-2);padding:var(--s-3) var(--s-2);font-size:13px;line-height:18px;text-align:center;white-space:normal}
+.co-opt .ci{color:var(--txt-2);display:inline-flex}
+.md-txt h2,.md-txt h3,.md-txt h4{font-weight:600;margin:var(--s-3) 0 var(--s-1)}
+.md-txt h2{font-size:17px;line-height:22px}.md-txt h3{font-size:14px}.md-txt h4{font-size:13px}
 .md-txt ul{margin:6px 0 6px 18px}
 .md-txt p{margin:0 0 8px}
+
+/* ===== 16. MOTION (DESIGN §7) — só com preferência por movimento; sem scale() em :active ===== */
+@media (prefers-reduced-motion:no-preference){
+  .page.active,.modal,.toast{animation:fade var(--dur-2) var(--ease)}
+  .sheet{animation:up var(--dur-3) var(--ease)}
+  .btn-primary,.btn-nav,.btn-ai,.btn-sec,.btn-analyze,.btn-mini,.sug,.btn-filt,.pager button,.co-opt,.qa,.tab,.nav-btn,.bell,.x,.chk,.flag-chip,.mais-row,.lead-card,.qa-item,.dt-act,.dt-tab,.fab,.ai-send,.sec-title a{transition:background-color var(--dur-1) var(--ease),color var(--dur-1) var(--ease),border-color var(--dur-1) var(--ease)}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+}
+/* ===== 17. ALVOS DE TOQUE ≤1023px — DESIGN §5 (36 desktop / 44 mobile); ícone continua 18-20px, cresce só a área clicável (fix pack 1) ===== */
+@media (max-width:1023px){
+  .qa,.bell,.x,.avatar{width:44px;height:44px}
+  .pager button,.btn-sm,.ai-card .btn-mini{height:44px}
+  .sec-title a{display:inline-flex;align-items:center;min-height:44px;padding:0 var(--s-1);margin:-12px 0}
+  .chk{position:relative}
+  .chk::before{content:"";position:absolute;inset:-13px} /* hit-area 44×44 (QA C7: -12 dava 42 com borda 1px) mantendo a caixa visual de 20px */
+}
+@media (min-width:1024px){
+  .kpi{height:96px;padding:var(--s-4)}
+  .kpi .v{font-size:29px;line-height:32px}
+}
 </style>
 </head>
 <body>
@@ -271,9 +376,9 @@ input,select,textarea{font-family:inherit}
   <div class="login-card">
     <div class="brand"><span id="logo-login"></span><b>ONE<span>CLICK</span> CRM</b></div>
     <div class="login-sub">ENTERPRISE v4 · Sua TI sob Controle</div>
-    <div class="fld"><label>Usuário</label><input id="lg-user" autocomplete="username" placeholder="email" type="email"></div>
-    <div class="fld"><label>Senha</label><input id="lg-pass" type="password" autocomplete="current-password" placeholder="senha"></div>
-    <button class="btn-primary" onclick="fazerLogin()">Entrar</button>
+    <div class="fld"><label for="lg-user">Usuário</label><input id="lg-user" autocomplete="username" placeholder="email" type="email"></div>
+    <div class="fld"><label for="lg-pass">Senha</label><input id="lg-pass" type="password" autocomplete="current-password" placeholder="senha"></div>
+    <button class="btn-primary" type="button" onclick="fazerLogin()">Entrar</button>
     <div class="login-err" id="lg-err"></div>
   </div>
 </div>
@@ -282,19 +387,19 @@ input,select,textarea{font-family:inherit}
  <div class="app-wrap">
   <div class="topbar">
     <div class="tb-brand"><span id="logo-top"></span><div class="tt"><b>ONE<span>CLICK</span> CRM</b><small>ENTERPRISE v4</small></div></div>
-    <button class="bell" onclick="irPara('atividades')">🔔<span class="dot">3</span></button>
-    <button class="avatar" onclick="irPara('mais')">RS</button>
+    <button class="bell" id="btn-tema" type="button" aria-label="Alternar tema claro/escuro" title="Tema" onclick="alternarTema()"><i class="ico" data-lucide="sun-moon"></i></button>
+    <button class="bell" type="button" aria-label="Notificações" onclick="irPara('atividades')"><i class="ico" data-lucide="bell"></i><span class="dot">3</span></button>
+    <button class="avatar" type="button" aria-label="Mais" onclick="irPara('mais')">RS</button>
   </div>
 
   <div class="page active" id="pg-home">
-    <div class="greeting">Olá, <span id="home-nome">Ronie</span>! 👋</div>
+    <h1 class="greeting">Olá, <span id="home-nome">Ronie</span></h1>
     <div class="subdate" id="home-data"></div>
     <div class="kpi-grid" id="home-kpi"></div>
     <div class="ai-card">
-      <div class="ai-h">✨ OneClick AI <span class="beta">BETA</span></div>
+      <div class="ai-h"><i class="ico" data-lucide="sparkles"></i>OneClick AI <span class="beta">BETA</span></div>
       <div class="ai-txt">Você possui <b>2.314 farmácias</b> sem contato nos últimos 30 dias.</div>
-      <button class="btn-mini" onclick="irPara('ai')">Ver insights</button>
-      <span class="robot" id="robot-home"></span>
+      <button class="btn-mini" type="button" onclick="irPara('ai')">Ver insights</button>
     </div>
     <div class="sec-title">Próximas visitas <a onclick="irPara('roteiro')">Ver todas</a></div>
     <div id="home-visitas"></div>
@@ -303,13 +408,14 @@ input,select,textarea{font-family:inherit}
   </div>
 
   <div class="page" id="pg-leads">
-    <div class="ptitle">Leads</div>
+    <h1 class="ptitle">Leads</h1>
     <div class="subdate">Sua base comercial SP + MG</div>
     <div class="tabs" id="lead-tabs"></div>
     <div class="tabs hidden" id="prio-chips" style="margin-top:8px"></div>
     <div class="searchbar">
-      <input id="busca" placeholder="🔍 Buscar nome, CNPJ, cidade..." onkeydown="if(event.key==='Enter')buscarClientes(0)">
-      <button class="btn-filt" onclick="abrirFiltros()">⚙</button>
+      <i class="ico i16 sb-ico" data-lucide="search"></i>
+      <input id="busca" aria-label="Buscar clientes" placeholder="Nome, CNPJ ou cidade" onkeydown="if(event.key==='Enter')buscarClientes(0)">
+      <button class="btn-filt" type="button" aria-label="Filtros" title="Filtros" onclick="abrirFiltros()"><i class="ico" data-lucide="sliders-horizontal"></i></button>
     </div>
     <div class="list-info" id="lista-total">—</div>
     <div id="lista-clientes"><div class="spinner"></div></div>
@@ -318,14 +424,14 @@ input,select,textarea{font-family:inherit}
 
   <div class="page" id="pg-roteiro">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-      <div><div class="ptitle">Roteiro IA</div><div class="subdate" style="margin:3px 0 0">SP + MG · Otimizado por IA</div></div>
-      <button class="btn-ai" id="btn-rota" onclick="gerarRoteiro()" style="padding:11px 15px;flex:0 0 auto">✨ Gerar roteiro</button>
+      <div><h1 class="ptitle">Roteiro IA</h1><div class="subdate" style="margin:3px 0 0">SP + MG · Otimizado por IA</div></div>
+      <button class="btn-ai btn-sm" id="btn-rota" type="button" onclick="gerarRoteiro()" style="flex:0 0 auto"><i class="ico i16" data-lucide="sparkles"></i>Gerar roteiro</button>
     </div>
     <div class="rt-summary">
       <div class="rt-cell"><div class="n" id="rt-vis">—</div><div class="l">Visitas</div></div>
       <div class="rt-cell"><div class="n" id="rt-dist">—</div><div class="l">Distância</div></div>
       <div class="rt-cell"><div class="n" id="rt-tempo">—</div><div class="l">Tempo</div></div>
-      <div class="rt-cell"><div class="n pink" id="rt-novos">—</div><div class="l">Novos</div></div>
+      <div class="rt-cell"><div class="n" id="rt-novos">—</div><div class="l">Novos</div></div>
     </div>
     <div id="mapa"></div>
     <div id="next-visit"></div>
@@ -333,16 +439,16 @@ input,select,textarea{font-family:inherit}
   </div>
 
   <div class="page" id="pg-dashboard">
-    <div class="ptitle">Dashboard</div>
+    <h1 class="ptitle">Dashboard</h1>
     <div class="subdate">Visão analítica da operação</div>
-    <div class="chart-card"><h3>Taxa de conversão</h3><div class="conv">3,12%<small>↑ 8,4%</small></div><div id="chart-conv"></div></div>
-    <div class="chart-card"><h3>Leads por segmento</h3><div id="chart-seg"></div></div>
-    <div class="chart-card"><h3>Funil de vendas</h3><div id="funil"></div></div>
-    <div class="chart-card"><h3>Distribuição por estado</h3><div id="estados"></div></div>
+    <div class="chart-card"><h2>Taxa de conversão</h2><div class="conv">3,12%</div><div id="chart-conv"></div></div>
+    <div class="chart-card"><h2>Leads por segmento</h2><div id="chart-seg"></div></div>
+    <div class="chart-card"><h2>Funil de vendas</h2><div id="funil"></div></div>
+    <div class="chart-card"><h2>Distribuição por estado</h2><div id="estados"></div></div>
   </div>
 
   <div class="page" id="pg-atividades">
-    <div class="ptitle">Atividades</div>
+    <h1 class="ptitle">Atividades</h1>
     <div class="subdate">Sua agenda comercial</div>
     <div class="tabs" style="margin-top:10px">
       <button class="tab active" onclick="filtrarAtiv(this,'todas')">Todas</button>
@@ -353,25 +459,26 @@ input,select,textarea{font-family:inherit}
   </div>
 
   <div class="page" id="pg-ai">
-    <div class="ai-hero"><span class="robot" id="robot-ai"></span><h2>OneClick AI <span class="beta" style="vertical-align:middle">BETA</span></h2><p>Como posso te ajudar hoje, Ronie?</p></div>
+    <div class="ai-hero"><i class="ico i32 hero-ic" data-lucide="sparkles"></i><h1>OneClick AI <span class="beta" style="vertical-align:middle">BETA</span></h1><p>Como posso te ajudar hoje, Ronie?</p></div>
     <div class="sug-grid">
-      <button class="sug" onclick="perguntarIA('Quais farmácias devo priorizar hoje?')"><span class="si">📊</span>Analisar meus leads</button>
-      <button class="sug" onclick="irPara('roteiro');gerarRoteiro()"><span class="si">🗺️</span>Gerar roteiro otimizado</button>
-      <button class="sug" onclick="perguntarIA('Liste tipos de leads com WhatsApp válido e sem contato há 30 dias e como abordar.')"><span class="si">📵</span>Leads sem contato</button>
-      <button class="sug" onclick="perguntarIA('Faça um resumo das minhas atividades de hoje e próximos passos.')"><span class="si">📝</span>Resumo de atividades</button>
+      <button class="sug" type="button" onclick="perguntarIA('Quais farmácias devo priorizar hoje?')"><span class="si"><i class="ico" data-lucide="chart-column"></i></span>Analisar meus leads</button>
+      <button class="sug" type="button" onclick="irPara('roteiro');gerarRoteiro()"><span class="si"><i class="ico" data-lucide="map"></i></span>Gerar roteiro otimizado</button>
+      <button class="sug" type="button" onclick="perguntarIA('Liste tipos de leads com WhatsApp válido e sem contato há 30 dias e como abordar.')"><span class="si"><i class="ico" data-lucide="message-square-off"></i></span>Leads sem contato</button>
+      <button class="sug" type="button" onclick="perguntarIA('Faça um resumo das minhas atividades de hoje e próximos passos.')"><span class="si"><i class="ico" data-lucide="list-checks"></i></span>Resumo de atividades</button>
     </div>
     <div class="ai-feed" id="ai-feed">Toque numa sugestão ou escreva um comando. Ex.: "Crie uma campanha para médicos dermatologistas em SP."</div>
     <div class="ai-input">
       <input id="ai-prompt" placeholder="Pergunte algo para a IA..." onkeydown="if(event.key==='Enter')perguntarIA()">
-      <button class="ai-send" onclick="perguntarIA()">➤</button>
+      <button class="ai-send" type="button" aria-label="Enviar" onclick="perguntarIA()"><i class="ico" data-lucide="send"></i></button>
     </div>
   </div>
 
   <div class="page" id="pg-unic">
-    <div class="ptitle">Farmácias com Operação Ativa</div>
+    <h1 class="ptitle">Farmácias com Operação Ativa</h1>
     <div class="subdate">Já com operação ativa nos últimos 90 dias · oferecer CotaçãoNaMão</div>
     <div class="searchbar">
-      <input id="unic-busca" placeholder="🔍 Buscar nome, CNPJ, cidade..." onkeydown="if(event.key==='Enter')buscarUnicAtivos(0)">
+      <i class="ico i16 sb-ico" data-lucide="search"></i>
+      <input id="unic-busca" aria-label="Buscar farmácias" placeholder="Nome, CNPJ ou cidade" onkeydown="if(event.key==='Enter')buscarUnicAtivos(0)">
     </div>
     <div class="list-info" id="unic-total">—</div>
     <div id="unic-lista"><div class="spinner"></div></div>
@@ -379,10 +486,11 @@ input,select,textarea{font-family:inherit}
   </div>
 
   <div class="page" id="pg-medicos">
-    <div class="ptitle">Médicos</div>
+    <h1 class="ptitle">Médicos</h1>
     <div class="subdate">Com atividade registrada nos últimos 90 dias</div>
     <div class="searchbar">
-      <input id="med-busca" placeholder="🔍 Buscar nome ou CRM..." onkeydown="if(event.key==='Enter')buscarMedicos(0)">
+      <i class="ico i16 sb-ico" data-lucide="search"></i>
+      <input id="med-busca" aria-label="Buscar médicos" placeholder="Nome ou CRM" onkeydown="if(event.key==='Enter')buscarMedicos(0)">
     </div>
     <div class="list-info" id="med-total">—</div>
     <div id="med-lista"><div class="spinner"></div></div>
@@ -391,38 +499,40 @@ input,select,textarea{font-family:inherit}
 
   <div class="page" id="pg-reps">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-      <div><div class="ptitle">Representantes</div><div class="subdate" style="margin:3px 0 0">Gerencie usuários e acessos</div></div>
-      <button class="btn-ai" onclick="abrirNovoRep()" style="padding:11px 15px;flex:0 0 auto">+ Novo</button>
+      <div><h1 class="ptitle">Representantes</h1><div class="subdate" style="margin:3px 0 0">Gerencie usuários e acessos</div></div>
+      <button class="btn-ai btn-sm" type="button" onclick="abrirNovoRep()" style="flex:0 0 auto"><i class="ico i16" data-lucide="plus"></i>Novo</button>
     </div>
     <div id="reps-lista"><div class="spinner"></div></div>
   </div>
 
   <div class="page" id="pg-mais">
-    <div class="ptitle" style="margin-bottom:14px">Mais</div>
+    <h1 class="ptitle" style="margin-bottom:var(--s-3)">Mais</h1>
     <div class="mais-prof"><div class="av">RS</div><div><div class="nm" id="mais-nome">Ronie Silva</div><div class="rl">Diretor Comercial · Admin</div><div class="rl" id="mais-mail">ronie@oneclicksolucoes.com.br</div></div></div>
     <div class="sec-title">Painéis</div>
-    <div class="mais-row" onclick="irPara('dashboard')"><div class="mi">📊</div><div class="mt"><div class="n">Dashboard</div><div class="d">Conversão, funil e segmentos</div></div><span class="arr">›</span></div>
-    <div class="mais-row" onclick="irPara('atividades')"><div class="mi">🗓️</div><div class="mt"><div class="n">Atividades</div><div class="d">Agenda e tarefas</div></div><span class="arr">›</span></div>
-    <div class="mais-row" onclick="irPara('ai')"><div class="mi">🤖</div><div class="mt"><div class="n">OneClick AI</div><div class="d">Assistente comercial</div></div><span class="arr">›</span></div>
+    <div class="mais-row" onclick="irPara('dashboard')"><div class="mi"><i class="ico" data-lucide="layout-dashboard"></i></div><div class="mt"><div class="n">Dashboard</div><div class="d">Conversão, funil e segmentos</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
+    <div class="mais-row" onclick="irPara('atividades')"><div class="mi"><i class="ico" data-lucide="calendar"></i></div><div class="mt"><div class="n">Atividades</div><div class="d">Agenda e tarefas</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
+    <div class="mais-row" onclick="irPara('ai')"><div class="mi"><i class="ico" data-lucide="bot"></i></div><div class="mt"><div class="n">OneClick AI</div><div class="d">Assistente comercial</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
+    <div class="sec-title">Aparência</div>
+    <div class="mais-row" onclick="alternarTema()"><div class="mi"><i class="ico" data-lucide="sun-moon"></i></div><div class="mt"><div class="n">Tema</div><div class="d" id="tema-atual">Escuro</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
     <div class="sec-title">Base Ativa</div>
-    <div class="mais-row" onclick="irPara('unic')"><div class="mi">🔵</div><div class="mt"><div class="n">Farmácias ativas (90d)</div><div class="d">Com operação ativa · oferecer CotaçãoNaMão</div></div><span class="arr">›</span></div>
-    <div class="mais-row" onclick="irPara('medicos')"><div class="mi">🩺</div><div class="mt"><div class="n">Médicos</div><div class="d">Base ativa (90d)</div></div><span class="arr">›</span></div>
+    <div class="mais-row" onclick="irPara('unic')"><div class="mi"><i class="ico" data-lucide="activity"></i></div><div class="mt"><div class="n">Farmácias ativas (90d)</div><div class="d">Com operação ativa · oferecer CotaçãoNaMão</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
+    <div class="mais-row" onclick="irPara('medicos')"><div class="mi"><i class="ico" data-lucide="stethoscope"></i></div><div class="mt"><div class="n">Médicos</div><div class="d">Base ativa (90d)</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
     <div class="sec-title">Gestão</div>
-    <div class="mais-row" id="mais-reps" onclick="irPara('reps')"><div class="mi">👥</div><div class="mt"><div class="n">Representantes</div><div class="d">Usuários e acessos</div></div><span class="arr">›</span></div>
-    <div class="mais-row" onclick="emBreve()"><div class="mi">⚡</div><div class="mt"><div class="n">Automações</div><div class="d">n8n · OpenClaw · WhatsApp</div></div><span class="arr">›</span></div>
-    <div class="mais-row" onclick="emBreve()"><div class="mi">📣</div><div class="mt"><div class="n">Campanhas</div><div class="d">WhatsApp · Email · Instagram</div></div><span class="arr">›</span></div>
-    <div class="mais-row" onclick="emBreve()"><div class="mi">📑</div><div class="mt"><div class="n">Apresentações</div><div class="d">Folders comerciais · OneClick</div></div><span class="arr">›</span></div>
-    <div class="mais-row" onclick="emBreve()"><div class="mi">📤</div><div class="mt"><div class="n">Exportar base</div><div class="d">CSV completo de clientes</div></div><span class="arr">›</span></div>
-    <div class="mais-row" onclick="sair()" style="margin-top:8px"><div class="mi">🚪</div><div class="mt"><div class="n" style="color:var(--err)">Sair</div><div class="d">Encerrar sessão</div></div></div>
-    <div style="text-align:center;color:var(--txt3);font-size:11px;margin-top:14px">OneClick CRM v4 · crm-api.oneclicksolucoes.com.br</div>
+    <div class="mais-row" id="mais-reps" onclick="irPara('reps')"><div class="mi"><i class="ico" data-lucide="users"></i></div><div class="mt"><div class="n">Representantes</div><div class="d">Usuários e acessos</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
+    <div class="mais-row" onclick="emBreve()"><div class="mi"><i class="ico" data-lucide="zap"></i></div><div class="mt"><div class="n">Automações</div><div class="d">n8n · OpenClaw · WhatsApp</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
+    <div class="mais-row" onclick="emBreve()"><div class="mi"><i class="ico" data-lucide="megaphone"></i></div><div class="mt"><div class="n">Campanhas</div><div class="d">WhatsApp · Email · Instagram</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
+    <div class="mais-row" onclick="emBreve()"><div class="mi"><i class="ico" data-lucide="file-text"></i></div><div class="mt"><div class="n">Apresentações</div><div class="d">Folders comerciais · OneClick</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
+    <div class="mais-row" onclick="emBreve()"><div class="mi"><i class="ico" data-lucide="download"></i></div><div class="mt"><div class="n">Exportar base</div><div class="d">CSV completo de clientes</div></div><span class="arr"><i class="ico" data-lucide="chevron-right"></i></span></div>
+    <div class="mais-row" onclick="sair()" style="margin-top:8px"><div class="mi"><i class="ico" data-lucide="log-out"></i></div><div class="mt"><div class="n" style="color:var(--err)">Sair</div><div class="d">Encerrar sessão</div></div></div>
+    <div class="rodape">OneClick CRM v4 · crm-api.oneclicksolucoes.com.br</div>
   </div>
 
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-pg="home" onclick="irPara('home')"><span class="ni">🏠</span>Início</button>
-    <button class="nav-btn" data-pg="leads" onclick="irPara('leads')"><span class="ni">👥</span>Leads</button>
-    <div class="nav-fab"><button class="fab" onclick="abrirQuickActions()">＋</button></div>
-    <button class="nav-btn" data-pg="roteiro" onclick="irPara('roteiro')"><span class="ni">🧭</span>Roteiro</button>
-    <button class="nav-btn" data-pg="mais" onclick="irPara('mais')"><span class="ni">⋯</span>Mais</button>
+    <button class="nav-btn active" type="button" data-pg="home" onclick="irPara('home')"><span class="ni"><i class="ico i20" data-lucide="home"></i></span>Início</button>
+    <button class="nav-btn" type="button" data-pg="leads" onclick="irPara('leads')"><span class="ni"><i class="ico i20" data-lucide="users"></i></span>Leads</button>
+    <div class="nav-fab"><button class="fab" type="button" aria-label="Ações rápidas" onclick="abrirQuickActions()"><i class="ico i20" data-lucide="plus"></i></button></div>
+    <button class="nav-btn" type="button" data-pg="roteiro" onclick="irPara('roteiro')"><span class="ni"><i class="ico i20" data-lucide="map"></i></span>Roteiro</button>
+    <button class="nav-btn" type="button" data-pg="mais" onclick="irPara('mais')"><span class="ni"><i class="ico i20" data-lucide="ellipsis"></i></span>Mais</button>
   </nav>
  </div>
 </div>
@@ -430,33 +540,33 @@ input,select,textarea{font-family:inherit}
 <div class="modal hidden" id="modal-qa">
   <div class="sheet">
     <div class="grip"></div>
-    <div class="sheet-head"><h2>Ações rápidas</h2><button class="x" onclick="fecharModal('modal-qa')">✕</button></div>
-    <div class="qa-item" onclick="fecharModal('modal-qa');abrirNovo()"><div class="qai" style="background:rgba(0,229,255,.14);color:var(--cyan)">👤</div><div class="qan">Criar lead</div></div>
-    <div class="qa-item" onclick="fecharModal('modal-qa');emBreve()"><div class="qai" style="background:rgba(34,197,94,.14);color:var(--ok)">✅</div><div class="qan">Nova atividade</div></div>
-    <div class="qa-item" onclick="fecharModal('modal-qa');irPara('roteiro');gerarRoteiro()"><div class="qai" style="background:rgba(123,97,255,.14);color:var(--st-prospect)">🗺️</div><div class="qan">Gerar roteiro IA</div></div>
-    <div class="qa-item" onclick="fecharModal('modal-qa');irPara('ai')"><div class="qai" style="background:rgba(139,92,246,.14);color:var(--ai-violet)">🤖</div><div class="qan">OneClick AI</div></div>
-    <div class="qa-item" onclick="fecharModal('modal-qa');emBreve()"><div class="qai" style="background:rgba(255,176,32,.14);color:var(--warn)">📥</div><div class="qan">Importar contatos</div></div>
+    <div class="sheet-head"><h2>Ações rápidas</h2><button class="x" type="button" aria-label="Fechar" onclick="fecharModal('modal-qa')"><i class="ico" data-lucide="x"></i></button></div>
+    <div class="qa-item" onclick="fecharModal('modal-qa');abrirNovo()"><div class="qai"><i class="ico" data-lucide="user-plus"></i></div><div class="qan">Criar lead</div></div>
+    <div class="qa-item" onclick="fecharModal('modal-qa');emBreve()"><div class="qai"><i class="ico" data-lucide="check"></i></div><div class="qan">Nova atividade</div></div>
+    <div class="qa-item" onclick="fecharModal('modal-qa');irPara('roteiro');gerarRoteiro()"><div class="qai"><i class="ico" data-lucide="map"></i></div><div class="qan">Gerar roteiro IA</div></div>
+    <div class="qa-item" onclick="fecharModal('modal-qa');irPara('ai')"><div class="qai"><i class="ico" data-lucide="bot"></i></div><div class="qan">OneClick AI</div></div>
+    <div class="qa-item" onclick="fecharModal('modal-qa');emBreve()"><div class="qai"><i class="ico" data-lucide="upload"></i></div><div class="qan">Importar contatos</div></div>
   </div>
 </div>
 
 <div class="modal hidden" id="modal-filtros">
   <div class="sheet">
     <div class="grip"></div>
-    <div class="sheet-head"><h2>Filtros</h2><button class="x" onclick="fecharModal('modal-filtros')">✕</button></div>
+    <div class="sheet-head"><h2>Filtros</h2><button class="x" type="button" aria-label="Fechar" onclick="fecharModal('modal-filtros')"><i class="ico" data-lucide="x"></i></button></div>
     <div class="fld"><label>Segmento</label><select id="f-seg-filtro"><option value="">Todos</option></select></div>
     <div class="fld"><label>Estado (UF)</label><select id="f-uf-filtro"><option value="">Todos</option><option>SP</option><option>MG</option></select></div>
     <div class="fld"><label>Possui</label><select id="f-canal-filtro"><option value="">Indiferente</option><option value="whatsapp">Com WhatsApp</option><option value="email">Com Email</option></select></div>
     <div class="fld"><label>Bandeira (postos)</label><select id="f-band-filtro"><option value="">Todas</option><option>Ipiranga</option><option>Shell</option><option>BR Petrobras</option><option>ALE</option><option>Bandeira Branca</option><option>ESSO</option></select></div>
     <div class="fld hidden" id="fld-rep-filtro"><label>Representante</label><select id="f-rep-filtro"><option value="">Todos</option></select></div>
-    <button class="btn-primary" onclick="aplicarFiltros()">Aplicar filtros</button>
-    <button class="btn-sec" style="width:100%;margin-top:10px" onclick="limparFiltros()">Limpar</button>
+    <button class="btn-primary" type="button" onclick="aplicarFiltros()">Aplicar filtros</button>
+    <button class="btn-sec" type="button" style="width:100%;margin-top:var(--s-2)" onclick="limparFiltros()">Limpar</button>
   </div>
 </div>
 
 <div class="modal hidden" id="modal-detalhe">
   <div class="sheet">
     <div class="grip"></div>
-    <div class="sheet-head"><h2>Detalhes do lead</h2><button class="x" onclick="fecharModal('modal-detalhe')">✕</button></div>
+    <div class="sheet-head"><h2>Detalhes do lead</h2><button class="x" type="button" aria-label="Fechar" onclick="fecharModal('modal-detalhe')"><i class="ico" data-lucide="x"></i></button></div>
     <div id="d-content"><div class="spinner"></div></div>
   </div>
 </div>
@@ -464,7 +574,7 @@ input,select,textarea{font-family:inherit}
 <div class="modal hidden" id="modal-novo">
   <div class="sheet">
     <div class="grip"></div>
-    <div class="sheet-head"><h2>Novo lead</h2><button class="x" onclick="fecharModal('modal-novo')">✕</button></div>
+    <div class="sheet-head"><h2>Novo lead</h2><button class="x" type="button" aria-label="Fechar" onclick="fecharModal('modal-novo')"><i class="ico" data-lucide="x"></i></button></div>
     <div class="fld"><label>Razão social *</label><input id="f-razao"></div>
     <div class="fld"><label>Nome fantasia</label><input id="f-fantasia"></div>
     <div class="fld"><label>CNPJ</label><input id="f-cnpj"></div>
@@ -478,35 +588,35 @@ input,select,textarea{font-family:inherit}
     <div class="fld"><label>Observações</label><textarea id="f-obs" rows="2"></textarea></div>
     <div class="fld"><label>Flags de produto</label>
       <div class="flag-opts">
-        <label class="flag-chip" id="chip-cota"><input type="checkbox" id="f-cotacao" onchange="document.getElementById('chip-cota').classList.toggle('on',this.checked)">💊 Usa CotaçãoNaMão</label>
-        <label class="flag-chip" id="chip-manip"><input type="checkbox" id="f-manip" onchange="document.getElementById('chip-manip').classList.toggle('on',this.checked)">🧪 Revende Manipulados</label>
+        <label class="flag-chip" id="chip-cota"><input type="checkbox" id="f-cotacao" onchange="document.getElementById('chip-cota').classList.toggle('on',this.checked)"><i class="ico i16" data-lucide="pill"></i>Usa CotaçãoNaMão</label>
+        <label class="flag-chip" id="chip-manip"><input type="checkbox" id="f-manip" onchange="document.getElementById('chip-manip').classList.toggle('on',this.checked)"><i class="ico i16" data-lucide="flask-conical"></i>Revende Manipulados</label>
       </div>
     </div>
-    <button class="btn-primary" id="btn-salvar" onclick="salvarLead()">💾 Salvar lead</button>
+    <button class="btn-primary" id="btn-salvar" type="button" onclick="salvarLead()">Salvar lead</button>
   </div>
 </div>
 
 <div class="modal hidden" id="modal-rep">
   <div class="sheet">
     <div class="grip"></div>
-    <div class="sheet-head"><h2 id="rep-titulo">Novo representante</h2><button class="x" onclick="fecharModal('modal-rep')">✕</button></div>
+    <div class="sheet-head"><h2 id="rep-titulo">Novo representante</h2><button class="x" type="button" aria-label="Fechar" onclick="fecharModal('modal-rep')"><i class="ico" data-lucide="x"></i></button></div>
     <input type="hidden" id="rep-id">
     <div class="fld"><label>Nome *</label><input id="rep-nome"></div>
     <div class="fld"><label>Email *</label><input id="rep-email" type="email"></div>
-    <div class="fld"><label>Senha <span id="rep-senha-hint" style="color:var(--txt3);font-weight:400"></span></label><input id="rep-senha" type="text" placeholder="defina uma senha"></div>
+    <div class="fld"><label>Senha <span id="rep-senha-hint" style="color:var(--txt-2);font-weight:400"></span></label><input id="rep-senha" type="text" placeholder="defina uma senha"></div>
     <div class="fld"><label>Papel</label><select id="rep-papel"><option value="representante">Representante</option><option value="admin">Admin</option></select></div>
     <div class="fld"><label>Status</label><select id="rep-ativo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
     <div class="fld"><label>Cidade (região de atuação)</label><input id="rep-cidade" placeholder="ex: Ribeirão Preto"></div>
     <div class="fld"><label>Estado (UF)</label><input id="rep-estado" maxlength="2" placeholder="ex: SP" style="text-transform:uppercase"></div>
-    <div class="fld"><label>Bairros atendidos</label><textarea id="rep-bairros" rows="2" placeholder="ex: Santo Amaro, Moema, Vila Mariana"></textarea><div style="color:var(--txt3);font-size:11px;margin-top:5px;line-height:1.4">Separe por vírgula. Deixe em branco para cobrir a cidade inteira.</div></div>
-    <button class="btn-primary" id="btn-rep" onclick="salvarRep()">💾 Salvar</button>
+    <div class="fld"><label>Bairros atendidos</label><textarea id="rep-bairros" rows="2" placeholder="ex: Santo Amaro, Moema, Vila Mariana"></textarea><div style="color:var(--txt-2);font-size:13px;line-height:18px;margin-top:var(--s-1)">Separe por vírgula. Deixe em branco para cobrir a cidade inteira.</div></div>
+    <button class="btn-primary" id="btn-rep" type="button" onclick="salvarRep()">Salvar</button>
   </div>
 </div>
 
 <div class="modal hidden" id="modal-sugestao">
   <div class="sheet">
     <div class="grip"></div>
-    <div class="sheet-head"><h2>🤖 Sugestão de abordagem</h2><button class="x" onclick="fecharModal('modal-sugestao')">✕</button></div>
+    <div class="sheet-head"><h2><i class="ico i20" data-lucide="bot"></i>Sugestão de abordagem</h2><button class="x" type="button" aria-label="Fechar" onclick="fecharModal('modal-sugestao')"><i class="ico" data-lucide="x"></i></button></div>
     <div id="sug-content"><div class="spinner"></div></div>
   </div>
 </div>
@@ -514,33 +624,34 @@ input,select,textarea{font-family:inherit}
 <div class="modal hidden" id="modal-checkout">
   <div class="sheet">
     <div class="grip"></div>
-    <div class="sheet-head"><h2>Check-out da visita</h2><button class="x" onclick="fecharModal('modal-checkout')">✕</button></div>
+    <div class="sheet-head"><h2>Check-out da visita</h2><button class="x" type="button" aria-label="Fechar" onclick="fecharModal('modal-checkout')"><i class="ico" data-lucide="x"></i></button></div>
     <div class="subdate" id="co-cliente" style="margin:-6px 0 14px"></div>
     <div class="fld"><label>Produto oferecido</label></div>
     <div class="checkout-opts">
-      <button class="co-opt" onclick="confirmarCheckout('cotacao')"><span class="ci">💊</span>Cotação de Medicamentos</button>
-      <button class="co-opt" onclick="confirmarCheckout('manipulados')"><span class="ci">🧪</span>Manipulados</button>
-      <button class="co-opt" onclick="confirmarCheckout('ambos')"><span class="ci">🤝</span>Ambos</button>
-      <button class="co-opt" onclick="confirmarCheckout('nenhum')"><span class="ci">🚫</span>Nenhum</button>
+      <button class="co-opt" type="button" onclick="confirmarCheckout('cotacao')"><span class="ci"><i class="ico i20" data-lucide="pill"></i></span>Cotação de Medicamentos</button>
+      <button class="co-opt" type="button" onclick="confirmarCheckout('manipulados')"><span class="ci"><i class="ico i20" data-lucide="flask-conical"></i></span>Manipulados</button>
+      <button class="co-opt" type="button" onclick="confirmarCheckout('ambos')"><span class="ci"><i class="ico i20" data-lucide="handshake"></i></span>Ambos</button>
+      <button class="co-opt" type="button" onclick="confirmarCheckout('nenhum')"><span class="ci"><i class="ico i20" data-lucide="ban"></i></span>Nenhum</button>
     </div>
   </div>
 </div>
 
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <script>
 const API_BASE='https://crm-api.oneclicksolucoes.com.br';
 // chave da IA fica no backend (/api/ia) — nunca no front
 let TOKEN=null; // JWT do backend
 
-const LOGO_SVG='<svg class="logo-mark" viewBox="0 0 48 48" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00F5D4"/><stop offset="1" stop-color="#2D8CFF"/></linearGradient></defs><path d="M24 3l16 6v11c0 10-6.8 18.4-16 22-9.2-3.6-16-12-16-22V9l16-6z" fill="none" stroke="url(#lg)" stroke-width="2.4"/><circle cx="24" cy="22" r="6" fill="none" stroke="#00E5FF" stroke-width="2.4"/><path d="M24 16v-3M24 31v3M30 22h3M15 22h3" stroke="#00E5FF" stroke-width="2.4" stroke-linecap="round"/></svg>';
-function robotSVG(){return '<svg class="robot" viewBox="0 0 120 120" fill="none"><defs><linearGradient id="rb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7B4DFF"/><stop offset="1" stop-color="#2D8CFF"/></linearGradient></defs><rect x="28" y="34" width="64" height="54" rx="18" fill="url(#rb)"/><rect x="34" y="42" width="52" height="38" rx="13" fill="#0B1733"/><circle cx="49" cy="61" r="7" fill="#00E5FF"/><circle cx="71" cy="61" r="7" fill="#00E5FF"/><circle cx="51" cy="59" r="2.2" fill="#fff"/><circle cx="73" cy="59" r="2.2" fill="#fff"/><path d="M52 73c3 3 13 3 16 0" stroke="#00F5D4" stroke-width="2.6" stroke-linecap="round"/><rect x="56" y="20" width="8" height="12" rx="4" fill="#7B4DFF"/><circle cx="60" cy="18" r="5" fill="#00F5D4"/><rect x="20" y="50" width="9" height="24" rx="4.5" fill="#5B6BFF"/><rect x="91" y="50" width="9" height="24" rx="4.5" fill="#5B6BFF"/></svg>';}
+const LOGO_SVG='<svg class="logo-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 3l16 6v11c0 10-6.8 18.4-16 22-9.2-3.6-16-12-16-22V9l16-6z" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="22" r="6" stroke="currentColor" stroke-width="2.4"/><path d="M24 16v-3M24 31v3M30 22h3M15 22h3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'; // cor via currentColor (.logo-mark = --accent-txt); gradiente saiu (DESIGN §9)
 
-const KPIS={total:48212,whatsapp:36871,email:42091,fechados:1287,tr_total:'24,5%',tr_wpp:'18,7%',tr_email:'31,2%',tr_fech:'22,1%'};
+const KPIS={total:48212,whatsapp:36871,email:42091,fechados:1287}; // tr_* (delta inventado) saiu — DESIGN §6 KPI
+// cor = NOME do token (resolvido em runtime por tok()) — escala de luminância, sem 2º matiz (DESIGN §9)
 const SEGMENTOS_MOCK=[
-  {nome:'Farmácia',total:28004,cor:'#3B82F6'},{nome:'Médico/Clínica',total:17161,cor:'#8B5CF6'},
-  {nome:'Posto de Gasolina',total:897,cor:'#22C55E'},{nome:'Hospital',total:801,cor:'#F59E0B'},
-  {nome:'Comércio/Varejo',total:361,cor:'#00BFFF'},{nome:'Mercado/Supermercado',total:360,cor:'#EF4444'},
-  {nome:'Indústria',total:203,cor:'#FB923C'},{nome:'Transporte/Logística',total:170,cor:'#4F6FFF'}];
-const FUNIL=[{f:'Prospecção',v:48212,c:'#7B61FF'},{f:'Contato feito',v:18320,c:'#00B8FF'},{f:'Negociação',v:8743,c:'#FFB020'},{f:'Proposta',v:4231,c:'#FF6B35'},{f:'Fechados',v:1287,c:'#22C55E'}];
+  {nome:'Farmácia',total:28004,cor:'pipe-2'},{nome:'Médico/Clínica',total:17161,cor:'pipe-3'},
+  {nome:'Posto de Gasolina',total:897,cor:'accent'},{nome:'Hospital',total:801,cor:'pipe-4'},
+  {nome:'Comércio/Varejo',total:361,cor:'pipe-1'},{nome:'Mercado/Supermercado',total:360,cor:'abr'},
+  {nome:'Indústria',total:203,cor:'txt-3'},{nome:'Transporte/Logística',total:170,cor:'line-2'}];
+const FUNIL=[{f:'Prospecção',v:48212,c:'var(--pipe-1)'},{f:'Contato feito',v:18320,c:'var(--pipe-2)'},{f:'Negociação',v:8743,c:'var(--pipe-3)'},{f:'Proposta',v:4231,c:'var(--pipe-4)'},{f:'Fechados',v:1287,c:'var(--pipe-won)'}];
 const LEADS_MOCK=[
   {id:1,razao_social:'1000 MARCAS SAFETY BRASIL LTDA',segmento:'Farmácia',cidade:'São Paulo',estado:'SP',pipeline:'Em Prospeccao',telefone:'(11) 94001-6826',whatsapp:'11940016826',email:'contato@1000marcas.com.br',cnpj:'12.345.678/0001-90',when:'Hoje 11:30'},
   {id:2,razao_social:'10FARMA DROGARIA LTDA',segmento:'Farmácia',cidade:'Santo André',estado:'SP',pipeline:'Em Prospeccao',telefone:'(11) 4002-1010',whatsapp:'1140021010',email:'10farmadrogaria@gmail.com',when:'Hoje 10:12'},
@@ -561,17 +672,21 @@ const ROTA_MOCK={resumo:{visitas:12,distancia:'87 km',tempo:'3h42',novos:4},visi
   {ordem:4,cliente:'Hospital Vila Mariana',cidade:'Vila Mariana',horario:'13:30',prioridade:'Alta',motivo:'Cotação manipulados',lat:-23.5890,lng:-46.6340},
   {ordem:5,cliente:'Farmácia Moema',cidade:'Moema',horario:'15:00',prioridade:'Média',motivo:'Novo contato',lat:-23.6010,lng:-46.6650}]};
 const ATIVIDADES_MOCK=[
-  {g:'HOJE',tipo:'Visita presencial',sub:'Farmácia São Paulo · 09:30',ic:'📍',cor:'#7B61FF',done:false},
-  {g:'HOJE',tipo:'Ligação',sub:'Hospital Santa Clara · 11:00',ic:'📞',cor:'#22C55E',done:false},
-  {g:'HOJE',tipo:'E-mail',sub:'Lab. Exames Clínicos · 14:00',ic:'✉️',cor:'#FFB020',done:true},
-  {g:'AMANHÃ',tipo:'WhatsApp',sub:'Drogaria Mais Saúde · 09:00',ic:'💬',cor:'#22C55E',done:false},
-  {g:'AMANHÃ',tipo:'Reunião online',sub:'Clínica Bem Estar · 15:00',ic:'🎥',cor:'#2D8CFF',done:false},
-  {g:'QUARTA',tipo:'Visita presencial',sub:'Posto Shell Select · 10:00',ic:'📍',cor:'#7B61FF',done:false}];
+  {g:'HOJE',tipo:'Visita presencial',sub:'Farmácia São Paulo · 09:30',ic:'map-pin',done:false},
+  {g:'HOJE',tipo:'Ligação',sub:'Hospital Santa Clara · 11:00',ic:'phone',done:false},
+  {g:'HOJE',tipo:'E-mail',sub:'Lab. Exames Clínicos · 14:00',ic:'mail',done:true},
+  {g:'AMANHÃ',tipo:'WhatsApp',sub:'Drogaria Mais Saúde · 09:00',ic:'message-circle',done:false},
+  {g:'AMANHÃ',tipo:'Reunião online',sub:'Clínica Bem Estar · 15:00',ic:'video',done:false},
+  {g:'QUARTA',tipo:'Visita presencial',sub:'Posto Shell Select · 10:00',ic:'map-pin',done:false}];
 
 let sessao=null,segmentosCache=[],clientesCache=[];
 let filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:'',responsavel_id:'',prioridade:''};
 let pagina=0;const LIMIT=50;
-let mapa=null,mapaLayer=null,dashRendered=false;
+let mapa=null,mapaLayer=null,mapaTiles=null,dashRendered=false;
+/* ===== tema + tokens em runtime ===== */
+function temaAtual(){return document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';}
+function alternarTema(){window.aplicarTema(temaAtual()==='dark'?'light':'dark',true);if(mapaTiles)mapaTiles.setUrl(tileUrl());}
+function tok(n){return getComputedStyle(document.documentElement).getPropertyValue('--'+n).trim();} // valor real do token (ApexCharts/Leaflet não leem var())
 
 function authHeaders(extra){const h=extra||{};if(TOKEN)h['Authorization']='Bearer '+TOKEN;return h;}
 function trata401(r){if(r.status===401){sessaoExpirada();throw new Error('401');}}
@@ -588,20 +703,23 @@ async function chamarIA(prompt,maxTokens){
   return d.texto||'';
 }
 
-const SEG_EMOJI={'Farmácia':'💊','Mercado/Supermercado':'🛒','Posto de Gasolina':'⛽','Médico/Clínica':'🩺','Hospital':'🏥','Odontologia':'🦷','Laboratório':'🔬','Restaurante/Lanchonete':'🍽️','Academia/Fitness':'🏋️','Comércio/Varejo':'🏪','Indústria':'🏭','Tecnologia/TI':'💻','Transporte/Logística':'🚚','Outros':'📦'};
-function segIcone(s){return (s&&s.icone)||SEG_EMOJI[(s&&s.nome)||s]||'🏢';}
-function segEmoji(n){if(n&&typeof n==='object')return segIcone(n);const m=segmentosCache.find(x=>x.nome===n);return (m&&m.icone)||SEG_EMOJI[n]||'🏢';}
-const PIPE_COR={'Em Prospeccao':'#7B61FF','Prospecção':'#7B61FF','Contato Feito':'#00B8FF','Negociacao':'#FFB020','Negociação':'#FFB020','Proposta':'#FF6B35','Fechado':'#22C55E','Fechados':'#22C55E','Perdido':'#EF4444'};
-function pipeCor(p){return PIPE_COR[p]||'#254A7D';}
-function pill(p){const c=pipeCor(p);return '<span class="pill" style="background:'+c+'22;color:'+c+'">'+(p||'—')+'</span>';}
+// kiss: nome SEG_EMOJI mantido (identificadores intactos no PR1); valores agora são nomes Lucide. `icone` vindo da API (emoji) é ignorado — DESIGN §9 item 7
+const SEG_EMOJI={'Farmácia':'briefcase-medical','Mercado/Supermercado':'shopping-cart','Posto de Gasolina':'fuel','Médico/Clínica':'stethoscope','Hospital':'hospital','Odontologia':'smile','Laboratório':'microscope','Restaurante/Lanchonete':'utensils','Academia/Fitness':'dumbbell','Comércio/Varejo':'store','Indústria':'factory','Tecnologia/TI':'monitor','Transporte/Logística':'truck','Outros':'package'};
+function segIcone(s){return '<i class="ico" data-lucide="'+(SEG_EMOJI[(s&&s.nome)||s]||'building-2')+'"></i>';}
+function segEmoji(n){if(n&&typeof n==='object')return segIcone(n);return segIcone(n);}
+// pipeline = escala de luminância de 1 matiz + 2 terminais (DESIGN §3.3); valores = nome do token
+const PIPE_COR={'Em Prospeccao':'pipe-1','Prospecção':'pipe-1','Contato Feito':'pipe-2','Negociacao':'pipe-3','Negociação':'pipe-3','Proposta':'pipe-4','Fechado':'pipe-won','Fechados':'pipe-won','Perdido':'pipe-lost'};
+function pipeCor(p){return 'var(--'+(PIPE_COR[p]||'line-2')+')';}
+const PIPE_LABEL={'Em Prospeccao':'Prospecção','Negociacao':'Negociação'}; // só exibição: valor enviado à API continua o cru
+function pill(p){return '<span class="pill" style="--pc:var(--'+(PIPE_COR[p]||'txt-3')+')">'+esc(PIPE_LABEL[p]||p||'—')+'</span>';}
 function esc(s){return (s==null?'':String(s)).replace(/[<>&"]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[m]));}
 function fmt(n){return (n||0).toLocaleString('pt-BR');}
 function flagsBadges(c){
   if(!c)return '';
   let h='';
-  if(c.usa_cotacaonamao)h+='<span class="pflag pf-cota">💊 CotaçãoNaMão</span>';
-  if(c.revende_manipulados)h+='<span class="pflag pf-manip">🧪 Manipulados</span>';
-  if(c.unicpharma_ativo_90d)h+='<span class="pflag pf-unic" title="Cliente com operação ativa nos últimos 90 dias">🔵 Já opera</span>';
+  if(c.usa_cotacaonamao)h+='<span class="pflag pf-cota"><i class="ico i14" data-lucide="pill"></i>CotaçãoNaMão</span>';
+  if(c.revende_manipulados)h+='<span class="pflag pf-manip"><i class="ico i14" data-lucide="flask-conical"></i>Manipulados</span>';
+  if(c.unicpharma_ativo_90d)h+='<span class="pflag pf-unic" title="Cliente com operação ativa nos últimos 90 dias"><i class="ico i14" data-lucide="activity"></i>Já opera</span>';
   return h?'<div class="pflags">'+h+'</div>':'';
 }
 function mdToHtml(md){
@@ -639,8 +757,6 @@ function entrarApp(){
   document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('logo-top').innerHTML=LOGO_SVG;
-  document.getElementById('robot-home').innerHTML=robotSVG();
-  document.getElementById('robot-ai').innerHTML=robotSVG();
   document.getElementById('home-nome').textContent=sessao.nome.split(' ')[0];
   document.getElementById('mais-nome').textContent=sessao.nome;
   document.getElementById('mais-mail').textContent=sessao.mail||'';
@@ -671,29 +787,29 @@ async function inicializar(){
   carregarLeadsRecentes();
 }
 function preencherSelects(){
-  document.getElementById('f-seg').innerHTML='<option value="">Selecione</option>'+segmentosCache.map(s=>'<option value="'+s.id+'">'+segEmoji(s.nome)+' '+esc(s.nome)+'</option>').join('');
-  document.getElementById('f-seg-filtro').innerHTML='<option value="">Todos</option>'+segmentosCache.map(s=>'<option value="'+s.id+'">'+segEmoji(s.nome)+' '+esc(s.nome)+'</option>').join('');
+  document.getElementById('f-seg').innerHTML='<option value="">Selecione</option>'+segmentosCache.map(s=>'<option value="'+s.id+'">'+esc(s.nome)+'</option>').join('');
+  document.getElementById('f-seg-filtro').innerHTML='<option value="">Todos</option>'+segmentosCache.map(s=>'<option value="'+s.id+'">'+esc(s.nome)+'</option>').join('');
 }
 
 function renderKPIs(m){
   const k=m||KPIS;
   document.getElementById('home-kpi').innerHTML=
-    kpiCard('c-cyan','👥',fmt(k.total),'Leads totais','↑ '+KPIS.tr_total)+
-    kpiCard('c-green','💬',fmt(k.whatsapp),'WhatsApp','↑ '+KPIS.tr_wpp)+
-    kpiCard('c-purple','✉️',fmt(k.email),'E-mails','↑ '+KPIS.tr_email)+
-    kpiCard('c-amber','✅',fmt(k.fechados!=null?k.fechados:KPIS.fechados),'Fechados','↑ '+KPIS.tr_fech);
+    kpiCard(fmt(k.total),'Leads totais')+
+    kpiCard(fmt(k.whatsapp),'WhatsApp')+
+    kpiCard(fmt(k.email),'E-mails')+
+    kpiCard(fmt(k.fechados!=null?k.fechados:KPIS.fechados),'Fechados');
 }
-function kpiCard(cls,ic,v,l,tr){return '<div class="kpi '+cls+'"><div class="ic '+cls+'">'+ic+'</div><div class="v">'+v+'</div><div class="l">'+l+'</div><div class="tr up">'+tr+'</div></div>';}
+function kpiCard(v,l){return '<div class="kpi"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';} // sem ícone colorido nem delta (DESIGN §6)
 let visitasHomeCache=[];
 function renderVisitas(arr){
   visitasHomeCache=arr.slice(0,3);
   if(!visitasHomeCache.length){
-    document.getElementById('home-visitas').innerHTML='<div style="text-align:center;color:var(--txt3);font-size:13px;padding:18px 0">Nenhuma visita agendada para hoje</div>';
+    document.getElementById('home-visitas').innerHTML='<div class="empty">Nenhuma visita agendada para hoje</div>';
     return;
   }
   document.getElementById('home-visitas').innerHTML=visitasHomeCache.map((v,i)=>
     '<div class="visit-row"><div class="vi">'+segEmoji(v.segmento)+'</div><div class="vt"><div class="vn">'+esc(v.razao_social)+'</div><div class="vs">'+esc(v.segmento)+' · '+esc(v.cidade)+'</div></div><div class="vr"><div class="h">'+esc(v.horario)+'</div></div>'+
-    '<button class="qa" style="color:var(--ok);border-color:rgba(34,197,94,.4)" title="Check-out da visita" onclick="event.stopPropagation();abrirCheckoutHome('+i+')">✅</button></div>').join('');
+    '<button class="qa" type="button" title="Check-out da visita" aria-label="Check-out da visita" onclick="event.stopPropagation();abrirCheckoutHome('+i+')"><i class="ico" data-lucide="check"></i></button></div>').join('');
 }
 function abrirCheckoutHome(i){const v=visitasHomeCache[i];if(!v)return;abrirCheckout(v.id,v.razao_social,v.mock);}
 async function carregarVisitasHoje(){
@@ -722,16 +838,16 @@ async function carregarLeadsRecentes(){
   document.getElementById('home-leads').innerHTML=arr.slice(0,6).map(leadCard).join('');
 }
 function leadCard(c){
-  const seg=c.segmento||c.segmento_nome||'';const cor=pipeCor(c.pipeline);
+  const seg=c.segmento||c.segmento_nome||'';
   const wpp=(c.whatsapp||c.telefone||'').replace(/\D/g,'');const tel=(c.telefone||'').replace(/\D/g,'');
-  return '<div class="lead-card" style="border-left-color:'+cor+'">'+
+  return '<div class="lead-card">'+
     '<div class="lc-top" onclick="verCliente('+c.id+')"><div class="lc-av">'+segEmoji(seg)+'</div>'+
     '<div class="lc-info"><div class="lc-name">'+esc(c.razao_social||c.nome_fantasia||'Sem nome')+'</div>'+
     '<div class="lc-meta">'+esc(seg||'—')+(c.cidade?' · '+esc(c.cidade):'')+(c.estado?'/'+esc(c.estado):'')+'</div>'+flagsBadges(c)+'</div>'+pill(c.pipeline)+'</div>'+
     '<div class="lc-actions">'+
-    (wpp?'<button class="qa wpp" onclick="event.stopPropagation();window.open(\'https://wa.me/55'+wpp+'\')">💬</button>':'')+
-    (tel?'<button class="qa call" onclick="event.stopPropagation();window.open(\'tel:'+tel+'\')">📞</button>':'')+
-    (c.email?'<button class="qa mail" onclick="event.stopPropagation();window.open(\'mailto:'+esc(c.email)+'\')">✉️</button>':'')+
+    (wpp?'<button class="qa wpp" type="button" aria-label="WhatsApp" title="WhatsApp" onclick="event.stopPropagation();window.open(\'https://wa.me/55'+wpp+'\')"><i class="ico" data-lucide="message-circle"></i></button>':'')+
+    (tel?'<button class="qa call" type="button" aria-label="Ligar" title="Ligar" onclick="event.stopPropagation();window.open(\'tel:'+tel+'\')"><i class="ico" data-lucide="phone"></i></button>':'')+
+    (c.email?'<button class="qa mail" type="button" aria-label="E-mail" title="E-mail" onclick="event.stopPropagation();window.open(\'mailto:'+esc(c.email)+'\')"><i class="ico" data-lucide="mail"></i></button>':'')+
     '<span class="when">'+esc(c.when||'')+'</span></div></div>';
 }
 
@@ -743,7 +859,7 @@ function tabLead(el,pipe){document.querySelectorAll('#lead-tabs .tab').forEach(t
 
 // Chips P1/P2/P3 da campanha Portal StockFarma — aparecem para admin e para quem tem
 // clientes da campanha na carteira (prefixo [PORTAL STOCKFARMA ...] em observacoes).
-const PRIO_CHIPS=[['','Todos'],['P0','🔥 P0 · Migrar urgente'],['P1','P1 · Alvo quente'],['P2','P2 · Reativar'],['P3','P3 · Só cartão'],['CARTAO','💳 Novo · Cartão']];
+const PRIO_CHIPS=[['','Todos'],['P0','<i class="ico i16" data-lucide="flame"></i>P0 · Migrar urgente'],['P1','P1 · Alvo quente'],['P2','P2 · Reativar'],['P3','P3 · Só cartão'],['CARTAO','<i class="ico i16" data-lucide="credit-card"></i>Novo · Cartão']];
 function renderPrioChips(){
   document.getElementById('prio-chips').innerHTML=PRIO_CHIPS.map((t,i)=>'<button class="tab'+(i===0?' active':'')+'" onclick="tabPrio(this,\''+t[0]+'\')">'+t[1]+'</button>').join('');
 }
@@ -827,42 +943,42 @@ function verCliente(id){
 function renderDetalhe(c){
   const seg=c.segmento||c.segmento_nome||'';
   const wpp=(c.whatsapp||c.telefone||'').replace(/\D/g,'');const tel=(c.telefone||'').replace(/\D/g,'');
-  const opc=segmentosCache.map(s=>'<option value="'+s.id+'" '+(c.segmento_id===s.id?'selected':'')+'>'+segEmoji(s.nome)+' '+esc(s.nome)+'</option>').join('');
+  const opc=segmentosCache.map(s=>'<option value="'+s.id+'" '+(c.segmento_id===s.id?'selected':'')+'>'+esc(s.nome)+'</option>').join('');
   document.getElementById('d-content').innerHTML=
     '<div class="dt-card"><div class="dt-head"><div class="dt-av">'+segEmoji(seg)+'</div><div style="flex:1;min-width:0"><div class="dt-name">'+esc(c.razao_social||c.nome_fantasia||'Sem nome')+'</div><div style="margin:7px 0">'+pill(c.pipeline)+'</div><div class="dt-seg">'+esc(seg||'—')+(c.cidade?' · '+esc(c.cidade):'')+(c.estado?'/'+esc(c.estado):'')+'</div>'+flagsBadges(c)+'</div></div></div>'+
     '<div class="dt-actions">'+
-    '<button class="dt-act wpp" '+(wpp?'':'disabled style=opacity:.4')+' onclick="window.open(\'https://wa.me/55'+wpp+'\')"><span class="ai">💬</span>WhatsApp</button>'+
-    '<button class="dt-act call" '+(tel?'':'disabled style=opacity:.4')+' onclick="window.open(\'tel:'+tel+'\')"><span class="ai">📞</span>Ligar</button>'+
-    '<button class="dt-act mail" '+(c.email?'':'disabled style=opacity:.4')+' onclick="window.open(\'mailto:'+esc(c.email||'')+'\')"><span class="ai">✉️</span>E-mail</button>'+
-    '<button class="dt-act" onclick="emBreve()"><span class="ai">⋯</span>Mais</button></div></div>'+
+    '<button class="dt-act wpp" type="button" '+(wpp?'':'disabled')+' onclick="window.open(\'https://wa.me/55'+wpp+'\')"><span class="ai"><i class="ico i20" data-lucide="message-circle"></i></span>WhatsApp</button>'+
+    '<button class="dt-act call" type="button" '+(tel?'':'disabled')+' onclick="window.open(\'tel:'+tel+'\')"><span class="ai"><i class="ico i20" data-lucide="phone"></i></span>Ligar</button>'+
+    '<button class="dt-act mail" type="button" '+(c.email?'':'disabled')+' onclick="window.open(\'mailto:'+esc(c.email||'')+'\')"><span class="ai"><i class="ico i20" data-lucide="mail"></i></span>E-mail</button>'+
+    '<button class="dt-act" type="button" onclick="emBreve()"><span class="ai"><i class="ico i20" data-lucide="ellipsis"></i></span>Mais</button></div>'+
     '<div class="dt-tabs"><button class="dt-tab active" onclick="dtTab(this,\'info\')">Informações</button><button class="dt-tab" onclick="dtTab(this,\'tl\')">Timeline</button><button class="dt-tab" onclick="dtTab(this,\'ativ\')">Atividades</button></div>'+
     '<div id="dt-info"><div class="dt-card" style="margin-bottom:0">'+
-      '<div class="info-row"><span class="k">CNPJ</span><span class="v">'+esc(c.cnpj||'—')+'</span></div>'+
-      '<div class="info-row"><span class="k">Telefone</span><span class="v">'+esc(c.telefone||'—')+'</span></div>'+
+      '<div class="info-row"><span class="k">CNPJ</span><span class="v mono">'+esc(c.cnpj||'—')+'</span></div>'+
+      '<div class="info-row"><span class="k">Telefone</span><span class="v mono">'+esc(c.telefone||'—')+'</span></div>'+
       '<div class="info-row"><span class="k">E-mail</span><span class="v">'+esc(c.email||'—')+'</span></div>'+
       '<div class="info-row"><span class="k">Cidade / UF</span><span class="v">'+esc(c.cidade||'—')+(c.estado?' / '+esc(c.estado):'')+'</span></div>'+
       (c.bandeira?'<div class="info-row"><span class="k">Bandeira</span><span class="v">'+esc(c.bandeira)+'</span></div>':'')+
       '<div class="info-row"><span class="k">Segmento</span><span class="v">'+esc(seg||'—')+'</span></div>'+
       '<div class="info-row"><span class="k">Origem</span><span class="v">'+esc(c.fonte_lead||'Indicação')+'</span></div>'+
       '<div class="info-row"><span class="k">Responsável</span><span class="v">'+esc(c.responsavel||sessao.nome)+'</span></div>'+
-      (c.observacoes?'<div class="info-row" style="flex-direction:column;align-items:flex-start;gap:4px"><span class="k">📋 Observações</span><span class="v" style="text-align:left;white-space:pre-wrap;word-break:break-word;font-weight:500;line-height:1.5">'+esc(c.observacoes)+'</span></div>':'')+'</div>'+
+      (c.observacoes?'<div class="info-row" style="flex-direction:column;align-items:flex-start;gap:4px"><span class="k">Observações</span><span class="v" style="text-align:left;white-space:pre-wrap;word-break:break-word">'+esc(c.observacoes)+'</span></div>':'')+'</div>'+
       '<div class="edit-seg-box"><label>Alterar segmento</label><div class="row"><select id="d-seg">'+opc+'</select><button class="btn-sec" onclick="salvarSegmento('+c.id+')">Salvar</button></div></div>'+
       '<div class="edit-seg-box"><label>Flags de produto</label><div class="flag-opts">'+
-        '<label class="flag-chip'+(c.usa_cotacaonamao?' on':'')+'"><input type="checkbox" id="d-cota" '+(c.usa_cotacaonamao?'checked':'')+' onchange="this.parentElement.classList.toggle(\'on\',this.checked);salvarFlags('+c.id+')">💊 CotaçãoNaMão</label>'+
-        '<label class="flag-chip'+(c.revende_manipulados?' on':'')+'"><input type="checkbox" id="d-manip" '+(c.revende_manipulados?'checked':'')+' onchange="this.parentElement.classList.toggle(\'on\',this.checked);salvarFlags('+c.id+')">🧪 Manipulados</label>'+
+        '<label class="flag-chip'+(c.usa_cotacaonamao?' on':'')+'"><input type="checkbox" id="d-cota" '+(c.usa_cotacaonamao?'checked':'')+' onchange="this.parentElement.classList.toggle(\'on\',this.checked);salvarFlags('+c.id+')"><i class="ico i16" data-lucide="pill"></i>CotaçãoNaMão</label>'+
+        '<label class="flag-chip'+(c.revende_manipulados?' on':'')+'"><input type="checkbox" id="d-manip" '+(c.revende_manipulados?'checked':'')+' onchange="this.parentElement.classList.toggle(\'on\',this.checked);salvarFlags('+c.id+')"><i class="ico i16" data-lucide="flask-conical"></i>Manipulados</label>'+
       '</div></div>'+
-      '<div class="edit-seg-box"><label>📞 Registrar ligação</label>'+
+      '<div class="edit-seg-box"><label>Registrar ligação</label>'+
         '<div class="fld" style="margin-bottom:8px"><select id="d-lig-res"><option value="">Resultado da ligação...</option><option>Falou — vai usar o portal</option><option>Falou — ficou de pensar</option><option>Falou — sem interesse</option><option>Não atendeu</option><option>Caixa postal</option><option>Telefone errado</option></select></div>'+
         '<div class="fld" style="margin-bottom:8px"><textarea id="d-lig-obs" rows="2" placeholder="Anotação (opcional): com quem falou, quando retornar..."></textarea></div>'+
-        '<button class="btn-primary" style="width:100%" onclick="salvarLigacao('+c.id+')">💾 Salvar ligação</button></div></div>'+
+        '<button class="btn-primary" type="button" style="width:100%" onclick="salvarLigacao('+c.id+')">Salvar ligação</button></div></div>'+
     '<div id="dt-tl" class="hidden">'+
       '<div class="tl-item"><div class="tl-dot"></div><div><div class="tl-txt">Lead criado</div><div class="tl-time">Hoje 11:30 · por '+esc(sessao.nome)+'</div></div></div>'+
-      '<div class="tl-item"><div class="tl-dot" style="background:#22C55E"></div><div><div class="tl-txt">Mensagem enviada no WhatsApp</div><div class="tl-time">Hoje 11:45</div></div></div>'+
-      '<div class="tl-item"><div class="tl-dot" style="background:#7B61FF"></div><div><div class="tl-txt">E-mail aberto</div><div class="tl-time">Ontem 10:45</div></div></div>'+
-      '<div class="tl-item"><div class="tl-dot" style="background:#FF6B35"></div><div><div class="tl-txt">Proposta enviada</div><div class="tl-time">Ontem 16:20</div></div></div></div>'+
+      '<div class="tl-item"><div class="tl-dot on"></div><div><div class="tl-txt">Mensagem enviada no WhatsApp</div><div class="tl-time">Hoje 11:45</div></div></div>'+
+      '<div class="tl-item"><div class="tl-dot"></div><div><div class="tl-txt">E-mail aberto</div><div class="tl-time">Ontem 10:45</div></div></div>'+
+      '<div class="tl-item"><div class="tl-dot on"></div><div><div class="tl-txt">Proposta enviada</div><div class="tl-time">Ontem 16:20</div></div></div></div>'+
     '<div id="dt-ativ" class="hidden"><div class="spinner"></div></div>'+
-    '<button class="btn-analyze" onclick="analisarIA('+c.id+')">✨ Analisar com IA</button>'+
-    '<button class="btn-analyze" style="background:var(--grad-primary);color:#02111F;box-shadow:var(--glow-cyan);margin-top:9px" onclick="sugerirProduto('+c.id+')">🤖 Sugerir abordagem de produto</button>'+
+    '<button class="btn-analyze" type="button" onclick="analisarIA('+c.id+')"><i class="ico" data-lucide="sparkles"></i>Analisar com IA</button>'+
+    '<button class="btn-analyze" type="button" onclick="sugerirProduto('+c.id+')"><i class="ico" data-lucide="bot"></i>Sugerir abordagem de produto</button>'+
     '<div id="ia-result" style="margin-top:12px"></div>';
   carregarInteracoes(c.id);
 }
@@ -873,7 +989,7 @@ async function salvarLigacao(id){
   const desc=document.getElementById('d-lig-obs').value.trim();
   try{
     await apiPost('/api/clientes/'+id+'/interacoes',{tipo:'Ligação',resultado:res,descricao:desc||res,responsavel:sessao.nome,proximo_passo:null});
-    toast('Ligação registrada ✓','ok');
+    toast('Ligação registrada','ok');
     document.getElementById('d-lig-res').value='';document.getElementById('d-lig-obs').value='';
     await carregarInteracoes(id);
     const tabAtiv=document.querySelectorAll('.dt-tab')[2];if(tabAtiv)dtTab(tabAtiv,'ativ');
@@ -883,7 +999,7 @@ async function carregarInteracoes(id){
   const box=document.getElementById('dt-ativ');if(!box)return;
   try{
     const arr=await apiGet('/api/clientes/'+id+'/interacoes');
-    box.innerHTML=(arr&&arr.length)?arr.map(i=>'<div class="tl-item"><div class="tl-dot" style="background:#00E5FF"></div><div><div class="tl-txt">'+esc(i.tipo||'Interação')+(i.resultado?' — '+esc(i.resultado):'')+'</div>'+(i.descricao&&i.descricao!==i.resultado?'<div class="tl-txt" style="opacity:.85;font-weight:400">'+esc(i.descricao)+'</div>':'')+'<div class="tl-time">'+fmtDataHora(i.data_interacao)+(i.responsavel?' · '+esc(i.responsavel):'')+'</div></div></div>').join(''):'<div class="empty">Nenhuma ligação registrada ainda. Use o 📞 Registrar ligação na aba Informações.</div>';
+    box.innerHTML=(arr&&arr.length)?arr.map(i=>'<div class="tl-item"><div class="tl-dot on"></div><div><div class="tl-txt">'+esc(i.tipo||'Interação')+(i.resultado?' — '+esc(i.resultado):'')+'</div>'+(i.descricao&&i.descricao!==i.resultado?'<div class="tl-txt" style="opacity:.85;font-weight:400">'+esc(i.descricao)+'</div>':'')+'<div class="tl-time">'+fmtDataHora(i.data_interacao)+(i.responsavel?' · '+esc(i.responsavel):'')+'</div></div></div>').join(''):'<div class="empty">Nenhuma ligação registrada ainda. Use Registrar ligação na aba Informações.</div>';
   }catch(e){box.innerHTML='<div class="empty">Não foi possível carregar as atividades.</div>';}
 }
 function fmtDataHora(d){try{return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return '';}}
@@ -900,7 +1016,7 @@ async function analisarIA(id){
   const box=document.getElementById('ia-result');box.innerHTML='<div class="ai-feed"><span class="spinner-sm"></span> Analisando...</div>';
   const prompt='Você é consultor comercial da OneClick Soluções (TI enterprise), oferecendo também CotaçãoNaMão e uma linha de Manipulados (vitaminas, suplementos, dermatocosméticos). Cliente: '+(c.razao_social||'')+' | Segmento: '+(c.segmento||'')+' | Cidade: '+(c.cidade||'')+'/'+(c.estado||'')+' | Pipeline: '+(c.pipeline||'')+'. Em até 4 frases, sugira a abordagem comercial: qual produto oferecer e como abrir a conversa. Português, direto, sem saudação.';
   try{const t=await chamarIA(prompt,400);box.innerHTML='<div class="ai-feed">'+esc(t)+'</div>';}
-  catch(e){box.innerHTML='<div class="ai-feed" style="color:var(--warn)">⚠ '+esc(e.message)+'</div>';}
+  catch(e){box.innerHTML='<div class="ai-feed" style="color:var(--warn)"><i class="ico i16" data-lucide="triangle-alert"></i> '+esc(e.message)+'</div>';}
 }
 
 function abrirNovo(){document.getElementById('modal-novo').classList.remove('hidden');}
@@ -913,7 +1029,7 @@ async function salvarLead(){
     await apiPost('/api/clientes',{razao_social:razao,nome_fantasia:val('f-fantasia'),cnpj:val('f-cnpj'),segmento_id:segId,telefone:val('f-tel'),whatsapp:val('f-wpp'),email:val('f-email'),cidade:val('f-cidade'),estado:val('f-estado-form'),pipeline:document.getElementById('f-pipe').value||'Em Prospeccao',fonte_lead:'Manual',responsavel:sessao.nome,status:'Prospect',observacoes:val('f-obs'),usa_cotacaonamao:document.getElementById('f-cotacao').checked,revende_manipulados:document.getElementById('f-manip').checked});
     toast('Lead salvo com sucesso','ok');fecharModal('modal-novo');limparForm();carregarLeadsRecentes();if(clientesCache.length)buscarClientes(0);
   }catch(e){toast('Preview: lead não salvo (API offline)','err');fecharModal('modal-novo');limparForm();}
-  finally{btn.innerHTML='💾 Salvar lead';btn.disabled=false;}
+  finally{btn.innerHTML='Salvar lead';btn.disabled=false;}
 }
 function val(id){return document.getElementById(id).value||null;}
 function limparForm(){['f-razao','f-fantasia','f-cnpj','f-tel','f-wpp','f-email','f-cidade','f-estado-form','f-obs'].forEach(i=>{const e=document.getElementById(i);if(e)e.value='';});document.getElementById('f-seg').value='';
@@ -935,13 +1051,14 @@ async function sugerirProduto(clienteId){
   try{
     const r=await apiPost('/api/ia',{modo:'sugestao_produto',cliente_id:clienteId});
     box.innerHTML='<div class="ai-feed md-txt" style="white-space:normal">'+mdToHtml(r.texto||'Sem sugestão disponível.')+'</div>';
-  }catch(e){box.innerHTML='<div class="ai-feed" style="color:var(--warn)">⚠ Não foi possível gerar a sugestão. '+esc(e.message)+'</div>';}
+  }catch(e){box.innerHTML='<div class="ai-feed" style="color:var(--warn)"><i class="ico i16" data-lucide="triangle-alert"></i> Não foi possível gerar a sugestão. '+esc(e.message)+'</div>';}
 }
 
+function tileUrl(){return 'https://{s}.basemaps.cartocdn.com/'+(temaAtual()==='light'?'light_all':'dark_all')+'/{z}/{x}/{y}{r}.png?key=cb1_2i3l_1_6fc3ca6c861a0d35c441e7fa';} // tile acompanha o tema
 function initMapa(){
   if(mapa)return;
   mapa=L.map('mapa',{zoomControl:false,attributionControl:false}).setView([-23.56,-46.64],11);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2i3l_1_6fc3ca6c861a0d35c441e7fa',{subdomains:'abcd',maxZoom:20}).addTo(mapa);
+  mapaTiles=L.tileLayer(tileUrl(),{subdomains:'abcd',maxZoom:20}).addTo(mapa);
   setTimeout(()=>mapa.invalidateSize(),250);
 }
 let rotaVisitasAtual=[],proximaVisitaAtual=null;
@@ -960,7 +1077,7 @@ async function gerarRoteiro(){
     const txt=await chamarIA(prompt,1300);const j=JSON.parse(txt.replace(/```json|```/g,'').trim());
     renderRoteiro(j.visitas||[],j.resumo,carteira);
   }catch(e){renderRoteiro(ROTA_MOCK.visitas,ROTA_MOCK.resumo,[]);toast('IA indisponível — preview exibido','err');}
-  finally{btn.innerHTML='✨ Gerar roteiro';btn.disabled=false;}
+  finally{btn.innerHTML='<i class="ico i16" data-lucide="sparkles"></i>Gerar roteiro';btn.disabled=false;}
 }
 function renderRoteiro(visitas,resumo,carteira){
   initMapa();
@@ -978,27 +1095,27 @@ function renderRoteiro(visitas,resumo,carteira){
   }
   const pts=[];
   visitas.forEach(v=>{if(v.lat&&v.lng){
-    const mk=L.circleMarker([v.lat,v.lng],{radius:11,color:'#00E5FF',fillColor:'#7B4DFF',fillOpacity:.95,weight:2}).addTo(mapaLayer);
+    const mk=L.circleMarker([v.lat,v.lng],{radius:10,color:tok('accent'),fillColor:tok('bg-1'),fillOpacity:1,weight:2}).addTo(mapaLayer);
     const cli=achaCliente(v);
     mk.bindPopup('<b>'+v.ordem+'. '+esc(v.cliente)+'</b><br>'+esc(v.cidade||'')+' · '+esc(v.horario||'')+(cli?flagsBadges(cli):''));
     pts.push([v.lat,v.lng]);}});
-  if(pts.length){L.polyline(pts,{color:'#00F5D4',weight:3,opacity:.75}).addTo(mapaLayer);mapa.fitBounds(pts,{padding:[40,40]});}
+  if(pts.length){L.polyline(pts,{color:tok('accent'),weight:2,opacity:.8}).addTo(mapaLayer);mapa.fitBounds(pts,{padding:[40,40]});}
   const n=visitas[0];
   proximaVisitaAtual=n||null;
   const nCli=n?achaCliente(n):null;
-  document.getElementById('next-visit').innerHTML=n?'<div class="next-visit"><div class="nv-h">📍 Próxima visita</div><div class="nv-body"><div class="nv-av">🏢</div><div style="flex:1"><div class="nv-name">'+esc(n.cliente)+'</div><div class="nv-sub">'+esc(n.cidade||'')+' · '+esc(n.horario||'')+'</div>'+(nCli?flagsBadges(nCli):'')+'</div></div>'+
-    '<div style="display:flex;gap:9px;margin-top:14px">'+
-    '<button class="btn-nav" style="margin-top:0;flex:1" onclick="window.open(\'https://www.google.com/maps/dir/?api=1&destination='+(n.lat||'')+','+(n.lng||'')+'\')">🧭 Navegar</button>'+
-    (nCli?'<button class="btn-nav" style="margin-top:0;flex:0 0 auto;background:var(--grad-ai);color:#fff;box-shadow:var(--glow-ai);padding:13px 16px" title="Sugerir abordagem" onclick="sugerirProduto('+nCli.id+')">🤖</button>':'')+
-    '<button class="btn-nav" style="margin-top:0;flex:0 0 auto;background:var(--bg-card);color:var(--ok);box-shadow:none;border:1px solid rgba(34,197,94,.4);padding:13px 16px" title="Check-out da visita" onclick="abrirCheckout(proximaVisitaAtual&&proximaVisitaAtual.id,proximaVisitaAtual&&proximaVisitaAtual.cliente)">✅</button>'+
+  document.getElementById('next-visit').innerHTML=n?'<div class="next-visit"><div class="nv-h"><i class="ico i16" data-lucide="map-pin"></i>Próxima visita</div><div class="nv-body"><div class="nv-av"><i class="ico" data-lucide="building-2"></i></div><div style="flex:1;min-width:0"><div class="nv-name">'+esc(n.cliente)+'</div><div class="nv-sub">'+esc(n.cidade||'')+' · '+esc(n.horario||'')+'</div>'+(nCli?flagsBadges(nCli):'')+'</div></div>'+
+    '<div class="nv-actions">'+
+    '<button class="btn-nav" type="button" onclick="window.open(\'https://www.google.com/maps/dir/?api=1&destination='+(n.lat||'')+','+(n.lng||'')+'\')"><i class="ico" data-lucide="navigation"></i>Navegar</button>'+
+    (nCli?'<button class="btn-sec btn-ic" type="button" title="Sugerir abordagem" aria-label="Sugerir abordagem" onclick="sugerirProduto('+nCli.id+')"><i class="ico" data-lucide="bot"></i></button>':'')+
+    '<button class="btn-sec btn-ic" type="button" title="Check-out da visita" aria-label="Check-out da visita" onclick="abrirCheckout(proximaVisitaAtual&&proximaVisitaAtual.id,proximaVisitaAtual&&proximaVisitaAtual.cliente)"><i class="ico" data-lucide="check"></i></button>'+
     '</div></div>':'';
   document.getElementById('rota-lista').innerHTML=visitas.map((v,idx)=>{
     const cli=achaCliente(v);
-    return '<div class="rota-item"><div class="rota-ord">'+(v.ordem||'•')+'</div><div style="flex:1"><div style="font-weight:700;font-size:14px">'+esc(v.cliente||'')+'</div><div style="color:var(--txt3);font-size:12px;margin:2px 0 4px">'+esc(v.cidade||'')+' · <span style="color:var(--cyan);font-weight:700">'+esc(v.horario||'')+'</span> · '+esc(v.prioridade||'')+'</div><div style="font-size:12px;color:var(--txt2)">'+esc(v.motivo||'')+'</div>'+
+    return '<div class="rota-item"><div class="rota-ord">'+(v.ordem||'•')+'</div><div style="flex:1;min-width:0"><div class="rota-nm">'+esc(v.cliente||'')+'</div><div class="rota-meta">'+esc(v.cidade||'')+' · <span class="h">'+esc(v.horario||'')+'</span> · '+esc(v.prioridade||'')+'</div><div class="rota-mot">'+esc(v.motivo||'')+'</div>'+
       (cli?flagsBadges(cli):'')+
-      '<div style="display:flex;gap:8px;margin-top:9px;flex-wrap:wrap">'+
-      (cli?'<button class="btn-sec" style="padding:8px 12px;font-size:12px" onclick="sugerirProduto('+cli.id+')">🤖 Sugerir abordagem</button>':'')+
-      '<button class="btn-sec" style="padding:8px 12px;font-size:12px" onclick="abrirCheckout(rotaVisitasAtual['+idx+'].id, rotaVisitasAtual['+idx+'].cliente)">✅ Check-out</button>'+
+      '<div class="rota-acts">'+
+      (cli?'<button class="btn-sec btn-sm" type="button" onclick="sugerirProduto('+cli.id+')"><i class="ico i16" data-lucide="bot"></i>Sugerir abordagem</button>':'')+
+      '<button class="btn-sec btn-sm" type="button" onclick="abrirCheckout(rotaVisitasAtual['+idx+'].id, rotaVisitasAtual['+idx+'].cliente)"><i class="ico i16" data-lucide="check"></i>Check-out</button>'+
       '</div></div></div>';
   }).join('');
 }
@@ -1006,20 +1123,20 @@ function renderRoteiro(visitas,resumo,carteira){
 async function renderDashboard(){
   dashRendered=true;
   new ApexCharts(document.getElementById('chart-conv'),{
-    chart:{type:'area',height:150,background:'transparent',toolbar:{show:false}},theme:{mode:'dark'},
-    series:[{name:'Conversão',data:[2.1,2.4,2.3,2.7,2.9,3.12]}],colors:['#00E5FF'],stroke:{curve:'smooth',width:3},
-    fill:{type:'gradient',gradient:{shadeIntensity:1,opacityFrom:.4,opacityTo:0}},
-    xaxis:{categories:['Jan','Fev','Mar','Abr','Mai','Jun'],labels:{style:{colors:'#6F7FA3'}},axisBorder:{show:false},axisTicks:{show:false}},
-    yaxis:{show:false},dataLabels:{enabled:false},grid:{borderColor:'#254A7D22'}
+    chart:{type:'area',height:150,background:'transparent',toolbar:{show:false}},theme:{mode:temaAtual()},
+    series:[{name:'Conversão',data:[2.1,2.4,2.3,2.7,2.9,3.12]}],colors:[tok('accent')],stroke:{curve:'smooth',width:2},
+    fill:{type:'solid',opacity:.12},
+    xaxis:{categories:['Jan','Fev','Mar','Abr','Mai','Jun'],labels:{style:{colors:tok('txt-3')}},axisBorder:{show:false},axisTicks:{show:false}},
+    yaxis:{show:false},dataLabels:{enabled:false},grid:{borderColor:tok('line')}
   }).render();
   let segs=SEGMENTOS_MOCK;
-  try{const r=await apiGet('/api/clientes/por-segmento');const a=(r.segmentos||r||[]).filter(s=>s.total>0);if(a.length)segs=a.map(s=>({nome:s.nome,total:s.total,cor:(SEGMENTOS_MOCK.find(m=>m.nome===s.nome)||{}).cor||'#00E5FF'}));}catch(e){}
+  try{const r=await apiGet('/api/clientes/por-segmento');const a=(r.segmentos||r||[]).filter(s=>s.total>0);if(a.length)segs=a.map(s=>({nome:s.nome,total:s.total,cor:(SEGMENTOS_MOCK.find(m=>m.nome===s.nome)||{}).cor||'txt-3'}));}catch(e){}
   segs=segs.sort((a,b)=>b.total-a.total).slice(0,8);
   new ApexCharts(document.getElementById('chart-seg'),{
-    chart:{type:'donut',height:230,background:'transparent'},theme:{mode:'dark'},
-    series:segs.map(s=>s.total),labels:segs.map(s=>s.nome),colors:segs.map(s=>s.cor),
-    legend:{position:'bottom',labels:{colors:'#A8B3CF'},fontSize:'11px'},dataLabels:{enabled:false},
-    plotOptions:{pie:{donut:{size:'62%',labels:{show:true,total:{show:true,label:'Total',color:'#A8B3CF',formatter:()=>fmt(segs.reduce((a,b)=>a+b.total,0))}}}}}
+    chart:{type:'donut',height:230,background:'transparent'},theme:{mode:temaAtual()},stroke:{colors:[tok('bg-1')]},
+    series:segs.map(s=>s.total),labels:segs.map(s=>s.nome),colors:segs.map(s=>tok(s.cor)),
+    legend:{position:'bottom',labels:{colors:tok('txt-2')},fontSize:'13px'},dataLabels:{enabled:false},
+    plotOptions:{pie:{donut:{size:'62%',labels:{show:true,total:{show:true,label:'Total',color:tok('txt-2'),formatter:()=>fmt(segs.reduce((a,b)=>a+b.total,0))}}}}}
   }).render();
   let funilDados=FUNIL;
   try{
@@ -1027,13 +1144,13 @@ async function renderDashboard(){
     if(r&&r.length)funilDados=r.map(x=>({f:x.pipeline,v:Number(x.total),c:pipeCor(x.pipeline)}));
   }catch(e){}
   const funilMax=Math.max.apply(null,funilDados.map(f=>f.v).concat(1));
-  document.getElementById('funil').innerHTML=funilDados.map(f=>'<div class="funnel-row"><div class="funnel-bar" style="width:'+Math.max(8,f.v/funilMax*100)+'%;background:linear-gradient(90deg,'+f.c+','+f.c+'cc)"><span>'+esc(f.f)+'</span><span>'+fmt(f.v)+'</span></div></div>').join('');
-  let ufs=[{u:'SP',v:.82,c:'#00E5FF'},{u:'MG',v:.18,c:'#7B4DFF'}];
+  document.getElementById('funil').innerHTML=funilDados.map(f=>'<div class="funnel-row"><div class="funnel-bar" style="width:'+Math.max(8,f.v/funilMax*100)+'%;background:'+f.c+'"><span>'+esc(f.f)+'</span><span>'+fmt(f.v)+'</span></div></div>').join('');
+  let ufs=[{u:'SP',v:.82,c:'var(--pipe-3)'},{u:'MG',v:.18,c:'var(--pipe-1)'}];
   try{
     const r=await apiGet('/api/clientes/por-estado');
     if(r&&r.length){
       const total=r.reduce((a,b)=>a+Number(b.total),0);
-      const cores=['#00E5FF','#7B4DFF','#FFB020','#22C55E','#FF6B35'];
+      const cores=['var(--pipe-4)','var(--pipe-3)','var(--pipe-2)','var(--pipe-1)','var(--txt-3)'];
       if(total>0)ufs=r.slice(0,5).map((x,i)=>({u:x.estado||'—',v:Number(x.total)/total,c:cores[i%cores.length]}));
     }
   }catch(e){}
@@ -1045,7 +1162,7 @@ function renderAtividades(f){
   if(f==='pendentes')arr=arr.filter(a=>!a.done);if(f==='concluidas')arr=arr.filter(a=>a.done);
   let html='',grupo='';
   arr.forEach(a=>{if(a.g!==grupo){grupo=a.g;html+='<div class="day-h">'+a.g+'</div>';}
-    html+='<div class="act-row"><div class="act-ic" style="background:'+a.cor+'22;color:'+a.cor+'">'+a.ic+'</div><div class="act-t"><div class="act-n">'+a.tipo+'</div><div class="act-s">'+a.sub+'</div></div><div class="chk'+(a.done?' on':'')+'" onclick="this.classList.toggle(\'on\');this.textContent=this.classList.contains(\'on\')?\'✓\':\'\'">'+(a.done?'✓':'')+'</div></div>';});
+    html+='<div class="act-row"><div class="act-ic"><i class="ico" data-lucide="'+a.ic+'"></i></div><div class="act-t"><div class="act-n">'+a.tipo+'</div><div class="act-s">'+a.sub+'</div></div><div class="chk'+(a.done?' on':'')+'" role="checkbox" aria-checked="'+a.done+'" tabindex="0" onclick="this.classList.toggle(\'on\');this.setAttribute(\'aria-checked\',this.classList.contains(\'on\'))"><i class="ico i14" data-lucide="check"></i></div></div>';});
   document.getElementById('ativ-lista').innerHTML=html||'<div class="empty">Nenhuma atividade.</div>';
 }
 function filtrarAtiv(el,f){document.querySelectorAll('#pg-atividades .tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderAtividades(f);}
@@ -1056,7 +1173,7 @@ async function perguntarIA(texto){
   const feed=document.getElementById('ai-feed');feed.innerHTML='<span class="spinner-sm"></span> Pensando...';
   const prompt='Você é a OneClick AI, assistente comercial da OneClick Soluções (TI enterprise), oferecendo também CotaçãoNaMão e uma linha de Manipulados (vitaminas, suplementos, dermatocosméticos), atuando em SP e MG. Base: ~48 mil leads (farmácias, médicos/clínicas, hospitais, postos). Responda objetiva e prática em português. Pergunta: '+q;
   try{const t=await chamarIA(prompt,800);feed.textContent=t;}
-  catch(e){feed.innerHTML='<span style="color:var(--warn)">⚠ IA indisponível no momento. Tente novamente.</span>';}
+  catch(e){feed.innerHTML='<span style="color:var(--warn)"><i class="ico i16" data-lucide="triangle-alert"></i> IA indisponível no momento. Tente novamente.</span>';}
 }
 
 function abrirQuickActions(){document.getElementById('modal-qa').classList.remove('hidden');}
@@ -1076,13 +1193,12 @@ async function carregarReps(){
   }catch(e){box.innerHTML='<div class="empty">Erro ao carregar ('+esc(e.message)+')</div>';}
 }
 function repCard(u){
-  const cor=u.papel==='admin'?'#00E5FF':'#7B61FF';
-  const st=u.ativo?'<span class="pill" style="background:#22C55E22;color:#22C55E">Ativo</span>':'<span class="pill" style="background:#EF444422;color:#EF4444">Inativo</span>';
-  return '<div class="lead-card" style="border-left-color:'+cor+'">'+
-    '<div class="lc-top" onclick="editarRep('+u.id+')"><div class="lc-av">'+(u.papel==='admin'?'⭐':'👤')+'</div>'+
+  const st=u.ativo?'<span class="pill" style="--pc:var(--ok)">Ativo</span>':'<span class="pill" style="--pc:var(--err)">Inativo</span>';
+  return '<div class="lead-card">'+
+    '<div class="lc-top" onclick="editarRep('+u.id+')"><div class="lc-av"><i class="ico" data-lucide="'+(u.papel==='admin'?'star':'user')+'"></i></div>'+
     '<div class="lc-info"><div class="lc-name">'+esc(u.nome)+'</div><div class="lc-meta">'+esc(u.email)+' · '+esc(u.papel)+'</div></div>'+st+'</div>'+
-    '<div class="lc-actions"><button class="qa call" onclick="event.stopPropagation();editarRep('+u.id+')">✏️</button>'+
-    '<button class="qa" style="color:'+(u.ativo?'#EF4444':'#22C55E')+'" onclick="event.stopPropagation();toggleRep('+u.id+','+(!u.ativo)+')">'+(u.ativo?'⏻':'✓')+'</button></div></div>';
+    '<div class="lc-actions"><button class="qa call" type="button" aria-label="Editar" title="Editar" onclick="event.stopPropagation();editarRep('+u.id+')"><i class="ico" data-lucide="pencil"></i></button>'+
+    '<button class="qa" type="button" aria-label="'+(u.ativo?'Desativar':'Ativar')+'" title="'+(u.ativo?'Desativar':'Ativar')+'" onclick="event.stopPropagation();toggleRep('+u.id+','+(!u.ativo)+')"><i class="ico" data-lucide="'+(u.ativo?'power':'check')+'"></i></button></div></div>';
 }
 function abrirNovoRep(){
   document.getElementById('rep-titulo').textContent='Novo representante';
@@ -1124,14 +1240,14 @@ async function salvarRep(){
       const body={nome,email,papel,ativo,regiao_cidade,regiao_estado,regiao_bairros};if(senha)body.senha=senha;
       resp=await apiPatch('/api/usuarios/'+id,body);
     }else{
-      if(!senha){toast('Defina uma senha','err');btn.innerHTML='💾 Salvar';btn.disabled=false;return;}
+      if(!senha){toast('Defina uma senha','err');btn.innerHTML='Salvar';btn.disabled=false;return;}
       resp=await apiPost('/api/usuarios',{nome,email,senha,papel,regiao_cidade,regiao_estado,regiao_bairros});
     }
     let msg='Salvo com sucesso';
-    if(resp&&resp.clientes_associados>0)msg+=' · ✅ '+fmt(resp.clientes_associados)+' clientes associados automaticamente à carteira';
+    if(resp&&resp.clientes_associados>0)msg+=' · '+fmt(resp.clientes_associados)+' clientes associados automaticamente à carteira';
     toast(msg,'ok');fecharModal('modal-rep');repsFiltroCache=null;carregarReps();
   }catch(e){toast('Erro: '+esc(e.message),'err');}
-  finally{btn.innerHTML='💾 Salvar';btn.disabled=false;}
+  finally{btn.innerHTML='Salvar';btn.disabled=false;}
 }
 async function toggleRep(id,novo){
   try{await apiPatch('/api/usuarios/'+id,{ativo:novo});toast(novo?'Ativado':'Desativado','ok');carregarReps();}
@@ -1157,17 +1273,17 @@ async function buscarUnicAtivos(pg){
 }
 function unicCard(c){
   const seg=c.segmento_nome||'';const wpp=(c.whatsapp||c.telefone||'').replace(/\D/g,'');const tel=(c.telefone||'').replace(/\D/g,'');
-  return '<div class="lead-card" style="border-left-color:#2D8CFF">'+
+  return '<div class="lead-card">'+
     '<div class="lc-top" onclick="verCliente('+c.id+')"><div class="lc-av">'+segEmoji(seg)+'</div>'+
     '<div class="lc-info"><div class="lc-name">'+esc(c.razao_social||c.nome_fantasia||'Sem nome')+'</div>'+
     '<div class="lc-meta">'+esc(seg||'—')+(c.cidade?' · '+esc(c.cidade):'')+(c.estado?'/'+esc(c.estado):'')+'</div>'+
     '<div class="lc-meta">'+fmt(c.unicpharma_pedidos_90d)+' pedidos · '+fmtMoeda(c.unicpharma_faturamento_90d)+' · última venda '+fmtData(c.unicpharma_ultima_venda)+'</div>'+
     flagsBadges(c)+'</div></div>'+
     '<div class="lc-actions">'+
-    (wpp?'<button class="qa wpp" onclick="event.stopPropagation();window.open(\'https://wa.me/55'+wpp+'\')">💬</button>':'')+
-    (tel?'<button class="qa call" onclick="event.stopPropagation();window.open(\'tel:'+tel+'\')">📞</button>':'')+
-    (c.email?'<button class="qa mail" onclick="event.stopPropagation();window.open(\'mailto:'+esc(c.email)+'\')">✉️</button>':'')+
-    '<button class="qa" style="margin-left:auto;color:var(--ai-violet);border-color:rgba(139,92,246,.4)" title="Sugerir abordagem" onclick="event.stopPropagation();sugerirProduto('+c.id+')">🤖</button>'+
+    (wpp?'<button class="qa wpp" type="button" aria-label="WhatsApp" title="WhatsApp" onclick="event.stopPropagation();window.open(\'https://wa.me/55'+wpp+'\')"><i class="ico" data-lucide="message-circle"></i></button>':'')+
+    (tel?'<button class="qa call" type="button" aria-label="Ligar" title="Ligar" onclick="event.stopPropagation();window.open(\'tel:'+tel+'\')"><i class="ico" data-lucide="phone"></i></button>':'')+
+    (c.email?'<button class="qa mail" type="button" aria-label="E-mail" title="E-mail" onclick="event.stopPropagation();window.open(\'mailto:'+esc(c.email)+'\')"><i class="ico" data-lucide="mail"></i></button>':'')+
+    '<button class="qa" type="button" style="margin-left:auto" title="Sugerir abordagem" aria-label="Sugerir abordagem" onclick="event.stopPropagation();sugerirProduto('+c.id+')"><i class="ico" data-lucide="bot"></i></button>'+
     '</div></div>';
 }
 
@@ -1187,14 +1303,21 @@ async function buscarMedicos(pg){
   }catch(e){document.getElementById('med-lista').innerHTML='<div class="empty">Erro ao carregar ('+esc(e.message)+')</div>';}
 }
 function medCard(m){
-  return '<div class="lead-card" style="border-left-color:#8B5CF6">'+
-    '<div class="lc-top"><div class="lc-av">🩺</div>'+
+  return '<div class="lead-card">'+
+    '<div class="lc-top"><div class="lc-av"><i class="ico" data-lucide="stethoscope"></i></div>'+
     '<div class="lc-info"><div class="lc-name">'+esc(m.nome||('CRM '+m.crm+'/'+m.uf))+'</div>'+
     '<div class="lc-meta">CRM '+esc(m.crm)+'/'+esc(m.uf)+'</div>'+
     '<div class="lc-meta">'+fmt(m.receitas_unicpharma_90d)+' receitas · '+fmtMoeda(m.valor_unicpharma_90d)+' · última '+fmtData(m.ultima_receita_unicpharma)+'</div>'+
     '</div></div></div>';
 }
 
+/* ===== Ícones Lucide — mesmo mecanismo do mockup (redesign/proposta-final.html): <i data-lucide> + lucide.createIcons().
+   kiss: um MutationObserver único redesenha após qualquer innerHTML, em vez de tocar cada render*(); sem CDN o <i> fica vazio (18px) e o rótulo continua. ===== */
+function drawIcons(){if(window.lucide&&lucide.createIcons&&document.querySelector('i[data-lucide]'))try{lucide.createIcons({attrs:{'aria-hidden':'true'}})}catch(e){}}
+let iconsAgendado=false;
+new MutationObserver(()=>{if(iconsAgendado)return;iconsAgendado=true;setTimeout(()=>{iconsAgendado=false;drawIcons();},0);}).observe(document.body,{childList:true,subtree:true});
+window.aplicarTema(temaAtual(),false); // sincroniza rótulo "Tema" (#tema-atual) — o <head> rodou antes do body existir
+drawIcons();
 verificarSessao();
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
 </script>
