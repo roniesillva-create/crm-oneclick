@@ -230,6 +230,9 @@ input::placeholder,textarea::placeholder{color:var(--txt-3);opacity:1}
 .chart-card h3{font-size:17px;line-height:22px;font-weight:600;margin-bottom:var(--s-2)}
 .conv{font-size:29px;line-height:32px;font-weight:600;letter-spacing:-.02em}
 .funnel-row{margin-bottom:var(--s-2)}
+.funnel-row.narrow{display:flex;align-items:center;gap:var(--s-2)} /* item 7: barra estreita leva o rótulo pra fora */
+.funnel-row.narrow .funnel-bar{flex:0 0 auto}
+.funnel-out{font-size:13px;line-height:18px;color:var(--txt-1);white-space:nowrap}
 .funnel-bar{height:32px;border-radius:var(--r);display:flex;align-items:center;justify-content:space-between;padding:0 var(--s-3);font-size:13px;font-weight:500;color:var(--bg-0)}
 .seg-row{display:flex;align-items:center;gap:var(--s-3);padding:var(--s-2) 0}
 .seg-dot{width:8px;height:8px;border-radius:var(--r-pill);flex:0 0 auto}
@@ -370,10 +373,14 @@ input::placeholder,textarea::placeholder{color:var(--txt-3);opacity:1}
   @keyframes bell-ring{20%{transform:rotate(12deg)}40%{transform:rotate(-12deg)}60%{transform:rotate(8deg)}80%{transform:rotate(-8deg)}to{transform:none}}
   @keyframes ai-pulse{0%,100%{opacity:1}50%{opacity:.65}}
   @keyframes ico-flip{from{transform:rotate(0)}to{transform:rotate(180deg)}}
+  .panel-in{animation:panel-in var(--dur-3) var(--ease)} /* motion: conteúdo do painel da ficha entra (DESIGN §7 "Painel ficha"); largura fixa, só opacity+translateX */
+  @keyframes panel-in{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
 }
 /* motion: reduced-motion — nenhuma regra acima existe fora do no-preference; aqui só garante o estado final estático */
 @media (prefers-reduced-motion:reduce){
   .qa svg,.nav-btn svg,.fab svg,.bell svg,#btn-tema svg,.ai-card .ai-h svg.ico,.ai-hero svg.hero-ic{animation:none;transition:none;transform:none;opacity:1}
+  .panel-in{animation:pf-fade 1ms linear} /* motion: reduced — painel só opacity */
+  @keyframes pf-fade{from{opacity:0}to{opacity:1}}
 }
 /* ===== 17. ALVOS DE TOQUE ≤1023px — DESIGN §5 (36 desktop / 44 mobile); ícone continua 18-20px, cresce só a área clicável (fix pack 1) ===== */
 @media (max-width:1023px){
@@ -383,9 +390,43 @@ input::placeholder,textarea::placeholder{color:var(--txt-3);opacity:1}
   .chk{position:relative}
   .chk::before{content:"";position:absolute;inset:-13px} /* hit-area 44×44 (QA C7: -12 dava 42 com borda 1px) mantendo a caixa visual de 20px */
 }
+/* ===== 18. DESKTOP ≥1024 (PR2) — sidebar 56 + Leads em duas colunas (DESIGN §5 larguras, §6 sidebar/linha, §7 painel). Abaixo de 1024 nada muda ===== */
+.desk-only,.sidebar{display:none}
 @media (min-width:1024px){
   .kpi{height:96px;padding:var(--s-4)}
   .kpi .v{font-size:29px;line-height:32px}
+  .desk-only{display:block}
+  #app{padding-bottom:0}
+  .app-wrap{max-width:none;display:grid;grid-template-columns:56px minmax(0,1fr);min-height:100vh}
+  .main{min-width:0}
+  .sidebar{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;align-items:center;gap:var(--s-2);padding:var(--s-2) 0;background:var(--rail-bg);border-right:1px solid var(--line)}
+  .sidebar .nav-btn{width:40px;height:40px;flex:0 0 40px;display:flex;align-items:center;justify-content:center;gap:0;border-radius:var(--r);color:var(--rail-txt);font-size:0}
+  .sidebar .nav-btn:hover{color:var(--rail-txt-on);background:color-mix(in srgb,var(--rail-txt-on) 10%,transparent)}
+  .sidebar .nav-btn.active{color:var(--rail-txt-on);box-shadow:inset 2px 0 0 var(--rail-txt-on)}
+  .sidebar .nav-btn:focus-visible{outline-color:var(--rail-txt-on);outline-offset:-2px}
+  .bottom-nav{display:none}
+  .page{padding:var(--s-5)}
+  .page.active{max-width:1280px;margin:0 auto}
+  .kpi-grid{grid-template-columns:repeat(4,1fr)}
+  .toast{left:auto;right:var(--s-5);bottom:var(--s-5);transform:none;max-width:420px}
+  /* Leads: lista (min 560) + painel da ficha (480) */
+  #pg-leads.active{display:grid;grid-template-columns:minmax(560px,1fr) 480px;gap:var(--s-5);align-items:start}
+  .leads-col{min-width:0}
+  .pg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s-3)}
+  .btn-novo.desk-only{display:inline-flex;width:auto;height:36px;padding:0 var(--s-4);flex:0 0 auto;margin-top:2px}
+  #painel-ficha{display:flex;flex-direction:column;position:sticky;top:calc(56px + var(--s-5));height:calc(100vh - 56px - 2 * var(--s-5));background:var(--bg-1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .pf-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s-2);text-align:center;padding:var(--s-6) var(--s-5);color:var(--txt-2)}
+  .pf-empty .ico{color:var(--txt-3)}
+  .pf-empty h3{font-size:17px;line-height:22px;font-weight:600;color:var(--txt-1)}
+  .pf-empty p{font-size:13px;line-height:18px;color:var(--txt-3)}
+  .pf-ficha{display:none;flex:1;min-height:0;flex-direction:column}
+  #painel-ficha.open .pf-empty{display:none}
+  #painel-ficha.open .pf-ficha{display:flex}
+  .pf-head{display:flex;align-items:center;gap:var(--s-3);height:56px;padding:0 var(--s-3) 0 var(--s-4);border-bottom:1px solid var(--line);flex:0 0 auto}
+  .pf-head h2{flex:1;min-width:0;font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pf-body{flex:1;min-height:0;overflow:auto;padding:var(--s-4)}
+  .lead-card.sel{background:var(--accent-soft);box-shadow:inset 2px 0 0 var(--accent-txt)} /* DESIGN §6 linha selecionada */
+  #lista-clientes:focus-visible,.lead-card:focus-visible{outline-offset:-2px}
 }
 </style>
 </head>
@@ -404,6 +445,14 @@ input::placeholder,textarea::placeholder{color:var(--txt-3);opacity:1}
 
 <div id="app" class="hidden">
  <div class="app-wrap">
+  <nav class="sidebar" aria-label="Navegação principal"><!-- PR2: só >=1024px; mesma classe .nav-btn/data-pg da bottom-nav, assim irPara() já marca o ativo -->
+    <button class="nav-btn active" type="button" data-pg="home" onclick="irPara('home')" title="Início" aria-label="Início"><i class="ico i20" data-lucide="home"></i></button>
+    <button class="nav-btn" type="button" data-pg="leads" onclick="irPara('leads')" title="Leads" aria-label="Leads"><i class="ico i20" data-lucide="users"></i></button>
+    <button class="nav-btn" type="button" data-pg="roteiro" onclick="irPara('roteiro')" title="Roteiro" aria-label="Roteiro"><i class="ico i20" data-lucide="map"></i></button>
+    <button class="nav-btn" type="button" data-pg="dashboard" onclick="irPara('dashboard')" title="Dashboard" aria-label="Dashboard"><i class="ico i20" data-lucide="layout-dashboard"></i></button>
+    <button class="nav-btn" type="button" data-pg="mais" onclick="irPara('mais')" title="Mais" aria-label="Mais"><i class="ico i20" data-lucide="ellipsis"></i></button>
+  </nav>
+  <div class="main">
   <div class="topbar">
     <div class="tb-brand"><span id="logo-top"></span><div class="tt"><b>ONE<span>CLICK</span> CRM</b><small>ENTERPRISE v4</small></div></div>
     <button class="bell" id="btn-tema" type="button" aria-label="Alternar tema claro/escuro" title="Tema" onclick="alternarTema()"><i class="ico" data-lucide="sun-moon"></i></button>
@@ -427,8 +476,10 @@ input::placeholder,textarea::placeholder{color:var(--txt-3);opacity:1}
   </div>
 
   <div class="page" id="pg-leads">
-    <h1 class="ptitle">Leads</h1>
-    <div class="subdate">Sua base comercial SP + MG</div>
+   <div class="leads-col">
+    <div class="pg-head"><div><h1 class="ptitle">Leads</h1>
+    <div class="subdate">Sua base comercial SP + MG</div></div>
+    <button class="btn-primary btn-novo desk-only" type="button" onclick="abrirQuickActions()"><i class="ico" data-lucide="plus"></i>Novo</button></div>
     <div class="tabs" id="lead-tabs"></div>
     <div class="tabs hidden" id="prio-chips" style="margin-top:8px"></div>
     <div class="searchbar">
@@ -437,8 +488,16 @@ input::placeholder,textarea::placeholder{color:var(--txt-3);opacity:1}
       <button class="btn-filt" type="button" aria-label="Filtros" title="Filtros" onclick="abrirFiltros()"><i class="ico" data-lucide="sliders-horizontal"></i></button>
     </div>
     <div class="list-info" id="lista-total">—</div>
-    <div id="lista-clientes"><div class="spinner"></div></div>
+    <div id="lista-clientes" tabindex="0" aria-label="Lista de clientes"><div class="spinner"></div></div>
     <div class="pager" id="pager"></div>
+   </div>
+   <aside id="painel-ficha" class="desk-only" aria-label="Ficha do lead" tabindex="-1"><!-- PR2: coluna direita; #d-content é MOVIDO pra cá no desktop (nó único) -->
+    <div class="pf-empty"><i class="ico i32" data-lucide="building-2"></i><h3>Selecione um lead</h3><p>Clique em uma empresa na lista ou use as setas e Enter</p></div>
+    <div class="pf-ficha">
+      <div class="pf-head"><h2 id="pf-titulo">Ficha</h2><button class="x" type="button" aria-label="Fechar ficha" onclick="fecharPainel()"><i class="ico" data-lucide="x"></i></button></div>
+      <div id="pf-body" class="pf-body"></div>
+    </div>
+   </aside>
   </div>
 
   <div class="page" id="pg-roteiro">
@@ -553,6 +612,7 @@ input::placeholder,textarea::placeholder{color:var(--txt-3);opacity:1}
     <button class="nav-btn" type="button" data-pg="roteiro" onclick="irPara('roteiro')"><span class="ni"><i class="ico i20" data-lucide="map"></i></span>Roteiro</button>
     <button class="nav-btn" type="button" data-pg="mais" onclick="irPara('mais')"><span class="ni"><i class="ico i20" data-lucide="ellipsis"></i></span>Mais</button>
   </nav>
+  </div><!-- /.main -->
  </div>
 </div>
 
@@ -797,6 +857,7 @@ function irPara(pg){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.pg===pg));
   window.scrollTo(0,0);
   if(pg==='leads'&&!clientesCache.length)buscarClientes(0);
+  if(pg==='leads')sincronizarFicha(); // PR2 fix pack 1: ao entrar em Leads converge ficha modal/painel pelo estado
   if(pg==='roteiro'){initMapa();if(!mapaLayer)renderRoteiro(ROTA_MOCK.visitas,ROTA_MOCK.resumo);}
   if(pg==='dashboard'&&!dashRendered)renderDashboard();
   if(pg==='atividades')renderAtividades('todas');
@@ -866,7 +927,7 @@ async function carregarLeadsRecentes(){
 function leadCard(c){
   const seg=c.segmento||c.segmento_nome||'';
   const wpp=(c.whatsapp||c.telefone||'').replace(/\D/g,'');const tel=(c.telefone||'').replace(/\D/g,'');
-  return '<div class="lead-card">'+
+  return '<div class="lead-card" data-id="'+c.id+'">'+
     '<div class="lc-top" onclick="verCliente('+c.id+')"><div class="lc-av">'+segEmoji(seg)+'</div>'+
     '<div class="lc-info"><div class="lc-name">'+esc(c.razao_social||c.nome_fantasia||'Sem nome')+'</div>'+
     '<div class="lc-meta">'+esc(seg||'—')+(c.cidade?' · '+esc(c.cidade):'')+(c.estado?'/'+esc(c.estado):'')+'</div>'+flagsBadges(c)+'</div>'+pill(c.pipeline)+'</div>'+
@@ -961,12 +1022,14 @@ function aplicarFiltros(){
 function limparFiltros(){filtros={segmento_id:'',pipeline:'',estado:'',whatsapp:'',email:'',bandeira:'',responsavel_id:'',prioridade:''};document.querySelectorAll('#prio-chips .tab').forEach((t,i)=>t.classList.toggle('active',i===0));fecharModal('modal-filtros');buscarClientes(0);}
 
 function verCliente(id){
-  document.getElementById('modal-detalhe').classList.remove('hidden');
+  selecionadoId=id;marcarSelecao();
+  if(desktopPainel())abrirPainel();else{montarFicha(false);document.getElementById('modal-detalhe').classList.remove('hidden');} // PR2: desktop+Leads abre no painel; senão modal (igual antes)
   document.getElementById('d-content').innerHTML='<div class="spinner"></div>';
   let c=clientesCache.find(x=>x.id===id)||unicCache.find(x=>x.id===id)||LEADS_MOCK.find(x=>x.id===id);
   if(c){renderDetalhe(c);}else{apiGet('/api/clientes/'+id).then(renderDetalhe).catch(()=>{document.getElementById('d-content').innerHTML='<div class="empty">Erro ao carregar</div>';});}
 }
 function renderDetalhe(c){
+  const pt=document.getElementById('pf-titulo');if(pt)pt.textContent=c.razao_social||c.nome_fantasia||'Ficha'; // PR2: cabeçalho do painel
   const seg=c.segmento||c.segmento_nome||'';
   const wpp=(c.whatsapp||c.telefone||'').replace(/\D/g,'');const tel=(c.telefone||'').replace(/\D/g,'');
   const opc=segmentosCache.map(s=>'<option value="'+s.id+'" '+(c.segmento_id===s.id?'selected':'')+'>'+esc(s.nome)+'</option>').join('');
@@ -1170,7 +1233,7 @@ async function renderDashboard(){
     if(r&&r.length)funilDados=r.map(x=>({f:x.pipeline,v:Number(x.total),c:pipeCor(x.pipeline)}));
   }catch(e){}
   const funilMax=Math.max.apply(null,funilDados.map(f=>f.v).concat(1));
-  document.getElementById('funil').innerHTML=funilDados.map(f=>'<div class="funnel-row"><div class="funnel-bar" style="width:'+Math.max(8,f.v/funilMax*100)+'%;background:'+f.c+'"><span>'+esc(f.f)+'</span><span>'+fmt(f.v)+'</span></div></div>').join('');
+  document.getElementById('funil').innerHTML=funilDados.map(f=>{const pct=Math.max(8,f.v/funilMax*100),estreita=pct<40;return '<div class="funnel-row'+(estreita?' narrow':'')+'"><div class="funnel-bar" style="width:'+pct+'%;background:'+f.c+'">'+(estreita?'':'<span>'+esc(f.f)+'</span><span>'+fmt(f.v)+'</span>')+'</div>'+(estreita?'<span class="funnel-out">'+esc(f.f)+' · '+fmt(f.v)+'</span>':'')+'</div>';}).join(''); // item 7: barra <40% leva o rótulo pra fora (mesmos dados)
   let ufs=[{u:'SP',v:.82,c:'var(--pipe-3)'},{u:'MG',v:.18,c:'var(--pipe-1)'}];
   try{
     const r=await apiGet('/api/clientes/por-estado');
@@ -1203,7 +1266,7 @@ async function perguntarIA(texto){
 }
 
 function abrirQuickActions(){document.getElementById('modal-qa').classList.remove('hidden');}
-function fecharModal(id){document.getElementById(id).classList.add('hidden');}
+function fecharModal(id){document.getElementById(id).classList.add('hidden');if(id==='modal-detalhe')fecharPainel();} // PR2: no desktop a ficha vive no painel — fechar o "modal" fecha/limpa o painel
 function emBreve(){toast('Módulo em breve','ok');}
 function toast(msg,tipo){const t=document.createElement('div');t.className='toast toast-'+(tipo==='ok'?'ok':'err');t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden');}));
@@ -1299,7 +1362,7 @@ async function buscarUnicAtivos(pg){
 }
 function unicCard(c){
   const seg=c.segmento_nome||'';const wpp=(c.whatsapp||c.telefone||'').replace(/\D/g,'');const tel=(c.telefone||'').replace(/\D/g,'');
-  return '<div class="lead-card">'+
+  return '<div class="lead-card" data-id="'+c.id+'">'+
     '<div class="lc-top" onclick="verCliente('+c.id+')"><div class="lc-av">'+segEmoji(seg)+'</div>'+
     '<div class="lc-info"><div class="lc-name">'+esc(c.razao_social||c.nome_fantasia||'Sem nome')+'</div>'+
     '<div class="lc-meta">'+esc(seg||'—')+(c.cidade?' · '+esc(c.cidade):'')+(c.estado?'/'+esc(c.estado):'')+'</div>'+
@@ -1360,6 +1423,40 @@ document.addEventListener('pointerdown',e=>{const b=e.target&&e.target.closest&&
   const sync=()=>fab.classList.toggle('is-open',!m.classList.contains('hidden'));
   new MutationObserver(sync).observe(m,{attributes:true,attributeFilter:['class']});sync();
 })();
+/* ===== PR2 — painel da ficha no desktop (≥1024 + página Leads), seleção persistente, teclado, Leaflet em resize. Abaixo de 1024 o modal continua igual ===== */
+let selecionadoId=null;
+const mqDesk=window.matchMedia('(min-width:1024px)');
+function desktopPainel(){return mqDesk.matches&&document.getElementById('pg-leads').classList.contains('active');}
+function montarFicha(noPainel){ // kiss: #d-content (e seus ids únicos: #dt-ativ, #d-seg…) existe UMA vez — é movido entre o sheet do modal e o painel
+  const dc=document.getElementById('d-content'),alvo=noPainel?document.getElementById('pf-body'):document.querySelector('#modal-detalhe .sheet');
+  if(dc&&alvo&&dc.parentNode!==alvo)alvo.appendChild(dc);
+}
+function abrirPainel(){const p=document.getElementById('painel-ficha'),b=document.getElementById('pf-body');montarFicha(true);p.classList.add('open');b.classList.remove('panel-in');void b.offsetWidth;b.classList.add('panel-in');}
+function fecharPainel(){const p=document.getElementById('painel-ficha');if(!p)return;p.classList.remove('open');selecionadoId=null;marcarSelecao();}
+function marcarSelecao(){document.querySelectorAll('#lista-clientes .lead-card[data-id]').forEach(el=>el.classList.toggle('sel',selecionadoId!=null&&+el.dataset.id===selecionadoId));}
+new MutationObserver(marcarSelecao).observe(document.getElementById('lista-clientes'),{childList:true}); // seleção sobrevive ao re-render de buscarClientes(); se o id saiu da página, o painel segue aberto
+document.getElementById('lista-clientes').addEventListener('keydown',e=>{ // teclado só no desktop: setas movem e abrem no painel, Enter abre, Esc fecha
+  if(!desktopPainel())return;const cards=[...document.querySelectorAll('#lista-clientes .lead-card[data-id]')];if(!cards.length)return;
+  let i=cards.findIndex(c=>+c.dataset.id===selecionadoId);
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();i=e.key==='ArrowDown'?Math.min(cards.length-1,i+1):Math.max(0,i-1);verCliente(+cards[i].dataset.id);cards[i].scrollIntoView({block:'nearest'});}
+  else if(e.key==='Enter'){if(i>=0)verCliente(+cards[i].dataset.id);}
+  else if(e.key==='Escape'){fecharPainel();}
+});
+document.getElementById('painel-ficha').addEventListener('keydown',e=>{if(e.key==='Escape')fecharPainel();});
+let rszTimer=null;
+function aoRedimensionar(){clearTimeout(rszTimer);rszTimer=setTimeout(()=>{if(mapa)mapa.invalidateSize();sincronizarFicha();},150);} // Leaflet precisa recalcular quando o container muda (sidebar/max-width)
+window.addEventListener('resize',aoRedimensionar);
+function sincronizarFicha(){ // kiss: idempotente — lê o ESTADO (mqDesk.matches, página, modal/painel abertos) e converge pro layout certo; nunca abre ficha fechada; 2 chamadas = no-op
+  const modal=document.getElementById('modal-detalhe'),p=document.getElementById('painel-ficha'),emLeads=document.getElementById('pg-leads').classList.contains('active');
+  const modalAberto=!modal.classList.contains('hidden'),painelAberto=p.classList.contains('open');
+  if(mqDesk.matches){ // desktop: na página Leads a ficha vive no painel; fora de Leads não mexe (painel fica como está, escondido com a página)
+    if(emLeads){
+      if(modalAberto&&selecionadoId!=null){modal.classList.add('hidden');abrirPainel();}
+      else if(painelAberto)montarFicha(true); // já no painel: só garante o nó único no lugar certo (sem reabrir/animar)
+    }
+  }else if(painelAberto){p.classList.remove('open');montarFicha(false);modal.classList.remove('hidden');} // mobile: painel aberto volta pro modal
+}
+mqDesk.addEventListener('change',()=>{sincronizarFicha();aoRedimensionar();}); // o evento pode ser coalescido em resizes rápidos (QA-PR2): resize e irPara('leads') também chamam sincronizarFicha()
 verificarSessao();
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
 </script>
