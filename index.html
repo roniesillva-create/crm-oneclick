@@ -1599,7 +1599,7 @@ mqDesk.addEventListener('change',()=>{sincronizarFicha();aoRedimensionar();}); /
     function sanitizar(t){
       let s=String(t==null?'':t);
       try{s=s.normalize('NFKC');}catch(e){} // largura total -> ASCII (１２３ -> 123), ligaturas etc.
-      s=s.replace(/[­​-‏‪-‮⁠-⁤﻿]/g,''); // invisíveis: soft hyphen, zero-width, marcas bidi, word joiner, BOM
+      s=s.replace(/[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2064\ufeff]/g,''); // invisíveis: soft hyphen, zero-width, marcas bidi, word joiner, BOM
       s=s.replace(/\s+/g,' '); // tab, quebra de linha, NBSP -> 1 espaço (a tolerância abaixo conta caracteres entre dígitos)
       s=s.replace(/\[([^\]]*)\]\([^)]*\)/g,'$1');
       s=s.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu,' ');
